@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@theme {
+  --color-ink-950: #04051a;
+  --color-ink-900: #080a26;
+  --color-ink-800: #10133a;
+  --color-brand-300: #a5a8ff;
+  --color-brand-400: #7c80ff;
+  --color-brand-500: #5a5ef5;
+  --color-brand-600: #4044d8;
+  --color-brand-700: #2f32b0;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-float-delayed: float 7s ease-in-out 1.5s infinite;
+  --animate-fade-up: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+body {
+  background: var(--color-ink-950);
+  color: #fff;
+}
+
+/* Faint square grid used behind hero sections */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* Scattered "star" dots */
+.bg-stars {
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgb(255 255 255 / 0.5), transparent),
+    radial-gradient(1px 1px at 78% 12%, rgb(255 255 255 / 0.35), transparent),
+    radial-gradient(1px 1px at 34% 72%, rgb(255 255 255 / 0.3), transparent),
+    radial-gradient(1px 1px at 88% 64%, rgb(255 255 255 / 0.4), transparent),
+    radial-gradient(1px 1px at 56% 38%, rgb(255 255 255 / 0.25), transparent),
+    radial-gradient(1px 1px at 6% 86%, rgb(255 255 255 / 0.3), transparent),
+    radial-gradient(1px 1px at 66% 90%, rgb(255 255 255 / 0.3), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

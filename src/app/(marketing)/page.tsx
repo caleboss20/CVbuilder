@@ -1,0 +1,31 @@
+import { AiDemo } from "@/components/marketing/ai-demo";
+import { Hero } from "@/components/marketing/hero";
+import { Problems } from "@/components/marketing/problems";
+import { siteConfig } from "@/lib/site";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: siteConfig.name,
+  url: siteConfig.url,
+  description: siteConfig.description,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Any",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+};
+
+export default function HomePage() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\u003c"),
+        }}
+      />
+      <Hero />
+      <Problems />
+      <AiDemo />
+    </>
+  );
+}
