@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { FinishHook } from "./finish-hook";
 import { SectionHeading } from "./section-heading";
 import {
   DownloadVisual,
@@ -59,7 +60,7 @@ export function HowItWorks() {
               From blank page to <em>ready to send</em> in three steps
             </>
           }
-          description="No design skills and no Word headaches. Most students finish their first CV in under 15 minutes."
+          description="No design skills and no Word headaches. Pick a design, answer a few questions and you’re done."
         />
 
         <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-16">
@@ -140,6 +141,8 @@ export function HowItWorks() {
             </div>
           </div>
         </div>
+
+        <FinishHook />
       </div>
     </section>
   );
