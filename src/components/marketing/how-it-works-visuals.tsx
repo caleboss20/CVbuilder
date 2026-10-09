@@ -1,17 +1,23 @@
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
+import {
+  AtsClassicThumb,
+  ClassicBlueThumb,
+  MonochromeThumb,
+  ScaledPage,
+} from "./template-thumbs";
 
 /*
  * Animated visuals for the "How it works" steps.
- * Each one animates when an ancestor has data-active="true" (the `group-data-[active=true]:` variant
- * in globals.css) and resets instantly when it goes inactive.
+ * Each one animates when its `group` wrapper has data-active="true" and resets
+ * instantly when it goes inactive.
  */
 
 /* ------------------------------ Step 1 ------------------------------ */
 
 const thumbs = [
-  { name: "Monochrome", rotate: "-rotate-6", shift: "translate-x-6" },
-  { name: "Classic Blue", rotate: "rotate-0", shift: "translate-x-0" },
-  { name: "Elegant Serif", rotate: "rotate-6", shift: "-translate-x-6" },
+  { name: "Monochrome", page: <MonochromeThumb />, rotate: "-rotate-6", shift: "translate-x-8" },
+  { name: "ATS Classic", page: <AtsClassicThumb />, rotate: "rotate-0", shift: "translate-x-0" },
+  { name: "Classic Blue", page: <ClassicBlueThumb />, rotate: "rotate-6", shift: "-translate-x-8" },
 ];
 
 export function PickTemplateVisual() {
@@ -23,28 +29,28 @@ export function PickTemplateVisual() {
           <div
             key={t.name}
             className={`flex flex-col items-center gap-3 transition-all duration-0 group-data-[active=true]:duration-700 ${
-              i === 0 ? `group-data-[active=true]:delay-100` : i === 2 ? `group-data-[active=true]:delay-200` : ""
+              i === 0 ? "group-data-[active=true]:delay-100" : i === 2 ? "group-data-[active=true]:delay-200" : ""
             } ${t.rotate} ${t.shift} opacity-0 group-data-[active=true]:translate-x-0 group-data-[active=true]:rotate-0 group-data-[active=true]:opacity-100`}
           >
             <div
-              className={`relative w-24 rounded-md bg-white p-2 shadow-lg transition-all duration-0 sm:w-32 ${
+              className={`relative rounded-[3px] shadow-xl transition-all duration-0 ${
                 chosen
-                  ? `group-data-[active=true]:-translate-y-3 group-data-[active=true]:scale-105 group-data-[active=true]:shadow-[0_0_40px_rgb(124_128_255/0.6)] group-data-[active=true]:ring-2 group-data-[active=true]:ring-brand-400 group-data-[active=true]:duration-500 group-data-[active=true]:delay-[900ms]`
-                  : `group-data-[active=true]:opacity-60 group-data-[active=true]:duration-500 group-data-[active=true]:delay-[900ms]`
+                  ? "group-data-[active=true]:-translate-y-3 group-data-[active=true]:scale-110 group-data-[active=true]:shadow-[0_0_40px_rgb(124_128_255/0.6)] group-data-[active=true]:ring-2 group-data-[active=true]:ring-brand-400 group-data-[active=true]:duration-500 group-data-[active=true]:delay-[900ms]"
+                  : "group-data-[active=true]:opacity-55 group-data-[active=true]:duration-500 group-data-[active=true]:delay-[900ms]"
               }`}
             >
-              {i === 0 && <MiniSidebar />}
-              {i === 1 && <MiniClassic />}
-              {i === 2 && <MiniSerif />}
+              <ScaledPage>{t.page}</ScaledPage>
               {chosen && (
-                <span
-                  className={`absolute -right-2 -top-2 grid size-6 scale-0 place-items-center rounded-full bg-brand-500 text-white shadow-[0_0_14px_rgb(124_128_255/0.8)] transition-transform duration-0 group-data-[active=true]:scale-100 group-data-[active=true]:duration-300 group-data-[active=true]:delay-[1300ms]`}
-                >
+                <span className="absolute -right-2 -top-2 grid size-6 scale-0 place-items-center rounded-full bg-brand-500 text-white shadow-[0_0_14px_rgb(124_128_255/0.8)] transition-transform duration-0 group-data-[active=true]:scale-100 group-data-[active=true]:duration-300 group-data-[active=true]:delay-[1300ms]">
                   <Check />
                 </span>
               )}
             </div>
-            <span className="text-xs text-white/60">{t.name}</span>
+            <span
+              className={`text-xs ${chosen ? "text-white group-data-[active=true]:translate-y-2 transition-transform duration-500" : "text-white/55"}`}
+            >
+              {t.name}
+            </span>
           </div>
         );
       })}
@@ -54,68 +60,6 @@ export function PickTemplateVisual() {
 
 function Bar({ w, c = "bg-slate-200", h = "h-1" }: { w: string; c?: string; h?: string }) {
   return <span className={`block rounded-full ${h} ${w} ${c}`} />;
-}
-
-function MiniSidebar() {
-  return (
-    <div className="grid aspect-[1/1.35] grid-cols-[35%_1fr] gap-1.5 overflow-hidden rounded-sm">
-      <div className="space-y-1.5 bg-slate-100 p-1.5">
-        <span className="mx-auto block size-5 rounded-full bg-slate-300" />
-        <Bar w="w-full" c="bg-slate-300" />
-        <Bar w="w-3/4" />
-        <Bar w="w-full" />
-        <Bar w="w-2/3" />
-      </div>
-      <div className="space-y-1.5 py-1.5 pr-1">
-        <Bar w="w-full" c="bg-slate-800" h="h-1.5" />
-        <Bar w="w-2/3" />
-        <Bar w="w-full" c="bg-slate-400" />
-        <Bar w="w-full" />
-        <Bar w="w-5/6" />
-        <Bar w="w-full" c="bg-slate-400" />
-        <Bar w="w-full" />
-        <Bar w="w-3/4" />
-      </div>
-    </div>
-  );
-}
-
-function MiniClassic() {
-  return (
-    <div className="aspect-[1/1.35] space-y-1.5 overflow-hidden rounded-sm p-1">
-      <div className="flex gap-1.5">
-        <span className="block h-7 w-6 rounded-sm bg-slate-300" />
-        <div className="flex-1 space-y-1 pt-0.5">
-          <Bar w="w-full" c="bg-[#1e3a5f]" h="h-1.5" />
-          <Bar w="w-3/4" />
-          <Bar w="w-2/3" />
-        </div>
-      </div>
-      <Bar w="w-1/2" c="bg-[#1e3a5f]" />
-      <Bar w="w-full" />
-      <Bar w="w-5/6" />
-      <Bar w="w-1/2" c="bg-[#1e3a5f]" />
-      <Bar w="w-full" />
-      <Bar w="w-full" />
-      <Bar w="w-2/3" />
-    </div>
-  );
-}
-
-function MiniSerif() {
-  return (
-    <div className="aspect-[1/1.35] space-y-1.5 overflow-hidden rounded-sm p-1.5">
-      <Bar w="w-3/4" c="bg-slate-900" h="h-2" />
-      <Bar w="w-full" />
-      <span className="block h-0.5 w-full bg-slate-800" />
-      <Bar w="w-full" />
-      <Bar w="w-5/6" />
-      <span className="block h-0.5 w-full bg-slate-800" />
-      <Bar w="w-full" />
-      <Bar w="w-full" />
-      <Bar w="w-2/3" />
-    </div>
-  );
 }
 
 /* ------------------------------ Step 2 ------------------------------ */
