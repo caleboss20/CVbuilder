@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cvExamples, getCvExample } from "@/lib/cv-examples";
 import { siteConfig } from "@/lib/site";
-import { AtsCv } from "@/components/cv/ats-cv";
+import { CvTemplate } from "@/components/cv/cv-templates";
 import { CvIcon } from "@/components/cv/cv-icon";
 import { ButtonLink } from "@/components/ui/button";
 
@@ -89,7 +89,7 @@ export default async function CvExamplePage({ params }: PageProps<"/cv-examples/
             aria-label={`${example.course} CV example`}
             className="overflow-hidden rounded-md shadow-[0_0_60px_-15px_rgb(124_128_255/0.6)]"
           >
-            <AtsCv doc={example.cv} />
+            <CvTemplate example={example} />
           </article>
 
           <aside className="space-y-5 lg:sticky lg:top-28">

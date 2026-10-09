@@ -30,6 +30,8 @@ export type CvDoc = {
   skills: string[];
 };
 
+export type CvTemplateName = "ats" | "elegant" | "band" | "timeline" | "photo";
+
 export type CvExample = {
   slug: string;
   course: string;
@@ -39,7 +41,13 @@ export type CvExample = {
   intro: string;
   tips: string[];
   cv: CvDoc;
+  /** Job title line under the name, e.g. "Nursing Student". */
+  role: string;
+  template: CvTemplateName;
+  photo?: string;
 };
+
+type BaseExample = Omit<CvExample, "role" | "template" | "photo">;
 
 const contact = (name: string, city = "Kumasi") => [
   `${city}, Ghana`,
@@ -47,7 +55,7 @@ const contact = (name: string, city = "Kumasi") => [
   `${name.toLowerCase().replace(/[^a-z]+/g, ".")}@email.com`,
 ];
 
-export const cvExamples: CvExample[] = [
+const baseExamples: BaseExample[] = [
   // ---------------------------------------------------------------- row 0
   {
     slug: "nursing",
@@ -712,6 +720,43 @@ export const cvExamples: CvExample[] = [
     },
   },
 ];
+
+/** Role line, template design and optional photo for each course. */
+const looks: Record<string, Pick<CvExample, "role" | "template" | "photo">> = {
+  nursing: { role: "Nursing Student", template: "ats" },
+  "computer-science": {
+    role: "Computer Science Student",
+    template: "photo",
+    photo: "/images/demo/ama-mensah.webp",
+  },
+  accounting: { role: "Accounting Student", template: "band" },
+  midwifery: { role: "Midwifery Student", template: "elegant" },
+  "civil-engineering": { role: "Civil Engineering Graduate", template: "timeline" },
+  pharmacy: { role: "Pharmacy Student", template: "elegant" },
+  law: { role: "Law Student", template: "band" },
+  "national-service": {
+    role: "Electrical Engineer · National Service",
+    template: "photo",
+    photo: "/images/demo/osborn-appiah.webp",
+  },
+  banking: { role: "Banking and Finance Student", template: "elegant" },
+  teaching: { role: "Mathematics Teacher", template: "timeline" },
+  "medical-laboratory-science": { role: "Medical Laboratory Scientist", template: "ats" },
+  marketing: { role: "Marketing Student", template: "timeline" },
+  economics: { role: "Economics Graduate", template: "band" },
+  "mechanical-engineering": { role: "Mechanical Engineering Graduate", template: "ats" },
+  agriculture: { role: "Agriculture Graduate", template: "elegant" },
+  "graphic-design": { role: "Graphic Designer", template: "timeline" },
+  journalism: { role: "Journalism Student", template: "band" },
+  architecture: { role: "Architecture Student", template: "elegant" },
+  "data-science": { role: "Data Analyst", template: "ats" },
+  "business-administration": { role: "Business Administration Student", template: "band" },
+};
+
+export const cvExamples: CvExample[] = baseExamples.map((e) => ({
+  ...e,
+  ...(looks[e.slug] ?? { role: `${e.course} Student`, template: "ats" as const }),
+}));
 
 export function getCvExample(slug: string) {
   return cvExamples.find((e) => e.slug === slug);
