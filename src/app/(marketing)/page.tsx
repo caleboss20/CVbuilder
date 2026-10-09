@@ -1,5 +1,6 @@
 import { AiDemo } from "@/components/marketing/ai-demo";
 import { Hero } from "@/components/marketing/hero";
+import { HowItWorks } from "@/components/marketing/how-it-works";
 import { Problems } from "@/components/marketing/problems";
 import { siteConfig } from "@/lib/site";
 
@@ -26,6 +27,7 @@ export default function HomePage() {
       <Hero />
       <Problems />
       <AiDemo />
+      <HowItWorks />
     </>
   );
 }
