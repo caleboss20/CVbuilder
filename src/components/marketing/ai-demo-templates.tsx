@@ -91,13 +91,15 @@ export function SidebarTemplate(p: DemoTemplateProps) {
   return (
     <div className="grid grid-cols-[34%_1fr] overflow-hidden rounded-md bg-white text-slate-700">
       <aside className="space-y-5 bg-slate-100 px-2.5 py-6 sm:px-5 sm:py-8">
-        <Image
-          src={persona.photo}
-          alt=""
-          width={120}
-          height={120}
-          className="mx-auto size-16 rounded-full object-cover grayscale sm:size-24"
-        />
+        {persona.photo && (
+          <Image
+            src={persona.photo}
+            alt=""
+            width={120}
+            height={120}
+            className="mx-auto size-16 rounded-full object-cover grayscale sm:size-24"
+          />
+        )}
         <SideBlock title="Contact">
           <ContactRow icon={<path d="M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />}>
             +233 24 000 0000
@@ -207,13 +209,15 @@ export function ClassicTemplate(p: DemoTemplateProps) {
   return (
     <div className="rounded-md bg-white px-4 py-6 text-[11px] leading-relaxed text-slate-700 sm:px-8 sm:py-8 sm:text-[13px]">
       <header className="flex items-start gap-4 sm:gap-6">
-        <Image
-          src={persona.photo}
-          alt=""
-          width={112}
-          height={130}
-          className="h-[78px] w-[66px] shrink-0 object-cover sm:h-[118px] sm:w-[100px]"
-        />
+        {persona.photo && (
+          <Image
+            src={persona.photo}
+            alt=""
+            width={112}
+            height={130}
+            className="h-[78px] w-[66px] shrink-0 object-cover sm:h-[118px] sm:w-[100px]"
+          />
+        )}
         <div className="min-w-0">
           <p className={`text-lg font-bold uppercase tracking-wide sm:text-2xl ${NAVY}`}>
             {persona.name}
@@ -297,6 +301,111 @@ function ClassicEntry({ section, p }: { section: DemoSection; p: DemoTemplatePro
             <span className="font-normal text-slate-600">, {meta.place}</span>
           </span>
           <span className="shrink-0">{meta.date}</span>
+        </div>
+      )}
+      <LineBody section={section} bullet={!!meta} p={p} />
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Template 3: elegant serif, no photo, ruled headings (Caleb)         */
+/* ------------------------------------------------------------------ */
+
+export function SerifTemplate(p: DemoTemplateProps) {
+  const { persona } = p;
+
+  return (
+    <div className="rounded-md bg-white px-5 py-7 font-serif text-[11px] leading-relaxed text-slate-700 sm:px-10 sm:py-10 sm:text-[13px]">
+      <header>
+        <p className="text-xl font-bold uppercase tracking-wide text-slate-900 sm:text-3xl">
+          {persona.name}
+        </p>
+        <p className="mt-1 text-[10px] text-slate-600 sm:text-xs">
+          Kumasi, Ghana <Dot /> +233 55 000 0000 <Dot /> caleb@email.com
+        </p>
+        <p className="mt-0.5 text-[10px] text-slate-600 sm:text-xs">
+          <span className="inline-flex items-center gap-1">
+            <BrandIcon d="M4 9h3v11H4zM5.5 4a1.75 1.75 0 1 1 0 3.5 1.75 1.75 0 0 1 0-3.5M10 9h3v1.6c.5-.9 1.7-1.8 3.4-1.8 3.3 0 3.6 2.2 3.6 5V20h-3v-5.4c0-1.3 0-3-1.8-3s-2.2 1.4-2.2 2.9V20h-3z" />
+            <span className="underline decoration-slate-300 underline-offset-2">linkedin.com/in/calebantwi</span>
+          </span>
+          <Dot />
+          <span className="inline-flex items-center gap-1">
+            <BrandIcon d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0 0 12 2" />
+            <span className="underline decoration-slate-300 underline-offset-2">github.com/caleboss20</span>
+          </span>
+        </p>
+      </header>
+
+      <div className="mt-6 space-y-5 sm:mt-8">
+        <SerifSection title={persona.labels.summary}>
+          <LineBody section="summary" bullet={false} p={p} />
+        </SerifSection>
+
+        <SerifSection title={persona.labels.experience}>
+          <SerifEntry section="experience" p={p} />
+        </SerifSection>
+
+        <SerifSection title={persona.labels.projects}>
+          <SerifEntry section="projects" p={p} />
+        </SerifSection>
+
+        <SerifSection title="Education">
+          <div className="flex justify-between gap-3 text-slate-800">
+            <span>BSc Computer Science</span>
+            <span className="shrink-0">2021 – 2025</span>
+          </div>
+          <p className="text-slate-500">Kwame Nkrumah University of Science and Technology, Kumasi</p>
+        </SerifSection>
+
+        <SerifSection title={persona.labels.activities}>
+          <SerifEntry section="activities" p={p} />
+        </SerifSection>
+
+        <SerifSection title="Skills">
+          <p>Languages: TypeScript, JavaScript, Dart, Python</p>
+          <p>Frameworks: React Native, Next.js, Node.js, Tailwind CSS</p>
+          <p>Tools: Git, Firebase, Supabase, Figma</p>
+        </SerifSection>
+      </div>
+    </div>
+  );
+}
+
+function Dot() {
+  return <span className="mx-1 text-slate-400">•</span>;
+}
+
+function BrandIcon({ d }: { d: string }) {
+  return (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="shrink-0 text-slate-700">
+      <path d={d} />
+    </svg>
+  );
+}
+
+function SerifSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div>
+      <p className="border-b-2 border-slate-800 pb-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-900 sm:text-xs">
+        {title}
+      </p>
+      <div className="mt-2 sm:pl-6">{children}</div>
+    </div>
+  );
+}
+
+function SerifEntry({ section, p }: { section: DemoSection; p: DemoTemplateProps }) {
+  const { meta } = lineFor(section, p);
+  return (
+    <>
+      {meta && (
+        <div className="mb-1">
+          <div className="flex justify-between gap-3 text-slate-900">
+            <span className="text-[10px] uppercase tracking-wide sm:text-xs">{meta.title}</span>
+            <span className="shrink-0">{meta.date}</span>
+          </div>
+          <p className="font-semibold text-slate-700">{meta.place}</p>
         </div>
       )}
       <LineBody section={section} bullet={!!meta} p={p} />

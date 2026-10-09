@@ -12,9 +12,9 @@ export type DemoPersona = {
   id: string;
   name: string;
   role: string;
-  template: "sidebar" | "classic";
+  template: "sidebar" | "classic" | "serif";
   templateName: string;
-  photo: string;
+  photo?: string;
   labels: Record<DemoSection, string>;
   examples: DemoLine[];
 };
@@ -104,6 +104,48 @@ export const demoPersonas: DemoPersona[] = [
         input: "i was vice president of our engineering association, about 200 members",
         output:
           "Served as Vice President for 200+ members, organising technical workshops and industry visits with local engineering firms.",
+      },
+    ],
+  },
+  {
+    id: "caleb",
+    name: "Caleb Antwi",
+    role: "Software Developer",
+    template: "serif",
+    templateName: "Elegant Serif",
+    labels: {
+      summary: "Professional Profile",
+      experience: "Work Experience",
+      activities: "Leadership",
+      projects: "Projects",
+    },
+    examples: [
+      {
+        section: "summary",
+        input: "software dev, i build mobile and web apps with react native and next.js",
+        output:
+          "Software developer specialising in mobile and web apps with React Native and Next.js, focused on building fast, clean products people enjoy using.",
+      },
+      {
+        section: "experience",
+        meta: { title: "Co-founder & Mobile Engineer", place: "Husker AI (Kumasi, Ghana)", date: "2025 – present" },
+        input: "co-founded husker ai, i build the mobile app and the website",
+        output:
+          "Co-founded Husker AI and lead mobile and web development, shipping the company’s app and SEO-focused website from the ground up.",
+      },
+      {
+        section: "projects",
+        meta: { title: "Fintech Wallet App", place: "Personal project", date: "2025" },
+        input: "built a fintech app with 2fa and a dashboard",
+        output:
+          "Built a fintech wallet app with two-factor authentication and a real-time dashboard, with a focus on security and smooth onboarding.",
+      },
+      {
+        section: "activities",
+        meta: { title: "Lead Organiser", place: "Campus Developer Meetups (KNUST)", date: "2024" },
+        input: "i organise coding meetups for students on campus",
+        output:
+          "Organised monthly coding meetups on campus, running hands-on sessions that helped beginners ship their first projects.",
       },
     ],
   },

@@ -10,6 +10,7 @@ import {
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
 import {
   ClassicTemplate,
+  SerifTemplate,
   SidebarTemplate,
   type Phase,
 } from "./ai-demo-templates";
@@ -151,9 +152,9 @@ export function AiDemoPlayer() {
   const templateProps = { persona, current, filled, phase, words, written };
 
   return (
-    <div ref={rootRef} className="grid items-center gap-8 lg:grid-cols-[1fr_1.15fr] lg:gap-12">
+    <div ref={rootRef} className="grid items-start gap-8 lg:grid-cols-[1fr_1.15fr] lg:gap-12">
       {/* Left: student input */}
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur sm:p-6">
+      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur sm:p-6 lg:sticky lg:top-28 lg:mt-14">
         <div className="flex items-center justify-between gap-3">
           <p className="text-sm font-medium text-white">
             {mode === "auto" ? `${persona.name.split(" ")[0]}’s words` : "Your words"}
@@ -255,7 +256,7 @@ export function AiDemoPlayer() {
                 role="tab"
                 aria-selected={i === personaIdx}
                 onClick={() => pickTemplate(i)}
-                className={`rounded-md px-3 py-1.5 text-xs transition-colors ${
+                className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs transition-colors ${
                   i === personaIdx
                     ? "bg-white/10 text-white ring-1 ring-white/15"
                     : "text-white/50 hover:text-white"
@@ -265,7 +266,7 @@ export function AiDemoPlayer() {
               </button>
             ))}
           </div>
-          <p className="text-xs text-white/40">
+          <p className="hidden text-xs text-white/40 sm:block">
             Template {personaIdx + 1} of {demoPersonas.length}
           </p>
         </div>
@@ -283,11 +284,9 @@ export function AiDemoPlayer() {
             key={persona.id}
             className="animate-fade-up relative shadow-[0_0_60px_-15px_rgb(124_128_255/0.6)]"
           >
-            {persona.template === "sidebar" ? (
-              <SidebarTemplate {...templateProps} />
-            ) : (
-              <ClassicTemplate {...templateProps} />
-            )}
+            {persona.template === "sidebar" && <SidebarTemplate {...templateProps} />}
+            {persona.template === "classic" && <ClassicTemplate {...templateProps} />}
+            {persona.template === "serif" && <SerifTemplate {...templateProps} />}
           </div>
         </div>
 

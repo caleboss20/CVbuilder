@@ -54,7 +54,7 @@ export function Problems() {
 
         <ul className="mt-14 grid gap-5 md:grid-cols-3">
           {problems.map((p) => (
-            <li key={p.title} className="group h-56 sm:h-64 [perspective:1200px]">
+            <li key={p.title} className="group h-60 sm:h-64 [perspective:1200px]">
               <div
                 tabIndex={0}
                 className="relative h-full rounded-xl outline-none transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] focus-visible:[transform:rotateY(180deg)] focus-visible:ring-2 focus-visible:ring-brand-400"
