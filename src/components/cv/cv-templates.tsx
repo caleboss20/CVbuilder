@@ -2,10 +2,31 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import type { CvDoc, CvExample, CvJob } from "@/lib/cv-examples";
 import { AtsCv } from "./ats-cv";
+import {
+  Bullets,
+  ContactIcon,
+  contactKind,
+  extraLists,
+  ProjectsList,
+  ReferencesGrid,
+  skillGroups,
+} from "./cv-parts";
+import {
+  AccentPortraitCv,
+  BlueDiagonalCv,
+  DarkHeaderCv,
+  MonoSplitCv,
+  NavyPanelCv,
+  NavyRingCv,
+  SimpleBoldCv,
+  SlateBandCv,
+} from "./cv-templates-more";
+
+export type TemplateProps = { doc: CvDoc; role: string; photo?: string };
 
 /** Renders a course example in its assigned template design. */
 export function CvTemplate({ example }: { example: CvExample }) {
-  const props = { doc: example.cv, role: example.role, photo: example.photo };
+  const props: TemplateProps = { doc: example.cv, role: example.role, photo: example.photo };
   switch (example.template) {
     case "elegant":
       return <ElegantCv {...props} />;
@@ -15,72 +36,25 @@ export function CvTemplate({ example }: { example: CvExample }) {
       return <TimelineCv {...props} />;
     case "photo":
       return <PhotoCv {...props} />;
+    case "simple":
+      return <SimpleBoldCv {...props} />;
+    case "darkHeader":
+      return <DarkHeaderCv {...props} />;
+    case "accent":
+      return <AccentPortraitCv {...props} />;
+    case "mono":
+      return <MonoSplitCv {...props} />;
+    case "navyPanel":
+      return <NavyPanelCv {...props} />;
+    case "navyRing":
+      return <NavyRingCv {...props} />;
+    case "blueDiagonal":
+      return <BlueDiagonalCv {...props} />;
+    case "slateBand":
+      return <SlateBandCv {...props} />;
     default:
       return <AtsCv doc={example.cv} role={example.role} />;
   }
-}
-
-type TemplateProps = { doc: CvDoc; role: string; photo?: string };
-
-/* ------------------------------------------------------------------ */
-/* Shared helpers                                                      */
-/* ------------------------------------------------------------------ */
-
-type ContactKind = "phone" | "email" | "link" | "location";
-
-function contactKind(value: string): ContactKind {
-  if (value.includes("@")) return "email";
-  if (/\.(com|net|org)\//.test(value)) return "link";
-  if (/^\+?[\d\s]+$/.test(value)) return "phone";
-  return "location";
-}
-
-const contactPaths: Record<ContactKind, string> = {
-  phone: "M5 4h4l2 5-3 2a11 11 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2",
-  email: "M3 6h18v12H3zM3 6l9 7 9-7",
-  link: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
-  location: "M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11zM12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4",
-};
-
-function ContactIcon({ kind, className = "" }: { kind: ContactKind; className?: string }) {
-  return (
-    <svg
-      width="13"
-      height="13"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className={`shrink-0 ${className}`}
-    >
-      <path d={contactPaths[kind]} />
-    </svg>
-  );
-}
-
-/** "Clinical: vital signs, wound dressing" -> { label: "Clinical", items: [...] } */
-function skillGroups(skills: string[]) {
-  return skills.map((line) => {
-    const [label, rest] = line.includes(": ") ? line.split(/: (.+)/) : ["", line];
-    const items = rest
-      .split(/,\s*/)
-      .filter(Boolean)
-      .map((item) => item.charAt(0).toUpperCase() + item.slice(1));
-    return { label, items };
-  });
-}
-
-function Bullets({ items, className = "" }: { items: string[]; className?: string }) {
-  return (
-    <ul className={`list-disc space-y-0.5 pl-5 ${className}`}>
-      {items.map((b) => (
-        <li key={b}>{b}</li>
-      ))}
-    </ul>
-  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -90,7 +64,7 @@ function Bullets({ items, className = "" }: { items: string[]; className?: strin
 function ElegantCv({ doc, role }: TemplateProps) {
   const [first, ...rest] = doc.name.split(" ");
   return (
-    <div className="bg-[#fbfaf8] px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 sm:px-10">
+    <div className="flex h-full flex-col bg-[#fbfaf8] px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 sm:px-10">
       <header className="text-center">
         <p className="text-[28px] font-light uppercase tracking-[0.3em] text-slate-900 sm:text-[34px]">
           {first} <span className="font-normal">{rest.join(" ")}</span>
@@ -99,7 +73,7 @@ function ElegantCv({ doc, role }: TemplateProps) {
       </header>
       <div className="mt-7 h-[3px] bg-[#b59a72]" />
 
-      <div className="mt-7 grid gap-7 sm:grid-cols-[34%_1fr] sm:gap-0">
+      <div className="mt-7 grid flex-1 gap-7 sm:grid-cols-[34%_1fr] sm:gap-0">
         <aside className="space-y-7 sm:border-r sm:border-slate-300 sm:pr-6">
           <div className="space-y-2.5">
             {doc.contact.map((c) => (
@@ -109,20 +83,36 @@ function ElegantCv({ doc, role }: TemplateProps) {
               </p>
             ))}
           </div>
-          <ElegantHeading>Education</ElegantHeading>
-          {doc.education.map((e) => (
-            <div key={e.degree} className="-mt-4 text-[11.5px]">
-              <p className="font-semibold text-slate-800">{e.school}</p>
-              <p>{e.degree}</p>
-              <p>{e.date}</p>
+          <div>
+            <ElegantHeading>Education</ElegantHeading>
+            <div className="mt-3 space-y-3 text-[11.5px]">
+              {doc.education.map((e) => (
+                <div key={e.degree}>
+                  <p className="font-semibold text-slate-800">{e.school}</p>
+                  <p>{e.degree}</p>
+                  <p>{e.date}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <ElegantHeading>Skills</ElegantHeading>
+            <ul className="mt-3 space-y-1.5 text-[11.5px]">
+              {skillGroups(doc.skills).flatMap((g) => g.items).map((s) => (
+                <li key={s}>{s}</li>
+              ))}
+            </ul>
+          </div>
+          {extraLists(doc).map((l) => (
+            <div key={l.title}>
+              <ElegantHeading>{l.title}</ElegantHeading>
+              <ul className="mt-3 space-y-1.5 text-[11.5px]">
+                {l.items.map((s) => (
+                  <li key={s}>{s}</li>
+                ))}
+              </ul>
             </div>
           ))}
-          <ElegantHeading>Skills</ElegantHeading>
-          <ul className="-mt-4 space-y-1.5 text-[11.5px]">
-            {skillGroups(doc.skills).flatMap((g) => g.items).map((s) => (
-              <li key={s}>{s}</li>
-            ))}
-          </ul>
         </aside>
 
         <main className="space-y-7 sm:pl-7">
@@ -144,6 +134,20 @@ function ElegantCv({ doc, role }: TemplateProps) {
               ))}
             </div>
           </div>
+          {doc.projects?.length ? (
+            <div>
+              <ElegantHeading>Projects</ElegantHeading>
+              <ProjectsList projects={doc.projects} className="mt-3" />
+            </div>
+          ) : null}
+          {doc.references?.length ? (
+            <div>
+              <ElegantHeading>References</ElegantHeading>
+              <div className="mt-3">
+                <ReferencesGrid refs={doc.references} />
+              </div>
+            </div>
+          ) : null}
         </main>
       </div>
     </div>
@@ -164,7 +168,7 @@ function BandCv({ doc, role }: TemplateProps) {
   const [first, ...rest] = doc.name.split(" ");
   const groups = skillGroups(doc.skills);
   return (
-    <div className="bg-linear-to-b from-white to-[#f1f1f1] text-[12.5px] leading-relaxed text-slate-600">
+    <div className="flex h-full flex-col bg-linear-to-b from-white to-[#f1f1f1] text-[12.5px] leading-relaxed text-slate-600">
       <header className="flex flex-wrap items-end justify-between gap-4 px-6 pt-10 pb-8 sm:px-10">
         <p className="font-serif text-[30px] font-light uppercase leading-tight tracking-[0.18em] text-slate-800 sm:text-[38px]">
           {first}
@@ -192,18 +196,20 @@ function BandCv({ doc, role }: TemplateProps) {
         </div>
       </div>
 
-      <div className="grid gap-7 px-6 py-8 sm:grid-cols-[34%_1fr] sm:gap-0 sm:px-10">
+      <div className="grid flex-1 gap-7 px-6 py-8 sm:grid-cols-[34%_1fr] sm:gap-0 sm:px-10">
         <aside className="space-y-6 sm:border-r sm:border-slate-300 sm:pr-6">
-          {groups.map((g, i) => (
-            <div key={g.label || i}>
-              <BandHeading>{g.label || "Skills"}</BandHeading>
-              <ul className="mt-3 space-y-1.5 text-[11.5px]">
-                {g.items.map((s) => (
-                  <li key={s}>{s}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {[...groups.map((g) => ({ title: g.label || "Skills", items: g.items })), ...extraLists(doc)].map(
+            (g, i) => (
+              <div key={g.title + i}>
+                <BandHeading>{g.title}</BandHeading>
+                <ul className="mt-3 space-y-1.5 text-[11.5px]">
+                  {g.items.map((s) => (
+                    <li key={s}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+            ),
+          )}
         </aside>
         <main className="space-y-6 sm:pl-7">
           <div>
@@ -212,7 +218,7 @@ function BandCv({ doc, role }: TemplateProps) {
               <div key={e.degree} className="mt-3">
                 <p className="font-semibold uppercase text-slate-800">{e.school}</p>
                 <p>{e.degree}</p>
-                <p>Graduation: {e.date.split("–").pop()?.trim()}</p>
+                <p>{e.date}</p>
               </div>
             ))}
           </div>
@@ -230,6 +236,20 @@ function BandCv({ doc, role }: TemplateProps) {
               ))}
             </div>
           </div>
+          {doc.projects?.length ? (
+            <div className="border-t border-slate-300 pt-5">
+              <BandHeading>Projects</BandHeading>
+              <ProjectsList projects={doc.projects} className="mt-3" />
+            </div>
+          ) : null}
+          {doc.references?.length ? (
+            <div className="border-t border-slate-300 pt-5">
+              <BandHeading>References</BandHeading>
+              <div className="mt-3">
+                <ReferencesGrid refs={doc.references} nameClass="font-semibold uppercase text-slate-800" />
+              </div>
+            </div>
+          ) : null}
         </main>
       </div>
     </div>
@@ -246,7 +266,7 @@ function BandHeading({ children }: { children: ReactNode }) {
 
 function TimelineCv({ doc, role }: TemplateProps) {
   return (
-    <div className="bg-white px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 sm:px-10">
+    <div className="flex h-full flex-col bg-white px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 sm:px-10">
       <header>
         <p className="text-[34px] font-black uppercase leading-none tracking-tight text-slate-950 sm:text-[42px]">
           {doc.name}
@@ -254,7 +274,7 @@ function TimelineCv({ doc, role }: TemplateProps) {
         <p className="mt-2 text-[17px] uppercase text-slate-800 sm:text-[19px]">{role}</p>
       </header>
 
-      <div className="mt-9 grid gap-8 sm:grid-cols-[35%_1fr]">
+      <div className="mt-9 grid flex-1 gap-8 sm:grid-cols-[35%_1fr]">
         <aside className="space-y-8">
           <div>
             <BoldHeading>Contact</BoldHeading>
@@ -281,6 +301,12 @@ function TimelineCv({ doc, role }: TemplateProps) {
             <BoldHeading>Skills</BoldHeading>
             <Bullets items={skillGroups(doc.skills).flatMap((g) => g.items)} className="mt-3" />
           </div>
+          {extraLists(doc).map((l) => (
+            <div key={l.title}>
+              <BoldHeading>{l.title}</BoldHeading>
+              <Bullets items={l.items} className="mt-3" />
+            </div>
+          ))}
         </aside>
 
         <main className="space-y-8">
@@ -296,6 +322,20 @@ function TimelineCv({ doc, role }: TemplateProps) {
               ))}
             </ol>
           </div>
+          {doc.projects?.length ? (
+            <div>
+              <BoldHeading rule>Projects</BoldHeading>
+              <ProjectsList projects={doc.projects} className="mt-3" />
+            </div>
+          ) : null}
+          {doc.references?.length ? (
+            <div>
+              <BoldHeading rule>Reference</BoldHeading>
+              <div className="mt-3">
+                <ReferencesGrid refs={doc.references} nameClass="text-[14px] font-semibold text-slate-700" />
+              </div>
+            </div>
+          ) : null}
         </main>
       </div>
     </div>
@@ -336,7 +376,7 @@ function PhotoCv({ doc, role, photo }: TemplateProps) {
   const parts = doc.name.split(" ");
   const last = parts.pop();
   return (
-    <div className="bg-white px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 sm:px-10">
+    <div className="flex h-full flex-col bg-white px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 sm:px-10">
       <header className="flex items-start justify-between gap-5">
         <div>
           <p className="text-[30px] font-light uppercase leading-none text-slate-500 sm:text-[38px]">
@@ -351,20 +391,20 @@ function PhotoCv({ doc, role, photo }: TemplateProps) {
           <Image
             src={photo}
             alt=""
-            width={120}
-            height={120}
+            width={140}
+            height={140}
             className="size-20 shrink-0 rounded-full object-cover sm:size-28"
           />
         )}
       </header>
 
-      <div className="mt-9 grid gap-8 sm:grid-cols-[38%_1fr]">
+      <div className="mt-9 grid flex-1 gap-8 sm:grid-cols-[38%_1fr]">
         <aside className="space-y-8">
           <div>
             <PhotoHeading>Contact</PhotoHeading>
             <div className="mt-4 space-y-3">
               {doc.contact.map((c) => (
-                <p key={c} className="flex items-center gap-3 break-words text-[12px]">
+                <p key={c} className="flex items-center gap-3 break-all text-[12px]">
                   <span className="grid size-7 shrink-0 place-items-center rounded-full border-2 border-slate-800">
                     <ContactIcon kind={contactKind(c)} className="text-slate-900" />
                   </span>
@@ -373,29 +413,21 @@ function PhotoCv({ doc, role, photo }: TemplateProps) {
               ))}
             </div>
           </div>
-          {skillGroups(doc.skills).map((g, i) => (
-            <div key={g.label || i}>
-              <PhotoHeading>{g.label || "Skills"}</PhotoHeading>
-              <ul className="mt-4 space-y-2">
-                {g.items.map((s) => (
-                  <li key={s} className="flex items-center gap-3">
-                    <span className="size-2 shrink-0 rounded-full border-2 border-slate-600" />
-                    {s}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-          <div>
-            <PhotoHeading>Education</PhotoHeading>
-            {doc.education.map((e) => (
-              <div key={e.degree} className="mt-4">
-                <p className="font-semibold text-slate-800">{e.degree}</p>
-                <p>{e.school}</p>
-                <p className="text-slate-500">{e.date}</p>
+          {[...skillGroups(doc.skills).map((g) => ({ title: g.label || "Skills", items: g.items })), ...extraLists(doc)].map(
+            (g, i) => (
+              <div key={g.title + i}>
+                <PhotoHeading>{g.title}</PhotoHeading>
+                <ul className="mt-4 space-y-2">
+                  {g.items.map((s) => (
+                    <li key={s} className="flex items-start gap-3">
+                      <span className="mt-1.5 size-2 shrink-0 rounded-full border-2 border-slate-600" />
+                      {s}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            ))}
-          </div>
+            ),
+          )}
         </aside>
 
         <main className="space-y-8">
@@ -422,6 +454,31 @@ function PhotoCv({ doc, role, photo }: TemplateProps) {
               ))}
             </div>
           </div>
+          <div>
+            <PhotoHeading>Education</PhotoHeading>
+            {doc.education.map((e) => (
+              <div key={e.degree} className="mt-4">
+                <p className="font-semibold text-slate-800">{e.degree}</p>
+                <p>
+                  {e.school} · <span className="text-slate-500">{e.date}</span>
+                </p>
+              </div>
+            ))}
+          </div>
+          {doc.projects?.length ? (
+            <div>
+              <PhotoHeading>Projects</PhotoHeading>
+              <ProjectsList projects={doc.projects} className="mt-4" />
+            </div>
+          ) : null}
+          {doc.references?.length ? (
+            <div>
+              <PhotoHeading>References</PhotoHeading>
+              <div className="mt-4">
+                <ReferencesGrid refs={doc.references} />
+              </div>
+            </div>
+          ) : null}
         </main>
       </div>
     </div>

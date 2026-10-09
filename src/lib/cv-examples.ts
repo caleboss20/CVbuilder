@@ -1,3 +1,5 @@
+import { cvExtras } from "./cv-example-extras";
+
 export type CvIcon =
   | "health"
   | "code"
@@ -21,16 +23,37 @@ export type CvJob = {
   bullets: string[];
 };
 
+export type CvEducation = { degree: string; school: string; date: string; detail?: string };
+
 export type CvDoc = {
   name: string;
   contact: string[];
   summary: string;
   experience: CvJob[];
-  education: { degree: string; school: string; date: string }[];
+  education: CvEducation[];
   skills: string[];
+  languages?: string[];
+  certifications?: string[];
+  projects?: { name: string; detail: string }[];
+  awards?: string[];
+  interests?: string[];
+  references?: { name: string; role: string; phone: string }[];
 };
 
-export type CvTemplateName = "ats" | "elegant" | "band" | "timeline" | "photo";
+export type CvTemplateName =
+  | "ats"
+  | "elegant"
+  | "band"
+  | "timeline"
+  | "photo"
+  | "simple"
+  | "darkHeader"
+  | "accent"
+  | "mono"
+  | "navyPanel"
+  | "navyRing"
+  | "blueDiagonal"
+  | "slateBand";
 
 export type CvExample = {
   slug: string;
@@ -134,7 +157,7 @@ const baseExamples: BaseExample[] = [
       ],
       education: [{ degree: "BSc Computer Science", school: "KNUST, Kumasi", date: "2022 – 2026" }],
       skills: [
-        "Languages: TypeScript, Python, SQL",
+        "Programming: TypeScript, Python, SQL",
         "Tools: React, React Native, Node.js, Git, Figma",
       ],
     },
@@ -722,39 +745,77 @@ const baseExamples: BaseExample[] = [
 ];
 
 /** Role line, template design and optional photo for each course. */
-const looks: Record<string, Pick<CvExample, "role" | "template" | "photo">> = {
-  nursing: { role: "Nursing Student", template: "ats" },
-  "computer-science": {
-    role: "Computer Science Student",
-    template: "photo",
-    photo: "/images/demo/ama-mensah.webp",
-  },
-  accounting: { role: "Accounting Student", template: "band" },
-  midwifery: { role: "Midwifery Student", template: "elegant" },
-  "civil-engineering": { role: "Civil Engineering Graduate", template: "timeline" },
-  pharmacy: { role: "Pharmacy Student", template: "elegant" },
-  law: { role: "Law Student", template: "band" },
-  "national-service": {
-    role: "Electrical Engineer · National Service",
-    template: "photo",
-    photo: "/images/demo/osborn-appiah.webp",
-  },
-  banking: { role: "Banking and Finance Student", template: "elegant" },
-  teaching: { role: "Mathematics Teacher", template: "timeline" },
-  "medical-laboratory-science": { role: "Medical Laboratory Scientist", template: "ats" },
-  marketing: { role: "Marketing Student", template: "timeline" },
-  economics: { role: "Economics Graduate", template: "band" },
-  "mechanical-engineering": { role: "Mechanical Engineering Graduate", template: "ats" },
-  agriculture: { role: "Agriculture Graduate", template: "elegant" },
-  "graphic-design": { role: "Graphic Designer", template: "timeline" },
-  journalism: { role: "Journalism Student", template: "band" },
-  architecture: { role: "Architecture Student", template: "elegant" },
-  "data-science": { role: "Data Analyst", template: "ats" },
-  "business-administration": { role: "Business Administration Student", template: "band" },
+const PHOTO = {
+  amaGlasses: "/images/demo/ama-mensah.webp",
+  girlNotebook: "/images/demo/student-girl-notebook.webp",
+  guyBooks: "/images/demo/student-guy-books.webp",
+  osborn: "/images/demo/osborn-appiah.webp",
 };
 
+const looks: Record<string, Pick<CvExample, "role" | "template" | "photo">> = {
+  nursing: { role: "Nursing Student", template: "blueDiagonal", photo: PHOTO.girlNotebook },
+  "computer-science": { role: "Computer Science Student", template: "photo", photo: PHOTO.amaGlasses },
+  accounting: { role: "Accounting Student", template: "band" },
+  midwifery: { role: "Midwifery Student", template: "elegant" },
+  "civil-engineering": { role: "Civil Engineering Graduate", template: "darkHeader", photo: PHOTO.guyBooks },
+  pharmacy: { role: "Pharmacy Student", template: "ats" },
+  law: { role: "Law Student", template: "navyPanel", photo: PHOTO.amaGlasses },
+  "national-service": {
+    role: "Electrical Engineer · National Service",
+    template: "navyRing",
+    photo: PHOTO.osborn,
+  },
+  banking: { role: "Banking and Finance Student", template: "slateBand", photo: PHOTO.girlNotebook },
+  teaching: { role: "Mathematics Teacher", template: "timeline" },
+  "medical-laboratory-science": { role: "Medical Laboratory Scientist", template: "simple" },
+  marketing: { role: "Marketing Student", template: "mono", photo: PHOTO.amaGlasses },
+  economics: { role: "Economics Graduate", template: "timeline" },
+  "mechanical-engineering": { role: "Mechanical Engineering Graduate", template: "simple" },
+  agriculture: { role: "Agriculture Graduate", template: "elegant" },
+  "graphic-design": { role: "Graphic Designer", template: "navyPanel", photo: PHOTO.guyBooks },
+  journalism: { role: "Journalism Student", template: "band" },
+  architecture: { role: "Architecture Student", template: "slateBand", photo: PHOTO.guyBooks },
+  "data-science": { role: "Data Analyst", template: "accent", photo: PHOTO.osborn },
+  "business-administration": {
+    role: "Business Administration Student",
+    template: "blueDiagonal",
+    photo: PHOTO.amaGlasses,
+  },
+};
+
+/** Merge the base example with its extra sections into one full CV. */
+function withExtras(e: BaseExample): BaseExample {
+  const x = cvExtras[e.slug];
+  if (!x) return e;
+  const name = x.name ?? e.cv.name;
+  const contact = x.name
+    ? e.cv.contact.map((c) =>
+        c.includes("@") ? `${name.toLowerCase().replace(/[^a-z]+/g, ".")}@email.com` : c,
+      )
+    : e.cv.contact;
+  // Languages get their own section, so drop any "Languages:" skill line
+  const skills = x.languages ? e.cv.skills.filter((s) => !s.startsWith("Languages:")) : e.cv.skills;
+  return {
+    ...e,
+    cv: {
+      ...e.cv,
+      name,
+      contact,
+      skills,
+      experience: [...e.cv.experience, ...(x.experience ?? [])],
+      education: [...e.cv.education, ...(x.education ?? [])],
+      languages: x.languages,
+      certifications: x.certifications,
+      projects: x.projects,
+      awards: x.awards,
+      interests: x.interests,
+      references: x.references,
+    },
+  };
+}
+
 export const cvExamples: CvExample[] = baseExamples.map((e) => ({
-  ...e,
+  ...withExtras(e),
   ...(looks[e.slug] ?? { role: `${e.course} Student`, template: "ats" as const }),
 }));
 
