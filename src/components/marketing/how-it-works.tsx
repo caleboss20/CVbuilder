@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { FinishHook } from "./finish-hook";
 import { SectionHeading } from "./section-heading";
 import {
   DownloadVisual,
@@ -142,7 +141,6 @@ export function HowItWorks() {
           </div>
         </div>
 
-        <FinishHook />
       </div>
     </section>
   );
