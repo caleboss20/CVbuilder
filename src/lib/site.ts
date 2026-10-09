@@ -19,7 +19,7 @@ export const siteConfig = {
     { label: "Home", href: "/" },
     { label: "Features", href: "/#features" },
     { label: "Templates", href: "/templates" },
-    { label: "Pricing", href: "/pricing" },
+    { label: "CV examples", href: "/cv-examples" },
     { label: "How it works", href: "/#how-it-works" },
     { label: "FAQ", href: "/#faq" },
   ],
