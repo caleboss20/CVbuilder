@@ -19,7 +19,7 @@ export const testimonials: Testimonial[] = [
   // SAMPLE quotes so the layout can be reviewed. Replace each with the person’s own
   // words (and their real name, course and school), then remove `draft: true`.
   {
-    name: "Kwame Asante",
+    name: "Frank Agyare",
     course: "BSc Computer Science",
     school: "KNUST",
     quote:
@@ -28,12 +28,21 @@ export const testimonials: Testimonial[] = [
     draft: true,
   },
   {
-    name: "Akua Mensah",
+    name: "Wilhelmina Adjah",
     course: "BSc Business Administration",
-    school: "UPSA",
+    school: "KNUST",
     quote:
       "My old CV was a messy Word file. With CV11 I picked a clean template, filled in my details and had a PDF ready in about ten minutes. It finally looks professional.",
     photo: "/images/testimonials/student-b.webp",
+    draft: true,
+  },
+  {
+    name: "Michaela Asante",
+    course: "BSc Nursing",
+    school: "UCC",
+    quote:
+      "I needed a CV for my rotation placement and had nothing on it but school. The nursing example showed me what to include, and now my ward experience actually stands out.",
+    photo: "/images/testimonials/student-c.webp",
     draft: true,
   },
 ];

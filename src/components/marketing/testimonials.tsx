@@ -62,7 +62,7 @@ export function Testimonials() {
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-ink-950 to-transparent" />
             </div>
           ) : (
-            <ul className="mx-auto grid max-w-4xl gap-5 md:grid-cols-2">
+            <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {visible.map((t) => (
                 <li key={t.photo}>
                   <TestimonialCard t={t} />
