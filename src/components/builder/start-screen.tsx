@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { cvExamples } from "@/lib/cv-examples";
+import { cvExamples, type CvTemplateName } from "@/lib/cv-examples";
 import { templates } from "@/lib/templates";
 import { CvPageFrame } from "@/components/cv/cv-page-frame";
-import { CvTemplate } from "@/components/cv/cv-templates";
+import { CvTemplateView } from "@/components/cv/cv-templates";
 import { CvIcon } from "@/components/cv/cv-icon";
 import { Logo } from "@/components/ui/logo";
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { SkyBackground } from "./sky-background";
 
 const perks = [
   { label: "No account needed", d: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M4 21a8 8 0 0 1 16 0" },
@@ -19,9 +20,12 @@ const perks = [
 
 /** First screen of the builder: start from a course example (with live preview) or blank. */
 export function StartScreen({
+  template,
   onBlank,
   onExample,
 }: {
+  /** Template picked on the homepage ("Use this template"), if any. */
+  template?: CvTemplateName | null;
   onBlank: () => void;
   onExample: (slug: string) => void;
 }) {
@@ -33,10 +37,13 @@ export function StartScreen({
     return q ? cvExamples.filter((e) => e.course.toLowerCase().includes(q)) : cvExamples;
   }, [query]);
   const example = cvExamples.find((e) => e.slug === selected) ?? cvExamples[0];
-  const templateName = templates.find((t) => t.id === example.template)?.name;
+  // Preview the course in the template the student already chose, if they chose one
+  const activeTemplate = template ?? example.template;
+  const templateName = templates.find((t) => t.id === activeTemplate)?.name;
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+      <SkyBackground />
       {/* Same atmosphere as the homepage hero */}
       <div aria-hidden="true" className="bg-grid absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_70%_50%_at_50%_0%,black,transparent)]" />
       <div aria-hidden="true" className="absolute left-1/2 top-0 -z-10 h-[460px] w-[900px] max-w-full -translate-x-1/2 rounded-full bg-brand-600/20 blur-[120px]" />
@@ -111,7 +118,7 @@ export function StartScreen({
                 />
               </div>
 
-              <ul className="mt-4 grid max-h-[340px] grid-cols-2 gap-2 overflow-y-auto pr-1 sm:grid-cols-3 [scrollbar-width:thin]">
+              <ul className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {shown.map((e) => {
                   const active = e.slug === selected;
                   return (
@@ -176,16 +183,21 @@ export function StartScreen({
                 <span>
                   Preview: <span className="text-fg/80">{example.course} CV</span>
                 </span>
-                {templateName && <span>Template: {templateName}</span>}
+                {templateName && (
+                  <span className={template ? "rounded-full bg-brand-500/15 px-2 py-0.5 text-brand-300 ring-1 ring-brand-400/40" : ""}>
+                    {template ? "Your template: " : "Template: "}
+                    {templateName}
+                  </span>
+                )}
               </div>
               <div className="relative">
                 <div aria-hidden="true" className="absolute inset-x-[8%] -bottom-6 h-24 rounded-[100%] bg-brand-500/40 blur-3xl" />
                 <div
-                  key={example.slug}
+                  key={example.slug + activeTemplate}
                   className="animate-fade-up relative mx-auto max-w-[520px] overflow-hidden rounded-md bg-white shadow-[0_30px_70px_-25px_rgb(0_0_0/0.7)] ring-1 ring-fg/10"
                 >
                   <CvPageFrame>
-                    <CvTemplate example={example} />
+                    <CvTemplateView template={activeTemplate} doc={example.cv} role={example.role} photo={example.photo} />
                   </CvPageFrame>
                 </div>
               </div>

@@ -69,19 +69,15 @@ export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }
 
       <ul
         style={accentStyle}
-        className={
-          layout === "row"
-            ? "mt-10 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-6 sm:px-0 [scrollbar-width:thin]"
-            : "mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3"
-        }
+        className={`mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 ${layout === "row" ? "px-4 sm:px-0" : ""}`}
       >
-        {shown.map((t) => {
+        {shown.map((t, i) => {
           const example = getCvExample(t.exampleSlug);
           if (!example) return null;
           return (
             <li
               key={t.id}
-              className={layout === "row" ? "w-[78vw] max-w-[300px] shrink-0 snap-start" : ""}
+              className={`min-w-0 ${layout === "row" && i >= 6 ? "hidden" : ""}`}
             >
               <article className="group">
                 <div className="relative overflow-hidden rounded-lg bg-white shadow-[0_20px_50px_-20px_rgb(0_0_0/0.5)] ring-1 ring-fg/10 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_0_50px_-12px_rgb(124_128_255/0.7)] group-hover:ring-brand-400/50">

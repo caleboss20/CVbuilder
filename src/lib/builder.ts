@@ -34,10 +34,10 @@ export type BuilderCv = {
 /** Short random id. Works on plain http too, where crypto.randomUUID is missing. */
 export const uid = () => Math.random().toString(36).slice(2, 10);
 
-export const emptyJob = (): Job => ({ id: uid(), title: "", place: "", date: "", bullets: [""] });
-export const emptySchool = (): School => ({ id: uid(), degree: "", school: "", date: "" });
+export const emptyJob = (id = uid()): Job => ({ id, title: "", place: "", date: "", bullets: [""] });
+export const emptySchool = (id = uid()): School => ({ id, degree: "", school: "", date: "" });
 export const emptyProject = (): Project => ({ id: uid(), name: "", detail: "" });
-export const emptySkillGroup = (): SkillGroup => ({ id: uid(), label: "", items: "" });
+export const emptySkillGroup = (id = uid()): SkillGroup => ({ id, label: "", items: "" });
 export const emptyReferee = (): Referee => ({ id: uid(), name: "", role: "", phone: "" });
 
 export function blankCv(template: CvTemplateName = "ats"): BuilderCv {
@@ -51,10 +51,12 @@ export function blankCv(template: CvTemplateName = "ats"): BuilderCv {
     email: "",
     links: [],
     summary: "",
-    education: [emptySchool()],
-    experience: [emptyJob()],
+    // Fixed ids for the first empty entries: blankCv can run during server render,
+    // where random values are not allowed. New items get random ids in the browser.
+    education: [emptySchool("school-1")],
+    experience: [emptyJob("job-1")],
     projects: [],
-    skills: [emptySkillGroup()],
+    skills: [emptySkillGroup("skills-1")],
     languages: [],
     certifications: [],
     awards: [],

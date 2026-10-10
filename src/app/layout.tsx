@@ -50,6 +50,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        {/* No visible scrollbars anywhere (scrolling still works), and no sideways page scroll */}
+        <style>{`*{scrollbar-width:none}*::-webkit-scrollbar{display:none}html,body{overflow-x:clip}`}</style>
       </head>
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>

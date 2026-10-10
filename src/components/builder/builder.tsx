@@ -49,12 +49,14 @@ export function Builder() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [saved, setSaved] = useState(true);
   const [fit, setFit] = useState(1);
-  const requestedTemplate = useRef<CvTemplateName | null>(null);
+  const [requested, setRequested] = useState<CvTemplateName | null>(null);
 
   // Load a saved CV (and a ?template= choice from the gallery) after mount
   useEffect(() => {
     const t = new URLSearchParams(window.location.search).get("template");
-    if (t && templates.some((x) => x.id === t)) requestedTemplate.current = t as CvTemplateName;
+    const picked = t && templates.some((x) => x.id === t) ? (t as CvTemplateName) : null;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- read once from the URL after mount
+    setRequested(picked);
     let stored: BuilderCv | null = null;
     try {
       const raw = localStorage.getItem(BUILDER_STORAGE_KEY);
@@ -64,7 +66,7 @@ export function Builder() {
     }
      
     if (stored) {
-      setCv(requestedTemplate.current ? { ...stored, template: requestedTemplate.current } : stored);
+      setCv(picked ? { ...stored, template: picked } : stored);
       setStatus("editing");
     } else {
       setStatus("start");
@@ -90,11 +92,11 @@ export function Builder() {
   const update = (patch: Partial<BuilderCv>) => setCv((c) => ({ ...c, ...patch }));
   const doc = useMemo(() => toDoc(cv), [cv]);
   const strength = useMemo(() => cvStrength(cv), [cv]);
-  const accentStyle = cv.accent ? ({ "--cv-accent": cv.accent } as CSSProperties) : undefined;
+  const accentStyle = cvStyle(cv, strength.score);
   const templateName = templates.find((t) => t.id === cv.template)?.name ?? "Template";
 
   function begin(next: BuilderCv) {
-    setCv(requestedTemplate.current ? { ...next, template: requestedTemplate.current } : next);
+    setCv(requested ? { ...next, template: requested } : next);
     setStep(0);
     setStatus("editing");
   }
@@ -121,7 +123,7 @@ export function Builder() {
   }
 
   if (status === "start") {
-    return <StartScreen onBlank={() => begin(blankCv(requestedTemplate.current ?? "ats"))} onExample={(slug) => {
+    return <StartScreen template={requested} onBlank={() => begin(blankCv(requested ?? "ats"))} onExample={(slug) => {
       const ex = cvExamples.find((e) => e.slug === slug);
       if (ex) begin(cvFromExample(ex));
     }} />;
@@ -188,7 +190,7 @@ export function Builder() {
         {/* Editor */}
         <section aria-label="Edit your CV" className={`min-w-0 ${mobileView === "edit" ? "block" : "hidden"} lg:block`}>
           <nav aria-label="Steps" className="sticky top-16 z-20 border-b border-fg/10 bg-ink-950/90 backdrop-blur-xl max-lg:top-[105px]">
-            <ol className="flex gap-1 overflow-x-auto px-4 py-3 sm:px-6 [scrollbar-width:none]">
+            <ol className="flex flex-wrap gap-1 px-3 py-2.5 sm:px-6 sm:py-3">
               {steps.map((s, i) => {
                 const done = strength.checks.filter((c) => c.step === s.id).every((c) => c.done) &&
                   strength.checks.some((c) => c.step === s.id);
@@ -198,9 +200,6 @@ export function Builder() {
                       type="button"
                       onClick={() => setStep(i)}
                       aria-current={i === step ? "step" : undefined}
-                      ref={(el) => {
-                        if (el && i === step) el.scrollIntoView({ block: "nearest", inline: "center" });
-                      }}
                       className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-sm transition-colors ${
                         i === step ? "bg-brand-500/15 text-fg ring-1 ring-brand-400/40" : "text-fg/55 hover:text-fg"
                       }`}
@@ -404,7 +403,7 @@ function TemplatePicker({
   onClose: () => void;
 }) {
   const doc = useMemo(() => toDoc(cv), [cv]);
-  const accentStyle = cv.accent ? ({ "--cv-accent": cv.accent } as CSSProperties) : undefined;
+  const accentStyle = cvStyle(cv, cvStrength(cv).score);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -469,6 +468,17 @@ const printCss = `
 }
 `;
 
+/**
+ * Accent colour plus how sections are spaced. A nearly complete CV spreads its
+ * sections to fill the page; a half-filled one keeps them together at the top.
+ */
+function cvStyle(cv: BuilderCv, score: number): CSSProperties {
+  return {
+    ...(cv.accent ? { "--cv-accent": cv.accent } : {}),
+    "--cv-justify": score >= 80 ? "space-between" : "flex-start",
+  } as CSSProperties;
+}
+
 const A4_WIDTH = 794;
 const A4_HEIGHT = 1123;
 /** Smallest shrink we allow before letting a very long CV run onto a second page. */
@@ -482,7 +492,7 @@ const MIN_FIT = 0.72;
 function PrintCopy({ cv, onFit }: { cv: BuilderCv; onFit: (scale: number) => void }) {
   const doc = useMemo(() => toDoc(cv), [cv]);
   const pageRef = useRef<HTMLDivElement>(null);
-  const accentStyle = cv.accent ? ({ "--cv-accent": cv.accent } as CSSProperties) : undefined;
+  const accentStyle = cvStyle(cv, cvStrength(cv).score);
 
   useLayoutEffect(() => {
     const el = pageRef.current;

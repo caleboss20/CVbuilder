@@ -244,6 +244,7 @@ export const cvExtras: Record<string, CvExtras> = {
         bullets: [
           "Ran pop-up stands on campus and signed up 300+ students for a data bundle offer.",
           "Collected student feedback for the brand team every week.",
+          "Trained 4 new ambassadors on the pitch and sign-up process.",
         ],
       },
     ],
@@ -318,6 +319,7 @@ export const cvExtras: Record<string, CvExtras> = {
         bullets: [
           "Designed social media posts and banners for 4 client brands.",
           "Prepared print-ready files for flyers and roll-up banners.",
+          "Kept brand guidelines consistent across every piece of work.",
         ],
       },
     ],

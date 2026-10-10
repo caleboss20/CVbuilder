@@ -83,7 +83,17 @@ export const cvMore: Record<string, { projects?: CvDoc["projects"]; bullets?: Re
     projects: [{ name: "Lab Safety Checklist", detail: "Drafted a one-page daily safety checklist adopted by the student lab." }],
   },
   marketing: {
-    projects: [{ name: "Hall Week Campaign", detail: "Planned a 2-week social campaign with a budget of GH₵ 1,500 that sold out all event tickets." }],
+    projects: [
+      { name: "Hall Week Campaign", detail: "Planned a 2-week social campaign with a budget of GH₵ 1,500 that sold out all event tickets." },
+      { name: "Small Business Rebrand", detail: "Helped a Legon food vendor refresh her menu, logo and WhatsApp catalogue, doubling weekly orders in a month." },
+      { name: "Student Survey on Ads", detail: "Surveyed 120 students on which social ads they trust and shared the findings with the Marketing Club." },
+    ],
+    bullets: {
+      0: [
+        "Wrote captions and scripts for weekly reels, keeping a consistent voice across Instagram and TikTok.",
+        "Tracked reach and engagement each week and shared simple reports with the committee.",
+      ],
+    },
   },
   economics: {
     projects: [
@@ -103,7 +113,17 @@ export const cvMore: Record<string, { projects?: CvDoc["projects"]; bullets?: Re
     bullets: { 0: ["Visited farms each week to check crops and answer farmers’ questions."] },
   },
   "graphic-design": {
-    projects: [{ name: "Campus Event Posters", detail: "Designed a consistent poster series for 6 SRC events in one semester." }],
+    projects: [
+      { name: "Campus Event Posters", detail: "Designed a consistent poster series for 6 SRC events in one semester." },
+      { name: "Chop Bar Menu Redesign", detail: "Redesigned a local restaurant’s menu and signage, making prices clearer and the brand easier to recognise." },
+      { name: "Mobile App UI Concept", detail: "Designed screens in Figma for a campus bus-tracking app and tested them with 10 students." },
+    ],
+    bullets: {
+      0: [
+        "Presented 2 to 3 design options per brief and refined them based on client feedback.",
+        "Prepared print-ready files and worked with Accra printers to keep colours accurate.",
+      ],
+    },
   },
   journalism: {
     projects: [
@@ -113,7 +133,11 @@ export const cvMore: Record<string, { projects?: CvDoc["projects"]; bullets?: Re
     bullets: { 0: ["Edited audio clips and wrote scripts for the weekly bulletin."] },
   },
   architecture: {
-    projects: [{ name: "Community Library", detail: "Concept design for a shaded, low-cost library built with local materials in Ho." }],
+    projects: [
+      { name: "Community Library", detail: "Concept design for a shaded, low-cost library built with local materials in Ho." },
+      { name: "Bamboo Bus Shelter", detail: "Designed and built a 1:10 model of a low-cost bus shelter for KNUST campus routes." },
+    ],
+    bullets: { 0: ["Helped prepare cost estimates and material lists for each project."] },
   },
   "data-science": {
     projects: [{ name: "Student Spending Dashboard", detail: "Power BI dashboard showing how 200 students spend their monthly allowance." }],

@@ -143,7 +143,7 @@ function ElegantCv({ doc, role }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-7 @xl:pl-7">
+        <main className="flex flex-col justify-[var(--cv-justify,space-between)] space-y-7 @xl:pl-7">
           <div>
             <ElegantHeading>Profile</ElegantHeading>
             <p className="mt-3 text-justify">{doc.summary}</p>
@@ -255,7 +255,7 @@ function BandCv({ doc, role }: TemplateProps) {
             ),
           )}
         </aside>
-        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-6 @xl:pl-7">
+        <main className="flex flex-col justify-[var(--cv-justify,space-between)] space-y-6 @xl:pl-7">
           <div>
             <BandHeading>Relevant Experience</BandHeading>
             <div className="mt-3 space-y-4">
@@ -349,7 +349,7 @@ function TimelineCv({ doc, role }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-8">
+        <main className="flex flex-col justify-[var(--cv-justify,space-between)] space-y-8">
           <div>
             <BoldHeading rule>Profile</BoldHeading>
             <p className="mt-3 text-justify">{doc.summary}</p>
@@ -476,7 +476,7 @@ function PhotoCv({ doc, role, photo }: TemplateProps) {
           )}
         </aside>
 
-        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-8">
+        <main className="flex flex-col justify-[var(--cv-justify,space-between)] space-y-8">
           <div>
             <PhotoHeading>Profile</PhotoHeading>
             <p className="mt-4">{doc.summary}</p>
