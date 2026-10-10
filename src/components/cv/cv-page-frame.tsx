@@ -11,16 +11,35 @@ const PAGE_MIN_HEIGHT = 1123;
  * then scaled to fit the available space, so phones see the same complete page
  * a recruiter would, never a cut-off or reflowed version.
  */
-export function CvPageFrame({ children }: { children: ReactNode }) {
+export function CvPageFrame({ children, lazy = false }: { children: ReactNode; lazy?: boolean }) {
   const outerRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [height, setHeight] = useState<number>();
+  // Lazy frames render a blank A4 placeholder until they come near the screen
+  const [shown, setShown] = useState(!lazy);
+
+  useEffect(() => {
+    if (shown) return;
+    const outer = outerRef.current;
+    if (!outer) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setShown(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "800px 0px" },
+    );
+    io.observe(outer);
+    return () => io.disconnect();
+  }, [shown]);
 
   useEffect(() => {
     const outer = outerRef.current;
     const page = pageRef.current;
-    if (!outer || !page) return;
+    if (!shown || !outer || !page) return;
 
     const fit = () => {
       const s = Math.min(outer.clientWidth / PAGE_WIDTH, 1);
@@ -41,7 +60,11 @@ export function CvPageFrame({ children }: { children: ReactNode }) {
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", fit);
     };
-  }, []);
+  }, [shown]);
+
+  if (!shown) {
+    return <div ref={outerRef} className="aspect-[210/297] w-full" aria-hidden="true" />;
+  }
 
   return (
     <div ref={outerRef} className="overflow-hidden" style={{ height }}>

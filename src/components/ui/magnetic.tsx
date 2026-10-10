@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
+import { subscribePointer } from "@/lib/pointer";
 
 type MagneticProps = {
   children: ReactNode;
@@ -34,17 +35,12 @@ export function Magnetic({
       return;
     }
 
-    let frame = 0;
-    let latest: PointerEvent | null = null;
-
-    const update = () => {
-      frame = 0;
-      if (!latest) return;
+    return subscribePointer((p) => {
       const rect = el.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
-      const dx = latest.clientX - cx;
-      const dy = latest.clientY - cy;
+      const dx = p.x - cx;
+      const dy = p.y - cy;
       const inside =
         Math.abs(dx) < rect.width / 2 + range &&
         Math.abs(dy) < rect.height / 2 + range;
@@ -52,18 +48,7 @@ export function Magnetic({
       el.style.translate = inside
         ? `${dx * strength}px ${dy * strength}px`
         : "0px 0px";
-    };
-
-    const onMove = (e: PointerEvent) => {
-      latest = e;
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-
-    window.addEventListener("pointermove", onMove, { passive: true });
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("pointermove", onMove);
-    };
+    });
   }, [strength, range]);
 
   return (

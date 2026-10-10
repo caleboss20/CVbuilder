@@ -1,4 +1,5 @@
 import { ButtonLink } from "@/components/ui/button";
+import { LazyMount } from "@/components/ui/lazy-mount";
 import { Magnetic } from "@/components/ui/magnetic";
 import { CvTemplate } from "@/components/cv/cv-templates";
 import { getCvExample, type CvExample } from "@/lib/cv-examples";
@@ -98,9 +99,11 @@ export function FinalCta() {
 function MiniPage({ example }: { example: CvExample }) {
   return (
     <div className="h-[300px] w-[212px] overflow-hidden rounded-md bg-white shadow-[0_20px_50px_-12px_rgb(0_0_0/0.55),0_0_40px_-10px_rgb(124_128_255/0.45)] ring-1 ring-black/5 sm:h-[360px] sm:w-[254px] lg:h-[440px] lg:w-[311px]">
-      <div className="@container flex min-h-[1123px] w-[794px] origin-top-left scale-[0.267] flex-col sm:scale-[0.32] lg:scale-[0.392] [&>*]:flex-1">
-        <CvTemplate example={example} />
-      </div>
+      <LazyMount>
+        <div className="@container flex min-h-[1123px] w-[794px] origin-top-left scale-[0.267] flex-col sm:scale-[0.32] lg:scale-[0.392] [&>*]:flex-1">
+          <CvTemplate example={example} />
+        </div>
+      </LazyMount>
     </div>
   );
 }

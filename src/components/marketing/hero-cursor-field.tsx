@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { subscribePointer } from "@/lib/pointer";
 
 const SPACING = 28; // aligns with the 56px CSS grid (every intersection + midpoints)
 const RADIUS = 150; // how far the cursor influences dots
@@ -149,21 +150,25 @@ export function HeroCursorField() {
       if (!frame && visible) frame = requestAnimationFrame(step);
     };
 
-    const onMove = (e: PointerEvent) => {
+    const onPointer = ({ x, y }: { x: number; y: number }) => {
       const rect = host.getBoundingClientRect();
-      pointer.x = e.clientX - rect.left;
-      pointer.y = e.clientY - rect.top;
+      const inside = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+      if (!inside) {
+        // Left the area: let the glow fade out
+        if (pointer.active) {
+          pointer.active = false;
+          start();
+        }
+        return;
+      }
+      pointer.x = x - rect.left;
+      pointer.y = y - rect.top;
       if (!pointer.active && glow.strength < 0.01) {
         // Start the glow at the cursor instead of flying in from off-screen
         glow.x = pointer.x;
         glow.y = pointer.y;
       }
       pointer.active = true;
-      start();
-    };
-
-    const onLeave = () => {
-      pointer.active = false;
       start();
     };
 
@@ -176,15 +181,13 @@ export function HeroCursorField() {
     });
     io.observe(host);
 
-    host.addEventListener("pointermove", onMove);
-    host.addEventListener("pointerleave", onLeave);
+    const unsubscribe = subscribePointer(onPointer);
 
     return () => {
       cancelAnimationFrame(frame);
       ro.disconnect();
       io.disconnect();
-      host.removeEventListener("pointermove", onMove);
-      host.removeEventListener("pointerleave", onLeave);
+      unsubscribe();
     };
   }, []);
 

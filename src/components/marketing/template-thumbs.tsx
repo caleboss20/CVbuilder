@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { LazyMount } from "@/components/ui/lazy-mount";
 import { demoPersonas, type DemoPersona } from "@/lib/ai-demo";
 import { getCvExample } from "@/lib/cv-examples";
 import { AtsCv } from "@/components/cv/ats-cv";
@@ -27,7 +28,9 @@ function completed(persona: DemoPersona): DemoTemplateProps {
 export function ScaledPage({ children }: { children: ReactNode }) {
   return (
     <div className="h-[146px] w-[104px] overflow-hidden rounded-[3px] bg-white sm:h-[212px] sm:w-[150px]">
-      <div className="@container w-[600px] origin-top-left scale-[0.1733] sm:scale-[0.25]">{children}</div>
+      <LazyMount>
+        <div className="@container w-[600px] origin-top-left scale-[0.1733] sm:scale-[0.25]">{children}</div>
+      </LazyMount>
     </div>
   );
 }

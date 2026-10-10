@@ -6,6 +6,7 @@ import { cvExamples } from "@/lib/cv-examples";
 import { CvIcon } from "@/components/cv/cv-icon";
 import { ButtonLink } from "@/components/ui/button";
 import { Magnetic } from "@/components/ui/magnetic";
+import { subscribePointer } from "@/lib/pointer";
 import { HeroCursorField } from "./hero-cursor-field";
 
 const css = `
@@ -31,31 +32,22 @@ export function NotFoundScene() {
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    let frame = 0;
     let idleTimer: ReturnType<typeof setTimeout>;
-    const look = (cx: number, cy: number) => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const eye = eyeRef.current;
-        if (!eye) return;
-        const r = eye.getBoundingClientRect();
-        const dx = cx - (r.left + r.width / 2);
-        const dy = cy - (r.top + r.height / 2);
-        const dist = Math.hypot(dx, dy) || 1;
-        const reach = Math.min(1, dist / 220) * (r.width * 0.22);
-        setPupil({ x: (dx / dist) * reach, y: (dy / dist) * reach });
-      });
+    const unsubscribe = subscribePointer(({ x, y }) => {
+      const eye = eyeRef.current;
+      if (!eye) return;
+      const r = eye.getBoundingClientRect();
+      const dx = x - (r.left + r.width / 2);
+      const dy = y - (r.top + r.height / 2);
+      const dist = Math.hypot(dx, dy) || 1;
+      const reach = Math.min(1, dist / 220) * (r.width * 0.22);
+      setPupil({ x: (dx / dist) * reach, y: (dy / dist) * reach });
       clearTimeout(idleTimer);
       // Drift back to looking around if the visitor stops moving
       idleTimer = setTimeout(() => setPupil(null), 3500);
-    };
-    const onMove = (e: PointerEvent) => look(e.clientX, e.clientY);
-    window.addEventListener("pointermove", onMove, { passive: true });
-    window.addEventListener("pointerdown", onMove, { passive: true });
+    });
     return () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerdown", onMove);
-      cancelAnimationFrame(frame);
+      unsubscribe();
       clearTimeout(idleTimer);
     };
   }, []);
