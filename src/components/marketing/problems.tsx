@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { FlipCard } from "./flip-card";
 import { SectionHeading } from "./section-heading";
 
 const problems: {
@@ -54,13 +55,11 @@ export function Problems() {
 
         <ul className="mt-14 grid gap-5 md:grid-cols-3">
           {problems.map((p) => (
-            <li key={p.title} className="group h-60 sm:h-64 [perspective:1200px]">
-              <div
-                tabIndex={0}
-                className="relative h-full rounded-xl outline-none transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] focus-visible:[transform:rotateY(180deg)] focus-visible:ring-2 focus-visible:ring-brand-400"
-              >
-                {/* Front: the problem */}
-                <div className="absolute inset-0 flex flex-col rounded-xl border border-fg/10 bg-fg/[0.03] p-6 [backface-visibility:hidden]">
+            <li key={p.title} className="h-60 sm:h-64">
+              <FlipCard
+                label={p.title}
+                front={
+                  <div className="flex h-full flex-col rounded-xl border border-fg/10 bg-fg/[0.03] p-6">
                   <span className="grid size-11 place-items-center rounded-lg border border-fg/10 bg-fg/5 text-fg/70">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       {p.icon}
@@ -69,15 +68,16 @@ export function Problems() {
                   <h3 className="mt-5 text-lg font-medium text-fg">{p.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-fg/55">{p.problem}</p>
                   <p className="mt-auto inline-flex items-center gap-1.5 text-xs text-brand-300">
-                    See how we fix it
+                    <span className="[@media(hover:hover)]:hidden">Tap to see how we fix it</span>
+                    <span className="hidden [@media(hover:hover)]:inline">See how we fix it</span>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                       <path d="M5 12h14M13 6l6 6-6 6" />
                     </svg>
                   </p>
                 </div>
-
-                {/* Back: how CV11 fixes it */}
-                <div className="absolute inset-0 flex flex-col rounded-xl border border-brand-400/40 bg-linear-to-b from-brand-600/30 to-ink-900 p-6 shadow-[0_0_40px_-12px_rgb(124_128_255/0.7)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                }
+                back={
+                  <div className="flex h-full flex-col rounded-xl border border-brand-400/40 bg-linear-to-b from-brand-600/30 to-ink-900 p-6 shadow-[0_0_40px_-12px_rgb(124_128_255/0.7)]">
                   <span className="grid size-11 place-items-center rounded-lg bg-brand-500 text-white shadow-[0_0_20px_rgb(124_128_255/0.6)]">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <path d="M5 12l5 5L20 7" />
@@ -86,7 +86,8 @@ export function Problems() {
                   <h3 className="mt-5 text-lg font-medium text-fg">{p.fixTitle}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-fg/75">{p.fix}</p>
                 </div>
-              </div>
+                }
+              />
             </li>
           ))}
         </ul>
