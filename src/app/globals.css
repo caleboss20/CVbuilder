@@ -11,6 +11,12 @@
   --ink-900: #080a26;
   --ink-800: #10133a;
   --brand-300: #a5a8ff;
+  /* Sky / portal effects (RGB triplets) */
+  --sky-glow: 124 128 255;
+  --sky-glow-2: 90 94 245;
+  --sky-light: 165 168 255;
+  --sky-head: 255 255 255;
+  --sky-glow-strength: 1;
   color-scheme: dark;
 }
 
@@ -21,6 +27,11 @@
   --ink-900: #ffffff;
   --ink-800: #eceef8;
   --brand-300: #4f46e5;
+  --sky-glow: 196 181 253;
+  --sky-glow-2: 165 180 252;
+  --sky-light: 99 102 241;
+  --sky-head: 67 56 202;
+  --sky-glow-strength: 0.55;
   color-scheme: light;
 }
 

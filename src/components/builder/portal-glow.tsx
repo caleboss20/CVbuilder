@@ -40,7 +40,7 @@ export function PortalGlow() {
         className="cv11-burst absolute left-1/2 top-[70px] h-[360px] w-[760px] max-w-[140vw] rounded-full blur-3xl"
         style={{
           background:
-            "radial-gradient(ellipse 50% 60% at 50% 70%, rgb(124 128 255 / .28), rgb(90 94 245 / .12) 45%, transparent 75%)",
+            "radial-gradient(ellipse 50% 60% at 50% 70%, rgb(var(--sky-glow) / .28), rgb(var(--sky-glow-2) / .12) 45%, transparent 75%)",
         }}
       />
 
@@ -48,9 +48,9 @@ export function PortalGlow() {
       <div
         className="absolute left-1/2 top-[358px] size-[1100px] sm:top-[372px] max-w-none -translate-x-1/2 rounded-full"
         style={{
-          background: "radial-gradient(circle at 50% 0%, rgb(124 128 255 / .22), transparent 40%), var(--ink-950)",
+          background: "radial-gradient(circle at 50% 0%, rgb(var(--sky-glow) / .22), transparent 40%), var(--ink-950)",
           boxShadow:
-            "0 -1px 0 0 rgb(165 168 255 / .55), 0 -8px 30px 0 rgb(124 128 255 / .3), 0 -30px 90px 6px rgb(90 94 245 / .2), inset 0 30px 80px -20px rgb(124 128 255 / .2)",
+            "0 -1px 0 0 rgb(var(--sky-light) / .55), 0 -8px 30px 0 rgb(var(--sky-glow) / .3), 0 -30px 90px 6px rgb(var(--sky-glow-2) / .2), inset 0 30px 80px -20px rgb(var(--sky-glow) / .2)",
         }}
       />
 
@@ -59,10 +59,10 @@ export function PortalGlow() {
         className="cv11-ring absolute left-1/2 top-[358px] size-[1100px] sm:top-[372px] rounded-full"
         style={{
           background:
-            "conic-gradient(from 0deg, transparent 0deg, rgb(255 255 255 / .5) 18deg, rgb(165 168 255 / .2) 40deg, transparent 70deg, transparent 360deg)",
+            "conic-gradient(from 0deg, transparent 0deg, rgb(var(--sky-head) / .5) 18deg, rgb(var(--sky-light) / .2) 40deg, transparent 70deg, transparent 360deg)",
           WebkitMask: "radial-gradient(circle, transparent 549px, black 550px, black 552px, transparent 553px)",
           mask: "radial-gradient(circle, transparent 549px, black 550px, black 552px, transparent 553px)",
-          filter: "blur(1px) drop-shadow(0 0 8px rgb(165 168 255 / .9))",
+          filter: "blur(1px) drop-shadow(0 0 8px rgb(var(--sky-light) / .9))",
         }}
       />
 
