@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { cvExamples, type CvTemplateName } from "@/lib/cv-examples";
 import { accentSwatches, templates } from "@/lib/templates";
 import {
@@ -49,6 +49,7 @@ export function Builder() {
   const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [saved, setSaved] = useState(true);
+  const [fit, setFit] = useState(1);
   const requestedTemplate = useRef<CvTemplateName | null>(null);
 
   // Load a saved CV (and a ?template= choice from the gallery) after mount
@@ -276,7 +277,17 @@ export function Builder() {
               }
             }} />
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs text-fg/45">Live preview · A4</p>
+              <p className="text-xs text-fg/45">
+                Live preview · A4
+                {fit < 0.995 && fit > MIN_FIT + 0.005 && (
+                  <span className="mt-1 block text-amber-300">
+                    A bit long for one page. Your PDF will shrink it to {Math.round(fit * 100)}% so it fits.
+                  </span>
+                )}
+                {fit <= MIN_FIT + 0.005 && (
+                  <span className="mt-1 block text-amber-300">Too long for one page, so your PDF will use two. Try trimming it.</span>
+                )}
+              </p>
               <AccentPicker value={cv.accent} onChange={(accent) => update({ accent })} />
             </div>
             <div style={accentStyle} className="mx-auto mt-3 max-w-[640px] overflow-hidden rounded-md bg-white shadow-[0_20px_60px_-20px_rgb(0_0_0/0.6)] ring-1 ring-fg/10">
@@ -315,7 +326,7 @@ export function Builder() {
     </div>
 
     {/* Full-size copy used only when printing / saving as PDF */}
-    <PrintCopy cv={cv} />
+    <PrintCopy cv={cv} onFit={(f) => setFit((prev) => (Math.abs(prev - f) > 0.005 ? f : prev))} />
     </>
   );
 }
@@ -498,16 +509,73 @@ function TemplatePicker({
   );
 }
 
-/** Unscaled A4 copy of the CV, only visible to the printer. */
-function PrintCopy({ cv }: { cv: BuilderCv }) {
+/*
+ * Print rules live with the builder (not globals.css) so the PDF never depends
+ * on a cached stylesheet. The copy stays off-screen, not display:none, so its
+ * height can be measured for fit-to-page.
+ */
+const printCss = `
+#cv-print { position: fixed; left: -10000px; top: 0; visibility: hidden; pointer-events: none; }
+@media print {
+  @page { size: A4; margin: 0; }
+  html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+  body > *:not(#cv-print) { display: none !important; }
+  #cv-print { position: static; left: 0; visibility: visible; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  #cv-print li, #cv-print section, #cv-print p { break-inside: avoid; }
+  #cv-print h3 { break-after: avoid; }
+}
+`;
+
+const A4_WIDTH = 794;
+const A4_HEIGHT = 1123;
+/** Smallest shrink we allow before letting a very long CV run onto a second page. */
+const MIN_FIT = 0.72;
+
+/**
+ * Full-size copy of the CV that only the printer sees. If the CV is taller than
+ * one A4 page, it is laid out a little wider and zoomed down so it fills exactly
+ * one page edge to edge, instead of being cut across two pages.
+ */
+function PrintCopy({ cv, onFit }: { cv: BuilderCv; onFit: (scale: number) => void }) {
   const doc = useMemo(() => toDoc(cv), [cv]);
+  const pageRef = useRef<HTMLDivElement>(null);
   const accentStyle = cv.accent ? ({ "--cv-accent": cv.accent } as CSSProperties) : undefined;
+
+  useLayoutEffect(() => {
+    const el = pageRef.current;
+    if (!el) return;
+    el.style.zoom = "1";
+    // Rendered at width w and zoomed by A4_WIDTH / w, does the page fit one A4 height?
+    const fits = (w: number) => {
+      el.style.width = `${w}px`;
+      return (el.offsetHeight * A4_WIDTH) / w <= A4_HEIGHT - 2;
+    };
+    let width = A4_WIDTH;
+    if (!fits(A4_WIDTH)) {
+      let lo = A4_WIDTH;
+      let hi = A4_WIDTH / MIN_FIT;
+      width = hi;
+      if (fits(hi)) {
+        for (let i = 0; i < 12; i++) {
+          const mid = (lo + hi) / 2;
+          if (fits(mid)) hi = mid;
+          else lo = mid;
+        }
+        width = hi;
+      }
+    }
+    el.style.width = `${width}px`;
+    el.style.zoom = String(A4_WIDTH / width);
+    onFit(A4_WIDTH / width);
+  });
+
   return (
     <div id="cv-print" aria-hidden="true" style={accentStyle}>
-      <div className="@container flex min-h-[1123px] w-[794px] flex-col bg-white [&>*]:flex-1">
+      <style>{printCss}</style>
+      <div ref={pageRef} className="@container flex min-h-[1121px] w-[794px] flex-col bg-white [&>*]:flex-1">
         <HideEmptySections>
-                  <CvTemplateView template={cv.template} doc={doc} role={cv.role || "Your role"} photo={cv.photo} />
-                </HideEmptySections>
+          <CvTemplateView template={cv.template} doc={doc} role={cv.role || "Your role"} photo={cv.photo} />
+        </HideEmptySections>
       </div>
     </div>
   );
