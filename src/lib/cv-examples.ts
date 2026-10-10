@@ -54,7 +54,12 @@ export type CvTemplateName =
   | "navyPanel"
   | "navyRing"
   | "blueDiagonal"
-  | "slateBand";
+  | "slateBand"
+  | "sage"
+  | "softBars"
+  | "tealHeader"
+  | "cleanRule"
+  | "greyHeader";
 
 export type CvExample = {
   slug: string;
@@ -751,6 +756,10 @@ const PHOTO = {
   girlNotebook: "/images/demo/student-girl-notebook.webp",
   guyBooks: "/images/demo/student-guy-books.webp",
   osborn: "/images/demo/osborn-appiah.webp",
+  lawStudent: "/images/demo/law-student.webp",
+  gradBlue: "/images/demo/grad-blue.webp",
+  gradBlackSuit: "/images/demo/grad-black-suit.webp",
+  gradBurgundy: "/images/demo/grad-burgundy.webp",
 };
 
 const looks: Record<string, Pick<CvExample, "role" | "template" | "photo">> = {
@@ -759,28 +768,28 @@ const looks: Record<string, Pick<CvExample, "role" | "template" | "photo">> = {
   accounting: { role: "Accounting Student", template: "band" },
   midwifery: { role: "Midwifery Student", template: "elegant" },
   "civil-engineering": { role: "Civil Engineering Graduate", template: "darkHeader", photo: PHOTO.guyBooks },
-  pharmacy: { role: "Pharmacy Student", template: "ats" },
-  law: { role: "Law Student", template: "navyPanel", photo: PHOTO.amaGlasses },
+  pharmacy: { role: "Pharmacy Student", template: "greyHeader", photo: PHOTO.gradBlue },
+  law: { role: "Law Student", template: "tealHeader", photo: PHOTO.lawStudent },
   "national-service": {
     role: "Electrical Engineer · National Service",
     template: "navyRing",
     photo: PHOTO.osborn,
   },
-  banking: { role: "Banking and Finance Student", template: "slateBand", photo: PHOTO.girlNotebook },
+  banking: { role: "Banking and Finance Student", template: "softBars", photo: PHOTO.gradBlackSuit },
   teaching: { role: "Mathematics Teacher", template: "timeline" },
   "medical-laboratory-science": { role: "Medical Laboratory Scientist", template: "simple" },
   marketing: { role: "Marketing Student", template: "mono", photo: PHOTO.amaGlasses },
   economics: { role: "Economics Graduate", template: "timeline" },
-  "mechanical-engineering": { role: "Mechanical Engineering Graduate", template: "simple" },
+  "mechanical-engineering": { role: "Mechanical Engineering Graduate", template: "ats" },
   agriculture: { role: "Agriculture Graduate", template: "elegant" },
   "graphic-design": { role: "Graphic Designer", template: "navyPanel", photo: PHOTO.guyBooks },
-  journalism: { role: "Journalism Student", template: "band" },
+  journalism: { role: "Journalism Student", template: "cleanRule", photo: PHOTO.girlNotebook },
   architecture: { role: "Architecture Student", template: "slateBand", photo: PHOTO.guyBooks },
   "data-science": { role: "Data Analyst", template: "accent", photo: PHOTO.osborn },
   "business-administration": {
     role: "Business Administration Student",
-    template: "blueDiagonal",
-    photo: PHOTO.amaGlasses,
+    template: "sage",
+    photo: PHOTO.gradBurgundy,
   },
 };
 

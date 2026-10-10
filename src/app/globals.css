@@ -126,3 +126,24 @@ body {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ---------------- CV builder: print / save as PDF ---------------- */
+#cv-print {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  #cv-print {
+    display: block !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

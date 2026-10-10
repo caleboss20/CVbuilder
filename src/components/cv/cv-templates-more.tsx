@@ -161,7 +161,7 @@ export function DarkHeaderCv({ doc, role, photo }: TemplateProps) {
           </div>
         </aside>
 
-        <main className="flex flex-col justify-between space-y-9 px-6 py-10 @xl:px-9">
+        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-9 px-6 py-10 @xl:px-9">
           <DarkBlock title="About Me">
             <p className="text-justify">{doc.summary}</p>
           </DarkBlock>
@@ -285,7 +285,7 @@ export function AccentPortraitCv({ doc, role, photo }: TemplateProps) {
           </div>
         </aside>
 
-        <main className="flex flex-col justify-between space-y-7 @xl:border-l @xl:border-slate-800 @xl:pl-8">
+        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-7 @xl:border-l @xl:border-slate-800 @xl:pl-8">
           <div>
             <AccentHeading>Work Experience</AccentHeading>
             <div className="mt-3 space-y-5">
@@ -379,7 +379,7 @@ export function MonoSplitCv({ doc, role, photo }: TemplateProps) {
       </header>
 
       <div className="mt-10 grid gap-10 @xl:grid-cols-[1fr_32%]">
-        <main className="flex flex-col justify-between space-y-8">
+        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-8">
           <div>
             <MonoHeading>Summary</MonoHeading>
             <p className="mt-3 border-l border-slate-500 pl-4 text-justify">{doc.summary}</p>
@@ -576,7 +576,7 @@ export function NavyPanelCv({ doc, role, photo }: TemplateProps) {
           ) : null}
         </aside>
 
-        <main className="flex flex-col justify-between space-y-8 px-6 py-9 @xl:px-9">
+        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-8 px-6 py-9 @xl:px-9">
           <NavyMain title="About me">
             <p className="text-justify">{doc.summary}</p>
           </NavyMain>
@@ -703,7 +703,7 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="flex flex-col justify-between space-y-7 @xl:border-l-2 @xl:border-slate-400 @xl:pl-8">
+        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-7 @xl:border-l-2 @xl:border-slate-400 @xl:pl-8">
           <header className="pt-2 @xl:pt-16">
             <p className="text-[34px] font-black uppercase leading-none text-[color:var(--cv-accent,#1c2b4a)] @xl:text-[42px]">{doc.name}</p>
             <p className="mt-2 text-[17px] uppercase tracking-wide text-slate-800">{role}</p>
@@ -766,7 +766,7 @@ export function BlueDiagonalCv({ doc, role, photo }: TemplateProps) {
     <div className="grid h-full bg-white text-[12.5px] leading-relaxed text-slate-700 @xl:grid-cols-[38%_1fr]">
       <aside className="relative overflow-hidden bg-[#f4f5f7] px-6 pb-10 pt-8 @xl:px-7">
         <span className="absolute left-0 top-0 size-56 bg-[var(--cv-accent,#0b4aa2)] [clip-path:polygon(0_0,100%_0,0_100%)]" />
-        {photo && (
+        {photo ? (
           <Image
             src={photo}
             alt=""
@@ -774,6 +774,9 @@ export function BlueDiagonalCv({ doc, role, photo }: TemplateProps) {
             height={200}
             className="relative mx-auto size-40 rounded-full border-[6px] border-white object-cover @xl:size-44"
           />
+        ) : (
+          // Keep the name clear of the blue corner when there is no photo
+          <div className="h-36" />
         )}
         <div className="relative mt-4 text-center">
           <p className="text-[34px] font-medium leading-tight" style={{ color: BLUE }}>
@@ -813,7 +816,7 @@ export function BlueDiagonalCv({ doc, role, photo }: TemplateProps) {
         </div>
       </aside>
 
-      <main className="flex flex-col justify-between space-y-9 px-6 py-10 @xl:px-9">
+      <main className="flex flex-col [&>*:last-child]:mt-auto space-y-9 px-6 py-10 @xl:px-9">
         <BlueHeading icon="M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5" title="Education">
           <BlueTimeline
             items={doc.education.map((e) => ({
@@ -963,7 +966,7 @@ export function SlateBandCv({ doc, role, photo }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="flex flex-col justify-between space-y-7 @xl:pr-10">
+        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-7 @xl:pr-10">
           <div>
             <SlateHeading>Profile</SlateHeading>
             <p className="mt-2 text-justify">{doc.summary}</p>

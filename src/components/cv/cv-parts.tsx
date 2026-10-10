@@ -49,7 +49,7 @@ export function skillGroups(skills: string[]) {
       seen++;
     }
     const items = rest
-      .split(/,s*/)
+      .split(/,\s*/)
       .filter(Boolean)
       .map((item) => item.charAt(0).toUpperCase() + item.slice(1));
     return { label, items };

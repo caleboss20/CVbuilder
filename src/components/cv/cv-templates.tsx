@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
-import type { CvDoc, CvExample, CvJob } from "@/lib/cv-examples";
+import type { CvDoc, CvExample, CvJob, CvTemplateName } from "@/lib/cv-examples";
 import { AtsCv } from "./ats-cv";
 import {
   Bullets,
@@ -21,13 +21,24 @@ import {
   SimpleBoldCv,
   SlateBandCv,
 } from "./cv-templates-more";
+import { CleanRuleCv, GreyHeaderCv, SageCv, SoftBarsCv, TealHeaderCv } from "./cv-templates-single";
 
 export type TemplateProps = { doc: CvDoc; role: string; photo?: string };
 
-/** Renders a course example in its assigned template design. */
-export function CvTemplate({ example }: { example: CvExample }) {
-  const props: TemplateProps = { doc: example.cv, role: example.role, photo: example.photo };
-  switch (example.template) {
+/** Renders a CV in any template. Used by the examples, the gallery and the builder. */
+export function CvTemplateView({
+  template,
+  doc,
+  role,
+  photo,
+}: {
+  template: CvTemplateName;
+  doc: CvDoc;
+  role: string;
+  photo?: string;
+}) {
+  const props: TemplateProps = { doc, role, photo };
+  switch (template) {
     case "elegant":
       return <ElegantCv {...props} />;
     case "band":
@@ -52,9 +63,26 @@ export function CvTemplate({ example }: { example: CvExample }) {
       return <BlueDiagonalCv {...props} />;
     case "slateBand":
       return <SlateBandCv {...props} />;
+    case "sage":
+      return <SageCv {...props} />;
+    case "softBars":
+      return <SoftBarsCv {...props} />;
+    case "tealHeader":
+      return <TealHeaderCv {...props} />;
+    case "cleanRule":
+      return <CleanRuleCv {...props} />;
+    case "greyHeader":
+      return <GreyHeaderCv {...props} />;
     default:
-      return <AtsCv doc={example.cv} role={example.role} />;
+      return <AtsCv doc={doc} role={role} />;
   }
+}
+
+/** Renders a course example in its assigned template design. */
+export function CvTemplate({ example }: { example: CvExample }) {
+  return (
+    <CvTemplateView template={example.template} doc={example.cv} role={example.role} photo={example.photo} />
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -115,7 +143,7 @@ function ElegantCv({ doc, role }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="flex flex-col justify-between space-y-7 @xl:pl-7">
+        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-7 @xl:pl-7">
           <div>
             <ElegantHeading>Profile</ElegantHeading>
             <p className="mt-3 text-justify">{doc.summary}</p>
@@ -227,7 +255,7 @@ function BandCv({ doc, role }: TemplateProps) {
             ),
           )}
         </aside>
-        <main className="flex flex-col justify-between space-y-6 @xl:pl-7">
+        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-6 @xl:pl-7">
           <div>
             <BandHeading>Relevant Experience</BandHeading>
             <div className="mt-3 space-y-4">
@@ -321,7 +349,7 @@ function TimelineCv({ doc, role }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="flex flex-col justify-between space-y-8">
+        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-8">
           <div>
             <BoldHeading rule>Profile</BoldHeading>
             <p className="mt-3 text-justify">{doc.summary}</p>
@@ -448,7 +476,7 @@ function PhotoCv({ doc, role, photo }: TemplateProps) {
           )}
         </aside>
 
-        <main className="flex flex-col justify-between space-y-8">
+        <main className="flex flex-col [&>*:last-child]:mt-auto space-y-8">
           <div>
             <PhotoHeading>Profile</PhotoHeading>
             <p className="mt-4">{doc.summary}</p>
