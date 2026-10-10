@@ -27,7 +27,7 @@ function completed(persona: DemoPersona): DemoTemplateProps {
 export function ScaledPage({ children }: { children: ReactNode }) {
   return (
     <div className="h-[146px] w-[104px] overflow-hidden rounded-[3px] bg-white sm:h-[212px] sm:w-[150px]">
-      <div className="w-[600px] origin-top-left scale-[0.1733] sm:scale-[0.25]">{children}</div>
+      <div className="@container w-[600px] origin-top-left scale-[0.1733] sm:scale-[0.25]">{children}</div>
     </div>
   );
 }

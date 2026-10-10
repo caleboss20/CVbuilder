@@ -8,9 +8,9 @@ import { extraLists, ProjectsList, ReferencesGrid } from "./cv-parts";
  */
 export function AtsCv({ doc, role }: { doc: CvDoc; role?: string }) {
   return (
-    <div className="h-full bg-white px-6 py-8 text-[13px] leading-relaxed text-slate-700 sm:px-10 sm:py-10">
+    <div className="h-full bg-white px-6 py-8 text-[13px] leading-relaxed text-slate-700 @xl:px-10 @xl:py-10">
       <header className="text-center">
-        <p className="text-2xl font-medium uppercase tracking-[0.12em] text-slate-900 sm:text-[26px]">
+        <p className="text-2xl font-medium uppercase tracking-[0.12em] text-slate-900 @xl:text-[26px]">
           {doc.name}
         </p>
         {role && <p className="mt-0.5 text-sm text-slate-600">{role}</p>}

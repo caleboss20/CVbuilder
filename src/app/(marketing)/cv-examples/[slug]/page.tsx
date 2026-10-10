@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cvExamples, getCvExample } from "@/lib/cv-examples";
 import { siteConfig } from "@/lib/site";
+import { CvPageFrame } from "@/components/cv/cv-page-frame";
 import { CvTemplate } from "@/components/cv/cv-templates";
 import { CvIcon } from "@/components/cv/cv-icon";
 import { ButtonLink } from "@/components/ui/button";
@@ -87,12 +88,11 @@ export default async function CvExamplePage({ params }: PageProps<"/cv-examples/
         <div className="mt-12 grid items-start gap-8 lg:grid-cols-[1fr_340px]">
           <article
             aria-label={`${example.course} CV example`}
-            className="@container overflow-hidden rounded-md bg-white shadow-[0_0_60px_-15px_rgb(124_128_255/0.6)]"
+            className="overflow-hidden rounded-md bg-white shadow-[0_0_60px_-15px_rgb(124_128_255/0.6)]"
           >
-            {/* At least one A4 page tall (width × 1.414), growing with longer CVs */}
-            <div className="flex min-h-[141.4cqw] flex-col [&>*]:flex-1">
+            <CvPageFrame>
               <CvTemplate example={example} />
-            </div>
+            </CvPageFrame>
           </article>
 
           <aside className="space-y-5 lg:sticky lg:top-28">

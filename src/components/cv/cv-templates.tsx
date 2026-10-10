@@ -64,17 +64,17 @@ export function CvTemplate({ example }: { example: CvExample }) {
 function ElegantCv({ doc, role }: TemplateProps) {
   const [first, ...rest] = doc.name.split(" ");
   return (
-    <div className="flex h-full flex-col bg-[#fbfaf8] px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 sm:px-10">
+    <div className="flex h-full flex-col bg-[#fbfaf8] px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 @xl:px-10">
       <header className="text-center">
-        <p className="text-[28px] font-light uppercase tracking-[0.3em] text-slate-900 sm:text-[34px]">
+        <p className="text-[28px] font-light uppercase tracking-[0.3em] text-slate-900 @xl:text-[34px]">
           {first} <span className="font-normal">{rest.join(" ")}</span>
         </p>
         <p className="mt-2 text-[11px] uppercase tracking-[0.35em] text-slate-500">{role}</p>
       </header>
       <div className="mt-7 h-[3px] bg-[#b59a72]" />
 
-      <div className="mt-7 grid flex-1 gap-7 sm:grid-cols-[34%_1fr] sm:gap-0">
-        <aside className="space-y-7 sm:border-r sm:border-slate-300 sm:pr-6">
+      <div className="mt-7 grid flex-1 gap-7 @xl:grid-cols-[34%_1fr] @xl:gap-0">
+        <aside className="space-y-7 @xl:border-r @xl:border-slate-300 @xl:pr-6">
           <div className="space-y-2.5">
             {doc.contact.map((c) => (
               <p key={c} className="flex items-center gap-3 break-words text-[11.5px]">
@@ -115,7 +115,7 @@ function ElegantCv({ doc, role }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="space-y-7 sm:pl-7">
+        <main className="space-y-7 @xl:pl-7">
           <div>
             <ElegantHeading>Profile</ElegantHeading>
             <p className="mt-3 text-justify">{doc.summary}</p>
@@ -169,8 +169,8 @@ function BandCv({ doc, role }: TemplateProps) {
   const groups = skillGroups(doc.skills);
   return (
     <div className="flex h-full flex-col bg-linear-to-b from-white to-[#f1f1f1] text-[12.5px] leading-relaxed text-slate-600">
-      <header className="flex flex-wrap items-end justify-between gap-4 px-6 pt-10 pb-8 sm:px-10">
-        <p className="font-serif text-[30px] font-light uppercase leading-tight tracking-[0.18em] text-slate-800 sm:text-[38px]">
+      <header className="flex flex-wrap items-end justify-between gap-4 px-6 pt-10 pb-8 @xl:px-10">
+        <p className="font-serif text-[30px] font-light uppercase leading-tight tracking-[0.18em] text-slate-800 @xl:text-[38px]">
           {first}
           <br />
           {rest.join(" ")}
@@ -178,8 +178,8 @@ function BandCv({ doc, role }: TemplateProps) {
         <p className="pb-2 text-[11px] uppercase tracking-[0.45em] text-slate-600">{role}</p>
       </header>
 
-      <div className="grid gap-6 bg-[#e8e8e8] px-6 py-7 sm:grid-cols-[34%_1fr] sm:gap-0 sm:px-10">
-        <div className="sm:border-r sm:border-slate-300 sm:pr-6">
+      <div className="grid gap-6 bg-[#e8e8e8] px-6 py-7 @xl:grid-cols-[34%_1fr] @xl:gap-0 @xl:px-10">
+        <div className="@xl:border-r @xl:border-slate-300 @xl:pr-6">
           <BandHeading>Contact</BandHeading>
           <div className="mt-3 space-y-1.5 text-[11.5px]">
             {doc.contact.map((c) => (
@@ -190,14 +190,14 @@ function BandCv({ doc, role }: TemplateProps) {
             ))}
           </div>
         </div>
-        <div className="sm:pl-7">
+        <div className="@xl:pl-7">
           <BandHeading>Summary</BandHeading>
           <p className="mt-3 text-justify">{doc.summary}</p>
         </div>
       </div>
 
-      <div className="grid flex-1 gap-7 px-6 py-8 sm:grid-cols-[34%_1fr] sm:gap-0 sm:px-10">
-        <aside className="space-y-6 sm:border-r sm:border-slate-300 sm:pr-6">
+      <div className="grid flex-1 gap-7 px-6 py-8 @xl:grid-cols-[34%_1fr] @xl:gap-0 @xl:px-10">
+        <aside className="space-y-6 @xl:border-r @xl:border-slate-300 @xl:pr-6">
           {[...groups.map((g) => ({ title: g.label || "Skills", items: g.items })), ...extraLists(doc)].map(
             (g, i) => (
               <div key={g.title + i}>
@@ -211,7 +211,7 @@ function BandCv({ doc, role }: TemplateProps) {
             ),
           )}
         </aside>
-        <main className="space-y-6 sm:pl-7">
+        <main className="space-y-6 @xl:pl-7">
           <div>
             <BandHeading>Education</BandHeading>
             {doc.education.map((e) => (
@@ -266,15 +266,15 @@ function BandHeading({ children }: { children: ReactNode }) {
 
 function TimelineCv({ doc, role }: TemplateProps) {
   return (
-    <div className="flex h-full flex-col bg-white px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 sm:px-10">
+    <div className="flex h-full flex-col bg-white px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 @xl:px-10">
       <header>
-        <p className="text-[34px] font-black uppercase leading-none tracking-tight text-slate-950 sm:text-[42px]">
+        <p className="text-[34px] font-black uppercase leading-none tracking-tight text-slate-950 @xl:text-[42px]">
           {doc.name}
         </p>
-        <p className="mt-2 text-[17px] uppercase text-slate-800 sm:text-[19px]">{role}</p>
+        <p className="mt-2 text-[17px] uppercase text-slate-800 @xl:text-[19px]">{role}</p>
       </header>
 
-      <div className="mt-9 grid flex-1 gap-8 sm:grid-cols-[35%_1fr]">
+      <div className="mt-9 grid flex-1 gap-8 @xl:grid-cols-[35%_1fr]">
         <aside className="space-y-8">
           <div>
             <BoldHeading>Contact</BoldHeading>
@@ -376,13 +376,13 @@ function PhotoCv({ doc, role, photo }: TemplateProps) {
   const parts = doc.name.split(" ");
   const last = parts.pop();
   return (
-    <div className="flex h-full flex-col bg-white px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 sm:px-10">
+    <div className="flex h-full flex-col bg-white px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 @xl:px-10">
       <header className="flex items-start justify-between gap-5">
         <div>
-          <p className="text-[30px] font-light uppercase leading-none text-slate-500 sm:text-[38px]">
+          <p className="text-[30px] font-light uppercase leading-none text-slate-500 @xl:text-[38px]">
             {parts.join(" ")}
           </p>
-          <p className="text-[34px] font-extrabold uppercase leading-tight text-slate-950 sm:text-[44px]">
+          <p className="text-[34px] font-extrabold uppercase leading-tight text-slate-950 @xl:text-[44px]">
             {last}
           </p>
           <p className="mt-1 text-[13px] font-bold uppercase tracking-wide text-slate-500">{role}</p>
@@ -393,12 +393,12 @@ function PhotoCv({ doc, role, photo }: TemplateProps) {
             alt=""
             width={140}
             height={140}
-            className="size-20 shrink-0 rounded-full object-cover sm:size-28"
+            className="size-20 shrink-0 rounded-full object-cover @xl:size-28"
           />
         )}
       </header>
 
-      <div className="mt-9 grid flex-1 gap-8 sm:grid-cols-[38%_1fr]">
+      <div className="mt-9 grid flex-1 gap-8 @xl:grid-cols-[38%_1fr]">
         <aside className="space-y-8">
           <div>
             <PhotoHeading>Contact</PhotoHeading>

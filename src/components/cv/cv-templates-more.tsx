@@ -17,12 +17,12 @@ import {
 
 export function SimpleBoldCv({ doc, role }: TemplateProps) {
   return (
-    <div className="h-full bg-white px-6 py-10 text-[13px] leading-relaxed text-slate-700 sm:px-12">
+    <div className="h-full bg-white px-6 py-10 text-[13px] leading-relaxed text-slate-700 @xl:px-12">
       <header>
-        <p className="text-[32px] font-extrabold uppercase leading-none tracking-tight text-slate-950 sm:text-[38px]">
+        <p className="text-[32px] font-extrabold uppercase leading-none tracking-tight text-slate-950 @xl:text-[38px]">
           {doc.name}
         </p>
-        <p className="mt-2 text-[18px] uppercase text-slate-800 sm:text-[20px]">{role}</p>
+        <p className="mt-2 text-[18px] uppercase text-slate-800 @xl:text-[20px]">{role}</p>
         <div className="mt-2 h-[3px] bg-slate-900" />
         <p className="mt-2 text-[12px] text-slate-700">{doc.contact.join(" | ")}</p>
       </header>
@@ -106,10 +106,10 @@ function SimpleSection({ title, children }: { title: string; children: ReactNode
 export function DarkHeaderCv({ doc, role, photo }: TemplateProps) {
   return (
     <div className="flex h-full flex-col bg-white text-[12.5px] leading-relaxed text-slate-600">
-      <header className="grid bg-[#3b3b3b] px-6 pb-32 pt-10 sm:grid-cols-[40%_1fr] sm:px-0 sm:py-12">
+      <header className="grid bg-[#3b3b3b] px-6 pb-32 pt-10 @xl:grid-cols-[40%_1fr] @xl:px-0 @xl:py-12">
         <div />
-        <div className="sm:pr-10">
-          <p className="text-[32px] font-bold uppercase leading-none tracking-wide text-white sm:text-[40px]">
+        <div className="@xl:pr-10">
+          <p className="text-[32px] font-bold uppercase leading-none tracking-wide text-white @xl:text-[40px]">
             {doc.name}
           </p>
           <div className="mt-4 h-px bg-white/70" />
@@ -117,8 +117,8 @@ export function DarkHeaderCv({ doc, role, photo }: TemplateProps) {
         </div>
       </header>
 
-      <div className="grid flex-1 sm:grid-cols-[40%_1fr]">
-        <aside className="relative bg-[#f1f1f1] px-6 pb-10 pt-28 sm:px-8">
+      <div className="grid flex-1 @xl:grid-cols-[40%_1fr]">
+        <aside className="relative bg-[#f1f1f1] px-6 pb-10 pt-28 @xl:px-8">
           {photo && (
             <Image
               src={photo}
@@ -161,7 +161,7 @@ export function DarkHeaderCv({ doc, role, photo }: TemplateProps) {
           </div>
         </aside>
 
-        <main className="space-y-9 px-6 py-10 sm:px-9">
+        <main className="space-y-9 px-6 py-10 @xl:px-9">
           <DarkBlock title="About Me">
             <p className="text-justify">{doc.summary}</p>
           </DarkBlock>
@@ -217,9 +217,9 @@ export function AccentPortraitCv({ doc, role, photo }: TemplateProps) {
   const last = parts.pop();
   const groups = skillGroups(doc.skills);
   return (
-    <div className="h-full bg-[#fafafa] px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 sm:px-10">
-      <header className="grid gap-6 sm:grid-cols-[30%_1fr]">
-        <div className="relative hidden h-[270px] overflow-hidden bg-slate-200 sm:block">
+    <div className="h-full bg-[#fafafa] px-6 py-10 text-[12.5px] leading-relaxed text-slate-600 @xl:px-10">
+      <header className="grid gap-6 @xl:grid-cols-[30%_1fr]">
+        <div className="relative hidden h-[270px] overflow-hidden bg-slate-200 @xl:block">
           {photo && (
             <Image src={photo} alt="" fill sizes="220px" className="object-cover object-top grayscale" />
           )}
@@ -234,7 +234,7 @@ export function AccentPortraitCv({ doc, role, photo }: TemplateProps) {
                 <span className={`inline-block h-7 w-2 -skew-x-12 ${YELLOW}`} />
                 {parts.join(" ")}
               </p>
-              <p className="text-[40px] font-extrabold leading-none text-slate-950 sm:text-[46px]">{last}</p>
+              <p className="text-[40px] font-extrabold leading-none text-slate-950 @xl:text-[46px]">{last}</p>
               <p className="mt-4 border-l-2 border-slate-700 pl-4 text-[14px] uppercase tracking-wide text-slate-800">
                 {role}
               </p>
@@ -255,7 +255,7 @@ export function AccentPortraitCv({ doc, role, photo }: TemplateProps) {
         </div>
       </header>
 
-      <div className="mt-10 grid gap-8 sm:grid-cols-[30%_1fr]">
+      <div className="mt-10 grid gap-8 @xl:grid-cols-[30%_1fr]">
         <aside className="space-y-7">
           <div>
             <AccentHeading>Skills</AccentHeading>
@@ -280,13 +280,13 @@ export function AccentPortraitCv({ doc, role, photo }: TemplateProps) {
           </div>
         </aside>
 
-        <main className="space-y-7 sm:border-l sm:border-slate-800 sm:pl-8">
+        <main className="space-y-7 @xl:border-l @xl:border-slate-800 @xl:pl-8">
           <div>
             <AccentHeading>Work Experience</AccentHeading>
             <div className="mt-3 space-y-5">
               {doc.experience.map((j) => (
                 <div key={j.title + j.place} className="relative">
-                  <span className="absolute -left-[37px] top-2 hidden h-px w-3 bg-slate-800 sm:block" />
+                  <span className="absolute -left-[37px] top-2 hidden h-px w-3 bg-slate-800 @xl:block" />
                   <p className="text-[14.5px] font-medium text-slate-900">{j.title}</p>
                   <p className="italic text-slate-700">
                     {j.place} | {j.date}
@@ -305,7 +305,7 @@ export function AccentPortraitCv({ doc, role, photo }: TemplateProps) {
         </main>
       </div>
 
-      <div className="mt-10 grid gap-6 border-t border-slate-200 pt-6 sm:grid-cols-3">
+      <div className="mt-10 grid gap-6 border-t border-slate-200 pt-6 @xl:grid-cols-3">
         {doc.references?.length ? (
           <div>
             <AccentHeading>References</AccentHeading>
@@ -353,17 +353,17 @@ export function MonoSplitCv({ doc, role, photo }: TemplateProps) {
   const parts = doc.name.split(" ");
   const last = parts.pop();
   return (
-    <div className="relative h-full bg-white px-6 py-12 text-[12.5px] leading-relaxed text-slate-600 sm:pl-14 sm:pr-10">
-      <span className="absolute left-0 top-20 hidden h-36 w-4 bg-slate-950 sm:block" />
+    <div className="relative h-full bg-white px-6 py-12 text-[12.5px] leading-relaxed text-slate-600 @xl:pl-14 @xl:pr-10">
+      <span className="absolute left-0 top-20 hidden h-36 w-4 bg-slate-950 @xl:block" />
       <header className="flex flex-wrap items-start justify-between gap-6">
         <div>
-          <p className="text-[30px] font-light uppercase leading-tight text-slate-900 sm:text-[34px]">
+          <p className="text-[30px] font-light uppercase leading-tight text-slate-900 @xl:text-[34px]">
             {parts.join(" ")}
           </p>
-          <p className="text-[34px] font-bold uppercase leading-none text-slate-950 sm:text-[40px]">{last}</p>
+          <p className="text-[34px] font-bold uppercase leading-none text-slate-950 @xl:text-[40px]">{last}</p>
           <p className="mt-3 text-[13px] uppercase tracking-[0.35em] text-slate-800">{role}</p>
         </div>
-        <div className="w-full space-y-1.5 sm:w-auto sm:min-w-[230px]">
+        <div className="w-full space-y-1.5 @xl:w-auto @xl:min-w-[230px]">
           {doc.contact.map((c) => (
             <p key={c} className="flex items-center gap-3">
               <ContactIcon kind={contactKind(c)} className="text-slate-900" />
@@ -373,7 +373,7 @@ export function MonoSplitCv({ doc, role, photo }: TemplateProps) {
         </div>
       </header>
 
-      <div className="mt-10 grid gap-10 sm:grid-cols-[1fr_32%]">
+      <div className="mt-10 grid gap-10 @xl:grid-cols-[1fr_32%]">
         <main className="space-y-8">
           <div>
             <MonoHeading>Summary</MonoHeading>
@@ -484,7 +484,7 @@ export function NavyPanelCv({ doc, role, photo }: TemplateProps) {
   const [first, ...rest] = doc.name.split(" ");
   return (
     <div className="flex h-full flex-col bg-white text-[12.5px] leading-relaxed text-slate-600">
-      <header className="grid sm:grid-cols-[38%_1fr]">
+      <header className="grid @xl:grid-cols-[38%_1fr]">
         <div className="flex items-center justify-center rounded-br-[44px] bg-[#2c3a55] px-6 py-8">
           {photo && (
             <Image
@@ -492,12 +492,12 @@ export function NavyPanelCv({ doc, role, photo }: TemplateProps) {
               alt=""
               width={180}
               height={180}
-              className="size-36 rounded-full object-cover ring-4 ring-white/30 sm:size-40"
+              className="size-36 rounded-full object-cover ring-4 ring-white/30 @xl:size-40"
             />
           )}
         </div>
-        <div className="flex flex-col justify-center px-6 py-8 sm:px-10">
-          <p className="font-serif text-[30px] font-black uppercase leading-tight text-[#2c3a55] sm:text-[38px]">
+        <div className="flex flex-col justify-center px-6 py-8 @xl:px-10">
+          <p className="font-serif text-[30px] font-black uppercase leading-tight text-[#2c3a55] @xl:text-[38px]">
             {first}
             <br />
             {rest.join(" ")}
@@ -506,7 +506,7 @@ export function NavyPanelCv({ doc, role, photo }: TemplateProps) {
         </div>
       </header>
 
-      <div className="mx-4 mt-2 flex flex-wrap justify-around gap-x-6 gap-y-2 rounded-full bg-[#2c3a55] px-6 py-3 text-[11px] text-white sm:mx-6">
+      <div className="mx-4 mt-2 flex flex-wrap justify-around gap-x-6 gap-y-2 rounded-full bg-[#2c3a55] px-6 py-3 text-[11px] text-white @xl:mx-6">
         {doc.contact.map((c) => (
           <p key={c} className="flex items-center gap-2 break-all">
             <ContactIcon kind={contactKind(c)} className="text-white" />
@@ -515,8 +515,8 @@ export function NavyPanelCv({ doc, role, photo }: TemplateProps) {
         ))}
       </div>
 
-      <div className="mt-6 grid flex-1 sm:grid-cols-[38%_1fr]">
-        <aside className="space-y-7 rounded-tr-[44px] bg-[#2c3a55] px-6 py-9 text-white/85 sm:px-8">
+      <div className="mt-6 grid flex-1 @xl:grid-cols-[38%_1fr]">
+        <aside className="space-y-7 rounded-tr-[44px] bg-[#2c3a55] px-6 py-9 text-white/85 @xl:px-8">
           <NavySide title="Education">
             <div className="space-y-3">
               {doc.education.map((e) => (
@@ -551,7 +551,7 @@ export function NavyPanelCv({ doc, role, photo }: TemplateProps) {
           ) : null}
         </aside>
 
-        <main className="space-y-8 px-6 py-9 sm:px-9">
+        <main className="space-y-8 px-6 py-9 @xl:px-9">
           <NavyMain title="About me">
             <p className="text-justify">{doc.summary}</p>
           </NavyMain>
@@ -613,7 +613,7 @@ function NavyMain({ title, children }: { title: string; children: ReactNode }) {
 
 export function NavyRingCv({ doc, role, photo }: TemplateProps) {
   return (
-    <div className="relative h-full overflow-hidden bg-linear-to-br from-white via-[#f3f4f7] to-[#e9ebf0] px-6 pb-32 pt-10 text-[12.5px] leading-relaxed text-slate-700 sm:px-10">
+    <div className="relative h-full overflow-hidden bg-linear-to-br from-white via-[#f3f4f7] to-[#e9ebf0] px-6 pb-32 pt-10 text-[12.5px] leading-relaxed text-slate-700 @xl:px-10">
       {/* Decorative shapes and wave lines */}
       <span className="absolute -right-10 -top-6 h-10 w-72 -skew-x-[30deg] bg-[#1c2b4a]" />
       <span className="absolute right-24 top-0 h-6 w-56 -skew-x-[30deg] bg-slate-300" />
@@ -624,7 +624,7 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
       </svg>
       <span className="absolute -bottom-10 -left-10 h-24 w-[70%] rounded-[100%] bg-[#1c2b4a]" />
 
-      <div className="relative grid gap-8 sm:grid-cols-[42%_1fr]">
+      <div className="relative grid gap-8 @xl:grid-cols-[42%_1fr]">
         <aside className="space-y-6">
           {photo && (
             <Image
@@ -632,7 +632,7 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
               alt=""
               width={220}
               height={220}
-              className="mx-auto size-44 rounded-full border-[12px] border-[#1c2b4a] object-cover sm:size-52"
+              className="mx-auto size-44 rounded-full border-[12px] border-[#1c2b4a] object-cover @xl:size-52"
             />
           )}
           <RingSide title="Contact">
@@ -678,9 +678,9 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="space-y-7 sm:border-l-2 sm:border-slate-400 sm:pl-8">
-          <header className="pt-2 sm:pt-16">
-            <p className="text-[34px] font-black uppercase leading-none text-[#1c2b4a] sm:text-[42px]">{doc.name}</p>
+        <main className="space-y-7 @xl:border-l-2 @xl:border-slate-400 @xl:pl-8">
+          <header className="pt-2 @xl:pt-16">
+            <p className="text-[34px] font-black uppercase leading-none text-[#1c2b4a] @xl:text-[42px]">{doc.name}</p>
             <p className="mt-2 text-[17px] uppercase tracking-wide text-slate-800">{role}</p>
             <div className="mt-4 h-0.5 w-4/5 bg-slate-400" />
           </header>
@@ -733,8 +733,8 @@ const BLUE = "#0b4aa2";
 export function BlueDiagonalCv({ doc, role, photo }: TemplateProps) {
   const [first, ...rest] = doc.name.split(" ");
   return (
-    <div className="grid h-full bg-white text-[12.5px] leading-relaxed text-slate-700 sm:grid-cols-[38%_1fr]">
-      <aside className="relative overflow-hidden bg-[#f4f5f7] px-6 pb-10 pt-8 sm:px-7">
+    <div className="grid h-full bg-white text-[12.5px] leading-relaxed text-slate-700 @xl:grid-cols-[38%_1fr]">
+      <aside className="relative overflow-hidden bg-[#f4f5f7] px-6 pb-10 pt-8 @xl:px-7">
         <span className="absolute left-0 top-0 size-56 bg-[#0b4aa2] [clip-path:polygon(0_0,100%_0,0_100%)]" />
         {photo && (
           <Image
@@ -742,7 +742,7 @@ export function BlueDiagonalCv({ doc, role, photo }: TemplateProps) {
             alt=""
             width={200}
             height={200}
-            className="relative mx-auto size-40 rounded-full border-[6px] border-white object-cover sm:size-44"
+            className="relative mx-auto size-40 rounded-full border-[6px] border-white object-cover @xl:size-44"
           />
         )}
         <div className="relative mt-4 text-center">
@@ -783,7 +783,7 @@ export function BlueDiagonalCv({ doc, role, photo }: TemplateProps) {
         </div>
       </aside>
 
-      <main className="space-y-9 px-6 py-10 sm:px-9">
+      <main className="space-y-9 px-6 py-10 @xl:px-9">
         <BlueHeading icon="M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5" title="Education">
           <BlueTimeline
             items={doc.education.map((e) => ({
@@ -869,11 +869,11 @@ export function SlateBandCv({ doc, role, photo }: TemplateProps) {
   return (
     <div className="relative h-full bg-white text-[12.5px] leading-relaxed text-slate-600">
       {/* Grey column behind the sidebar, and the slate band across the top */}
-      <span className="absolute bottom-0 left-6 top-0 hidden w-[31%] bg-[#d9d9d9] sm:block" />
-      <span className="absolute left-0 right-0 top-[118px] hidden h-9 sm:block" style={{ background: SLATE }} />
+      <span className="absolute bottom-0 left-6 top-0 hidden w-[31%] bg-[#d9d9d9] @xl:block" />
+      <span className="absolute left-0 right-0 top-[118px] hidden h-9 @xl:block" style={{ background: SLATE }} />
 
-      <header className="relative grid sm:grid-cols-[37%_1fr]">
-        <div className="flex justify-center bg-[#d9d9d9] pb-6 pt-8 sm:bg-transparent sm:pl-6">
+      <header className="relative grid @xl:grid-cols-[37%_1fr]">
+        <div className="flex justify-center bg-[#d9d9d9] pb-6 pt-8 @xl:bg-transparent @xl:pl-6">
           {photo && (
             <Image
               src={photo}
@@ -884,12 +884,12 @@ export function SlateBandCv({ doc, role, photo }: TemplateProps) {
             />
           )}
         </div>
-        <div className="px-6 pt-6 text-center sm:px-8 sm:pt-12">
-          <p className="text-[30px] font-extrabold uppercase leading-none sm:text-[34px]" style={{ color: SLATE }}>
+        <div className="px-6 pt-6 text-center @xl:px-8 @xl:pt-12">
+          <p className="text-[30px] font-extrabold uppercase leading-none @xl:text-[34px]" style={{ color: SLATE }}>
             {doc.name}
           </p>
           <p
-            className="mt-3 py-2 text-[13px] uppercase tracking-[0.35em] text-white sm:mt-5 sm:bg-transparent"
+            className="mt-3 py-2 text-[13px] uppercase tracking-[0.35em] text-white @xl:mt-5 @xl:bg-transparent"
             style={{ background: SLATE }}
           >
             {role}
@@ -897,8 +897,8 @@ export function SlateBandCv({ doc, role, photo }: TemplateProps) {
         </div>
       </header>
 
-      <div className="relative grid gap-8 px-6 pb-10 pt-6 sm:grid-cols-[37%_1fr] sm:gap-10 sm:px-0">
-        <aside className="space-y-7 sm:pl-12 sm:pr-4">
+      <div className="relative grid gap-8 px-6 pb-10 pt-6 @xl:grid-cols-[37%_1fr] @xl:gap-10 @xl:px-0">
+        <aside className="space-y-7 @xl:pl-12 @xl:pr-4">
           <SlateHeading>Contact</SlateHeading>
           <div className="-mt-4 space-y-2 text-[11.5px]">
             {doc.contact.map((c) => (
@@ -928,7 +928,7 @@ export function SlateBandCv({ doc, role, photo }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="space-y-7 sm:pr-10">
+        <main className="space-y-7 @xl:pr-10">
           <div>
             <SlateHeading>Profile</SlateHeading>
             <p className="mt-2 text-justify">{doc.summary}</p>
