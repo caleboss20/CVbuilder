@@ -80,15 +80,15 @@ function TestimonialCard({ t, hidden = false }: { t: Testimonial; hidden?: boole
   return (
     <figure
       aria-hidden={hidden || undefined}
-      className={`relative flex h-full flex-col rounded-xl border bg-linear-to-b from-white/[0.06] to-white/[0.02] p-6 ${
-        "border-white/10"
+      className={`relative flex h-full flex-col rounded-xl border bg-linear-to-b from-fg/[0.06] to-fg/[0.02] p-6 ${
+        "border-fg/10"
       }`}
     >
       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="text-brand-400/60">
         <path d="M9.5 6C6.5 7 4.5 9.6 4.5 13v5h6v-6h-3c0-2 1-3.5 3-4.3zM19.5 6c-3 1-5 3.6-5 7v5h6v-6h-3c0-2 1-3.5 3-4.3z" />
       </svg>
-      <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-white/80">{t.quote}</blockquote>
-      <figcaption className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
+      <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-fg/80">{t.quote}</blockquote>
+      <figcaption className="mt-6 flex items-center gap-3 border-t border-fg/10 pt-5">
         <Image
           src={t.photo}
           alt={t.draft ? "" : t.name}
@@ -97,8 +97,8 @@ function TestimonialCard({ t, hidden = false }: { t: Testimonial; hidden?: boole
           className="size-12 rounded-full object-cover ring-2 ring-brand-400/30"
         />
         <div>
-          <p className="font-medium text-white">{t.name}</p>
-          <p className="text-sm text-white/50">
+          <p className="font-medium text-fg">{t.name}</p>
+          <p className="text-sm text-fg/50">
             {t.course} · {t.school}
           </p>
         </div>
@@ -110,7 +110,7 @@ function TestimonialCard({ t, hidden = false }: { t: Testimonial; hidden?: boole
 function UniversityStrip() {
   return (
     <div className="mt-14">
-      <p className="text-center text-xs uppercase tracking-[0.25em] text-white/40">Made for students at</p>
+      <p className="text-center text-xs uppercase tracking-[0.25em] text-fg/40">Made for students at</p>
       <div className="relative mt-6">
         <div className="group/uni flex overflow-hidden">
           {[0, 1].map((copy) => (
@@ -135,7 +135,7 @@ function UniversityStrip() {
                       />
                     </span>
                   </span>
-                  <span className="text-center text-[13px] font-medium leading-snug tracking-wide text-white/75">{u.name}</span>
+                  <span className="text-center text-[13px] font-medium leading-snug tracking-wide text-fg/75">{u.name}</span>
                 </li>
               ))}
             </ul>

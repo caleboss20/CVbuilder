@@ -61,16 +61,16 @@ export function Hero() {
         >
           <div
             aria-hidden="true"
-            className="flex items-center gap-1.5 rounded-lg border border-white/25 bg-ink-800/80 px-3 py-1.5 text-xs text-white/85 shadow-[0_0_24px_-4px_rgb(124_128_255/0.7)] backdrop-blur"
+            className="flex items-center gap-1.5 rounded-lg border border-fg/25 bg-ink-800/80 px-3 py-1.5 text-xs text-fg/85 shadow-[0_0_24px_-4px_rgb(124_128_255/0.7)] backdrop-blur"
           >
             <SparkleIcon className="text-brand-300" />
-            <span className="text-white/55">{s.label}:</span> {s.text}
+            <span className="text-fg/55">{s.label}:</span> {s.text}
           </div>
         </Magnetic>
       ))}
 
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-        <p className="animate-fade-up mx-auto inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] py-1 pl-1 pr-3 text-xs text-white/70">
+        <p className="animate-fade-up mx-auto inline-flex items-center gap-2 rounded-full border border-fg/10 bg-fg/[0.04] py-1 pl-1 pr-3 text-xs text-fg/70">
           <span className="flex -space-x-1.5" aria-hidden="true">
             {avatars.map((src) => (
               <Image
@@ -90,16 +90,16 @@ export function Hero() {
           id="hero-heading"
           className="animate-fade-up mt-6 text-5xl font-medium tracking-tight text-balance [animation-delay:80ms] sm:text-6xl lg:text-7xl"
         >
-          <span className="bg-linear-to-b from-white to-white/60 bg-clip-text text-transparent">
+          <span className="bg-linear-to-b from-fg to-fg/60 bg-clip-text text-transparent">
             Build your student CV
           </span>
           <br />
-          <span className="bg-linear-to-b from-white/80 to-white/40 bg-clip-text text-transparent">
+          <span className="bg-linear-to-b from-fg/80 to-fg/40 bg-clip-text text-transparent">
             smarter, faster, better
           </span>
         </h1>
 
-        <p className="animate-fade-up mx-auto mt-6 max-w-xl text-base text-white/65 [animation-delay:160ms] sm:text-lg">
+        <p className="animate-fade-up mx-auto mt-6 max-w-xl text-base text-fg/65 [animation-delay:160ms] sm:text-lg">
           The free CV builder made for students. Pick a template, let AI help
           with your wording and download a professional PDF in minutes.
         </p>
@@ -125,10 +125,10 @@ export function Hero() {
 
       <div className="animate-fade-up relative -mt-24 px-4 [animation-delay:320ms] sm:-mt-28">
         <HeroCvPreview />
-        <p className="relative mt-6 text-center text-lg font-medium text-white/90">
+        <p className="relative mt-6 text-center text-lg font-medium text-fg/90">
           <span className="text-brand-300">92%</span> ATS match
         </p>
-        <p className="relative mt-2 text-center text-xs text-white/40">
+        <p className="relative mt-2 text-center text-xs text-fg/40">
           No sign-up needed · No watermark · Unlimited PDF downloads
         </p>
       </div>

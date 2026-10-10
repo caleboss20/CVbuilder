@@ -1,15 +1,40 @@
 @import "tailwindcss";
 
+/*
+ * Theme colours. Dark is the default; [data-theme="light"] on <html> switches.
+ * "fg" is the main text/line colour, "ink-*" are the page and panel backgrounds.
+ */
+:root {
+  --fg: #ffffff;
+  --fg-rgb: 255 255 255;
+  --ink-950: #04051a;
+  --ink-900: #080a26;
+  --ink-800: #10133a;
+  --brand-300: #a5a8ff;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --fg: #0b1030;
+  --fg-rgb: 11 16 48;
+  --ink-950: #f6f7fc;
+  --ink-900: #ffffff;
+  --ink-800: #eceef8;
+  --brand-300: #4f46e5;
+  color-scheme: light;
+}
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-fg: var(--fg);
+  --color-ink-950: var(--ink-950);
+  --color-ink-900: var(--ink-900);
+  --color-ink-800: var(--ink-800);
+  --color-brand-300: var(--brand-300);
 }
 
 @theme {
-  --color-ink-950: #04051a;
-  --color-ink-900: #080a26;
-  --color-ink-800: #10133a;
-  --color-brand-300: #a5a8ff;
   --color-brand-400: #7c80ff;
   --color-brand-500: #5a5ef5;
   --color-brand-600: #4044d8;
@@ -62,28 +87,35 @@
 }
 
 body {
-  background: var(--color-ink-950);
-  color: #fff;
+  background: var(--ink-950);
+  color: var(--fg);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* Theme toggle shows the icon for the mode you would switch to */
+.theme-icon-sun { display: block; }
+.theme-icon-moon { display: none; }
+[data-theme="light"] .theme-icon-sun { display: none; }
+[data-theme="light"] .theme-icon-moon { display: block; }
 
 /* Faint square grid used behind hero sections */
 .bg-grid {
   background-image:
-    linear-gradient(to right, rgb(255 255 255 / 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgb(var(--fg-rgb) / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(var(--fg-rgb) / 0.04) 1px, transparent 1px);
   background-size: 56px 56px;
 }
 
 /* Scattered "star" dots */
 .bg-stars {
   background-image:
-    radial-gradient(1px 1px at 12% 18%, rgb(255 255 255 / 0.5), transparent),
-    radial-gradient(1px 1px at 78% 12%, rgb(255 255 255 / 0.35), transparent),
-    radial-gradient(1px 1px at 34% 72%, rgb(255 255 255 / 0.3), transparent),
-    radial-gradient(1px 1px at 88% 64%, rgb(255 255 255 / 0.4), transparent),
-    radial-gradient(1px 1px at 56% 38%, rgb(255 255 255 / 0.25), transparent),
-    radial-gradient(1px 1px at 6% 86%, rgb(255 255 255 / 0.3), transparent),
-    radial-gradient(1px 1px at 66% 90%, rgb(255 255 255 / 0.3), transparent);
+    radial-gradient(1px 1px at 12% 18%, rgb(var(--fg-rgb) / 0.5), transparent),
+    radial-gradient(1px 1px at 78% 12%, rgb(var(--fg-rgb) / 0.35), transparent),
+    radial-gradient(1px 1px at 34% 72%, rgb(var(--fg-rgb) / 0.3), transparent),
+    radial-gradient(1px 1px at 88% 64%, rgb(var(--fg-rgb) / 0.4), transparent),
+    radial-gradient(1px 1px at 56% 38%, rgb(var(--fg-rgb) / 0.25), transparent),
+    radial-gradient(1px 1px at 6% 86%, rgb(var(--fg-rgb) / 0.3), transparent),
+    radial-gradient(1px 1px at 66% 90%, rgb(var(--fg-rgb) / 0.3), transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {

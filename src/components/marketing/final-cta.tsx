@@ -12,11 +12,11 @@ export function FinalCta() {
         />
         <h2
           id="final-cta-heading"
-          className="text-3xl font-medium tracking-tight text-balance text-white sm:text-5xl"
+          className="text-3xl font-medium tracking-tight text-balance text-fg sm:text-5xl"
         >
           Ready to build your CV?
         </h2>
-        <p className="mx-auto mt-4 max-w-xl text-base text-white/65 sm:text-lg">
+        <p className="mx-auto mt-4 max-w-xl text-base text-fg/65 sm:text-lg">
           Pick a template, add your details and download a professional PDF. It’s free for
           students, and you can start right now.
         </p>

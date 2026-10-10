@@ -68,7 +68,7 @@ export function HowItWorks() {
             {/* Progress rail */}
             <span
               aria-hidden="true"
-              className="absolute bottom-10 left-5 top-10 hidden w-px bg-white/10 lg:block"
+              className="absolute bottom-10 left-5 top-10 hidden w-px bg-fg/10 lg:block"
             />
             <span
               aria-hidden="true"
@@ -92,7 +92,7 @@ export function HowItWorks() {
                       className={`relative z-10 grid size-10 shrink-0 place-items-center rounded-full border text-sm font-medium transition-all duration-500 ${
                         isActive
                           ? "border-brand-400 bg-brand-600 text-white shadow-[0_0_24px_rgb(124_128_255/0.7)]"
-                          : "border-white/15 bg-ink-950 text-white/50"
+                          : "border-fg/15 bg-ink-950 text-fg/50"
                       }`}
                     >
                       0{i + 1}
@@ -100,8 +100,8 @@ export function HowItWorks() {
                     <div
                       className={`transition-opacity duration-500 lg:opacity-40 ${isActive ? "lg:opacity-100" : ""}`}
                     >
-                      <h3 className="text-2xl font-medium text-white">{s.title}</h3>
-                      <p className="mt-3 max-w-md text-base leading-relaxed text-white/60">{s.body}</p>
+                      <h3 className="text-2xl font-medium text-fg">{s.title}</h3>
+                      <p className="mt-3 max-w-md text-base leading-relaxed text-fg/60">{s.body}</p>
                     </div>
                   </div>
 
@@ -122,7 +122,7 @@ export function HowItWorks() {
           <div className="hidden lg:block">
             <div
               aria-hidden="true"
-              className="sticky top-[calc(50vh-210px)] h-[420px] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]"
+              className="sticky top-[calc(50vh-210px)] h-[420px] overflow-hidden rounded-2xl border border-fg/10 bg-fg/[0.02]"
             >
               <div className="bg-grid absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
               <div className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-600/20 blur-3xl" />

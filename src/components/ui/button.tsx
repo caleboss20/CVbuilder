@@ -10,7 +10,7 @@ const variants = {
   primary:
     "bg-brand-600 text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)] hover:bg-brand-500 hover:shadow-[0_0_26px_rgb(124_128_255/0.65)]",
   ghost:
-    "bg-white/[0.03] text-white/90 ring-1 ring-white/25 hover:bg-white/[0.07] hover:text-white hover:shadow-[0_0_18px_rgb(255_255_255/0.12)]",
+    "bg-fg/[0.03] text-fg/90 ring-1 ring-fg/25 hover:bg-fg/[0.07] hover:text-fg hover:shadow-[0_0_18px_rgb(var(--fg-rgb)/0.12)]",
 };
 
 const sizes = {

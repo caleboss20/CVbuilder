@@ -46,11 +46,11 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-ink-950">
+    <footer className="border-t border-fg/10 bg-ink-950">
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.3fr_2fr] lg:px-8">
         <div className="max-w-sm">
           <Logo />
-          <p className="mt-5 text-sm leading-relaxed text-white/55">
+          <p className="mt-5 text-sm leading-relaxed text-fg/55">
             {siteConfig.name} helps students and fresh graduates in Ghana build professional CVs, with
             clean templates, real examples for every course and AI help with the wording.
           </p>
@@ -62,11 +62,11 @@ export function Footer() {
         <nav aria-label="Footer" className="grid gap-10 sm:grid-cols-3">
           {columns.map((col) => (
             <div key={col.title}>
-              <h2 className="text-sm font-semibold text-white">{col.title}</h2>
+              <h2 className="text-sm font-semibold text-fg">{col.title}</h2>
               <ul className="mt-4 space-y-3">
                 {col.links.map((l) => (
                   <li key={l.href}>
-                    <Link href={l.href} className="text-sm text-white/55 transition-colors hover:text-white">
+                    <Link href={l.href} className="text-sm text-fg/55 transition-colors hover:text-fg">
                       {l.label}
                     </Link>
                   </li>
@@ -77,8 +77,8 @@ export function Footer() {
         </nav>
       </div>
 
-      <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-white/40 sm:flex-row sm:px-6 lg:px-8">
+      <div className="border-t border-fg/10">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-fg/40 sm:flex-row sm:px-6 lg:px-8">
           <p>
             © 2026 {siteConfig.name}. All rights reserved.
           </p>

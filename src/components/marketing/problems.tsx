@@ -60,14 +60,14 @@ export function Problems() {
                 className="relative h-full rounded-xl outline-none transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] focus-visible:[transform:rotateY(180deg)] focus-visible:ring-2 focus-visible:ring-brand-400"
               >
                 {/* Front: the problem */}
-                <div className="absolute inset-0 flex flex-col rounded-xl border border-white/10 bg-white/[0.03] p-6 [backface-visibility:hidden]">
-                  <span className="grid size-11 place-items-center rounded-lg border border-white/10 bg-white/5 text-white/70">
+                <div className="absolute inset-0 flex flex-col rounded-xl border border-fg/10 bg-fg/[0.03] p-6 [backface-visibility:hidden]">
+                  <span className="grid size-11 place-items-center rounded-lg border border-fg/10 bg-fg/5 text-fg/70">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       {p.icon}
                     </svg>
                   </span>
-                  <h3 className="mt-5 text-lg font-medium text-white">{p.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/55">{p.problem}</p>
+                  <h3 className="mt-5 text-lg font-medium text-fg">{p.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-fg/55">{p.problem}</p>
                   <p className="mt-auto inline-flex items-center gap-1.5 text-xs text-brand-300">
                     See how we fix it
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -83,8 +83,8 @@ export function Problems() {
                       <path d="M5 12l5 5L20 7" />
                     </svg>
                   </span>
-                  <h3 className="mt-5 text-lg font-medium text-white">{p.fixTitle}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/75">{p.fix}</p>
+                  <h3 className="mt-5 text-lg font-medium text-fg">{p.fixTitle}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-fg/75">{p.fix}</p>
                 </div>
               </div>
             </li>

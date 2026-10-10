@@ -47,7 +47,7 @@ export function PickTemplateVisual() {
               )}
             </div>
             <span
-              className={`text-xs ${chosen ? "text-white group-data-[active=true]:translate-y-2 transition-transform duration-500" : "text-white/55"}`}
+              className={`text-xs ${chosen ? "text-fg group-data-[active=true]:translate-y-2 transition-transform duration-500" : "text-fg/55"}`}
             >
               {t.name}
             </span>
@@ -76,11 +76,11 @@ const cvDelays = ["group-data-[active=true]:delay-[600ms]", "group-data-[active=
 export function FillDetailsVisual() {
   return (
     <div className="grid h-full items-center gap-4 sm:grid-cols-[1fr_0.9fr]">
-      <div className="space-y-3 rounded-xl border border-white/10 bg-ink-900/80 p-4">
+      <div className="space-y-3 rounded-xl border border-fg/10 bg-ink-900/80 p-4">
         {fields.map((f, i) => (
           <div key={f.label}>
-            <p className="text-[11px] text-white/45">{f.label}</p>
-            <div className="mt-1 rounded-md border border-white/10 bg-ink-950/70 px-3 py-2 text-sm text-white">
+            <p className="text-[11px] text-fg/45">{f.label}</p>
+            <div className="mt-1 rounded-md border border-fg/10 bg-ink-950/70 px-3 py-2 text-sm text-fg">
               <span
                 className={`block overflow-hidden whitespace-nowrap transition-[max-width] duration-0 [max-width:0] group-data-[active=true]:[max-width:100%] group-data-[active=true]:duration-700 group-data-[active=true]:ease-linear ${fillDelays[i]}`}
               >
@@ -90,11 +90,11 @@ export function FillDetailsVisual() {
           </div>
         ))}
         <div
-          className={`flex items-start gap-2 rounded-md border border-brand-400/40 bg-brand-500/10 px-3 py-2 text-xs text-white/80 opacity-0 transition-all duration-0 translate-y-2 group-data-[active=true]:translate-y-0 group-data-[active=true]:opacity-100 group-data-[active=true]:duration-500 group-data-[active=true]:delay-[2500ms]`}
+          className={`flex items-start gap-2 rounded-md border border-brand-400/40 bg-brand-500/10 px-3 py-2 text-xs text-fg/80 opacity-0 transition-all duration-0 translate-y-2 group-data-[active=true]:translate-y-0 group-data-[active=true]:opacity-100 group-data-[active=true]:duration-500 group-data-[active=true]:delay-[2500ms]`}
         >
           <SparkleIcon className="mt-0.5 text-brand-300" />
           <span>
-            <span className="text-white/50">Try:</span> “Managed a GH₵ 8,000 club budget and
+            <span className="text-fg/50">Try:</span> “Managed a GH₵ 8,000 club budget and
             cut event costs by 15%.”
           </span>
         </div>
@@ -136,16 +136,16 @@ export function FillDetailsVisual() {
 export function DownloadVisual() {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-5">
-      <div className="w-full max-w-xs rounded-xl border border-white/10 bg-ink-900/80 p-4">
+      <div className="w-full max-w-xs rounded-xl border border-fg/10 bg-ink-900/80 p-4">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-white/70">Generating PDF…</span>
+          <span className="text-fg/70">Generating PDF…</span>
           <span
-            className={`text-white/40 transition-opacity duration-0 group-data-[active=true]:opacity-0 group-data-[active=true]:delay-[1400ms]`}
+            className={`text-fg/40 transition-opacity duration-0 group-data-[active=true]:opacity-0 group-data-[active=true]:delay-[1400ms]`}
           >
             A4 · 1 page
           </span>
         </div>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-fg/10">
           <div
             className={`h-full w-0 rounded-full bg-linear-to-r from-brand-500 to-brand-300 transition-[width] duration-0 group-data-[active=true]:w-full group-data-[active=true]:duration-[1300ms] group-data-[active=true]:ease-out`}
           />

@@ -31,21 +31,21 @@ export function Faq() {
           description="Everything you need to know before you build your first CV."
         />
 
-        <div className="mt-14 divide-y divide-white/10 rounded-xl border border-white/10 bg-white/[0.02]">
+        <div className="mt-14 divide-y divide-fg/10 rounded-xl border border-fg/10 bg-fg/[0.02]">
           {faqs.map((f, i) => (
             <details key={f.q} name="faq" open={i === 0} className="group px-5 sm:px-6">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-left text-base font-medium text-white transition-colors hover:text-brand-300 [&::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-left text-base font-medium text-fg transition-colors hover:text-brand-300 [&::-webkit-details-marker]:hidden">
                 {f.q}
                 <span
                   aria-hidden="true"
-                  className="grid size-7 shrink-0 place-items-center rounded-full border border-white/15 text-white/60 transition-transform duration-300 group-open:rotate-45 group-open:border-brand-400/60 group-open:text-brand-300"
+                  className="grid size-7 shrink-0 place-items-center rounded-full border border-fg/15 text-fg/60 transition-transform duration-300 group-open:rotate-45 group-open:border-brand-400/60 group-open:text-brand-300"
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                     <path d="M12 5v14M5 12h14" />
                   </svg>
                 </span>
               </summary>
-              <p className="pb-5 pr-10 text-[15px] leading-relaxed text-white/65">{f.a}</p>
+              <p className="pb-5 pr-10 text-[15px] leading-relaxed text-fg/65">{f.a}</p>
             </details>
           ))}
         </div>

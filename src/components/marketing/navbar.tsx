@@ -6,6 +6,7 @@ import { useState } from "react";
 import { siteConfig } from "@/lib/site";
 import { Logo } from "@/components/ui/logo";
 import { ButtonLink } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -28,7 +29,7 @@ export function Navbar() {
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   className={`text-sm transition-colors ${
-                    active ? "text-white" : "text-white/55 hover:text-white"
+                    active ? "text-fg" : "text-fg/55 hover:text-fg"
                   }`}
                 >
                   {item.label}
@@ -38,23 +39,26 @@ export function Navbar() {
           })}
         </ul>
 
-        <div className="hidden items-center gap-6 lg:flex">
+        <div className="hidden items-center gap-5 lg:flex">
+          <ThemeToggle />
           <Link
             href="/login"
-            className="text-sm font-medium text-white transition-colors hover:text-brand-300"
+            className="text-sm font-medium text-fg transition-colors hover:text-brand-300"
           >
             Log in
           </Link>
           <ButtonLink href="/builder">Try for free</ButtonLink>
         </div>
 
+        <div className="flex items-center gap-2 lg:hidden">
+        <ThemeToggle />
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "Close menu" : "Open menu"}
-          className="grid size-10 place-items-center rounded-lg text-white ring-1 ring-white/15 lg:hidden"
+          className="grid size-10 place-items-center rounded-lg text-fg ring-1 ring-fg/15 lg:hidden"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
             {open ? (
@@ -74,12 +78,13 @@ export function Navbar() {
             )}
           </svg>
         </button>
+        </div>
       </nav>
 
       {open && (
         <div
           id="mobile-menu"
-          className="mx-4 rounded-2xl border border-white/10 bg-ink-900/95 p-4 backdrop-blur-xl lg:hidden"
+          className="mx-4 rounded-2xl border border-fg/10 bg-ink-900/95 p-4 backdrop-blur-xl lg:hidden"
         >
           <ul className="flex flex-col">
             {siteConfig.nav.map((item) => (
@@ -87,14 +92,14 @@ export function Navbar() {
                 <Link
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg px-3 py-2.5 text-sm text-white/75 hover:bg-white/5 hover:text-white"
+                  className="block rounded-lg px-3 py-2.5 text-sm text-fg/75 hover:bg-fg/5 hover:text-fg"
                 >
                   {item.label}
                 </Link>
               </li>
             ))}
           </ul>
-          <div className="mt-3 flex gap-3 border-t border-white/10 pt-4">
+          <div className="mt-3 flex gap-3 border-t border-fg/10 pt-4">
             <ButtonLink href="/login" variant="ghost" className="flex-1">
               Log in
             </ButtonLink>

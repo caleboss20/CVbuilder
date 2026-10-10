@@ -47,7 +47,7 @@ export function CvExamplesMarquee() {
       <div className="mt-12 text-center">
         <Link
           href="/cv-examples"
-          className="inline-flex items-center gap-2 text-sm font-medium text-brand-300 transition-colors hover:text-white"
+          className="inline-flex items-center gap-2 text-sm font-medium text-brand-300 transition-colors hover:text-fg"
         >
           View all CV examples
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -75,7 +75,7 @@ function MarqueeRow({ items, duration }: { items: CvExample[]; duration: string 
               <Link
                 href={`/cv-examples/${e.slug}`}
                 tabIndex={copy === 1 || i >= items.length ? -1 : undefined}
-                className="flex items-center gap-2.5 whitespace-nowrap rounded-full border border-white/10 bg-linear-to-b from-white/[0.08] to-white/[0.02] py-1.5 pl-1.5 pr-4 text-sm text-white/80 shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] transition-all duration-300 hover:border-brand-400/60 hover:from-brand-500/25 hover:to-brand-600/5 hover:text-white hover:shadow-[0_0_24px_-4px_rgb(124_128_255/0.7)]"
+                className="flex items-center gap-2.5 whitespace-nowrap rounded-full border border-fg/10 bg-linear-to-b from-fg/[0.08] to-fg/[0.02] py-1.5 pl-1.5 pr-4 text-sm text-fg/80 shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] transition-all duration-300 hover:border-brand-400/60 hover:from-brand-500/25 hover:to-brand-600/5 hover:text-fg hover:shadow-[0_0_24px_-4px_rgb(124_128_255/0.7)]"
               >
                 <span className="grid size-8 place-items-center rounded-full bg-linear-to-br from-brand-400/30 to-brand-700/20 text-brand-300 ring-1 ring-brand-400/20">
                   <CvIcon name={e.icon} />

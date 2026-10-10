@@ -89,6 +89,11 @@ export function HeroCursorField() {
         ctx.restore();
       }
 
+      // Theme text colour as "r g b", read each frame so a theme switch applies instantly
+      const fg = (getComputedStyle(document.documentElement).getPropertyValue("--fg-rgb").trim() || "255 255 255")
+        .split(/\s+/)
+        .map(Number);
+
       // Dots: pushed away from the glow, spring back with a wobble
       const cx = width / 2;
       const cy = height * 0.45;
@@ -126,9 +131,11 @@ export function HeroCursorField() {
 
         const alpha = (0.1 + influence * 0.8) * edge;
         const size = 0.9 + influence * 1.6;
-        const r = Math.round(255 + (BRAND[0] - 255) * influence);
-        const gC = Math.round(255 + (BRAND[1] - 255) * influence);
-        ctx.fillStyle = `rgba(${r}, ${gC}, ${BRAND[2]}, ${alpha})`;
+        // Blend from the theme text colour (white in dark, navy in light) toward brand indigo
+        const r = Math.round(fg[0] + (BRAND[0] - fg[0]) * influence);
+        const gC = Math.round(fg[1] + (BRAND[1] - fg[1]) * influence);
+        const b = Math.round(fg[2] + (BRAND[2] - fg[2]) * influence);
+        ctx.fillStyle = `rgba(${r}, ${gC}, ${b}, ${alpha})`;
         ctx.beginPath();
         ctx.arc(d.x, d.y, size, 0, Math.PI * 2);
         ctx.fill();

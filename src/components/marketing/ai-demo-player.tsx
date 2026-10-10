@@ -154,21 +154,21 @@ export function AiDemoPlayer() {
   return (
     <div ref={rootRef} className="grid items-start gap-8 lg:grid-cols-[1fr_1.15fr] lg:gap-12">
       {/* Left: student input */}
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur sm:p-6 lg:sticky lg:top-28 lg:mt-14">
+      <div className="rounded-xl border border-fg/10 bg-fg/[0.03] p-5 backdrop-blur sm:p-6 lg:sticky lg:top-28 lg:mt-14">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-medium text-white">
+          <p className="text-sm font-medium text-fg">
             {mode === "auto" ? `${persona.name.split(" ")[0]}’s words` : "Your words"}
           </p>
           {mode === "user" ? (
             <button
               type="button"
               onClick={() => pickTemplate(personaIdx)}
-              className="text-xs text-brand-300 hover:text-white"
+              className="text-xs text-brand-300 hover:text-fg"
             >
               ↺ Watch demo
             </button>
           ) : (
-            <span className="inline-flex items-center gap-1.5 text-xs text-white/40">
+            <span className="inline-flex items-center gap-1.5 text-xs text-fg/40">
               <span className="size-1.5 animate-pulse rounded-full bg-emerald-400" />
               Live demo
             </span>
@@ -182,7 +182,7 @@ export function AiDemoPlayer() {
               className={`rounded-md px-2.5 py-1 text-xs transition-colors ${
                 current.section === s
                   ? "bg-brand-500/20 text-brand-300 ring-1 ring-brand-400/50"
-                  : "bg-white/5 text-white/45"
+                  : "bg-fg/5 text-fg/45"
               }`}
             >
               {persona.labels[s]}
@@ -208,7 +208,7 @@ export function AiDemoPlayer() {
               }
             }}
             placeholder="e.g. i was class rep and organised study groups for exams"
-            className="w-full resize-none rounded-lg border border-white/10 bg-ink-950/60 px-4 py-3 text-[15px] text-white placeholder:text-white/30 focus:border-brand-400/60 focus:outline-none"
+            className="w-full resize-none rounded-lg border border-fg/10 bg-ink-950/60 px-4 py-3 text-[15px] text-fg placeholder:text-fg/30 focus:border-brand-400/60 focus:outline-none"
           />
           {mode === "auto" && phase === "typing" && (
             <span
@@ -222,7 +222,7 @@ export function AiDemoPlayer() {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-fg/40">
             {mode === "auto" ? "Click the box to try your own sentence" : "Press Enter or click Improve"}
           </p>
           <button
@@ -240,7 +240,7 @@ export function AiDemoPlayer() {
           </button>
         </div>
 
-        <p className="mt-5 border-t border-white/10 pt-4 text-xs text-white/35">
+        <p className="mt-5 border-t border-fg/10 pt-4 text-xs text-fg/35">
           Demo uses sample suggestions. The full AI assistant works inside the builder.
         </p>
       </div>
@@ -248,7 +248,7 @@ export function AiDemoPlayer() {
       {/* Right: the CV being written */}
       <div>
         <div className="mb-4 flex items-center justify-between gap-3">
-          <div role="tablist" aria-label="Template preview" className="flex gap-1 rounded-lg bg-white/5 p-1">
+          <div role="tablist" aria-label="Template preview" className="flex gap-1 rounded-lg bg-fg/5 p-1">
             {demoPersonas.map((p, i) => (
               <button
                 key={p.id}
@@ -258,15 +258,15 @@ export function AiDemoPlayer() {
                 onClick={() => pickTemplate(i)}
                 className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs transition-colors ${
                   i === personaIdx
-                    ? "bg-white/10 text-white ring-1 ring-white/15"
-                    : "text-white/50 hover:text-white"
+                    ? "bg-fg/10 text-fg ring-1 ring-fg/15"
+                    : "text-fg/50 hover:text-fg"
                 }`}
               >
                 {p.templateName}
               </button>
             ))}
           </div>
-          <p className="hidden text-xs text-white/40 sm:block">
+          <p className="hidden text-xs text-fg/40 sm:block">
             Template {personaIdx + 1} of {demoPersonas.length}
           </p>
         </div>
