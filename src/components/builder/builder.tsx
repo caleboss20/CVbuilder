@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { cvExamples, type CvTemplateName } from "@/lib/cv-examples";
 import { accentSwatches, templates } from "@/lib/templates";
@@ -14,7 +13,6 @@ import {
 } from "@/lib/builder";
 import { CvPageFrame } from "@/components/cv/cv-page-frame";
 import { CvTemplateView } from "@/components/cv/cv-templates";
-import { CvIcon } from "@/components/cv/cv-icon";
 import { HideEmptySections } from "@/components/cv/hide-empty-sections";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -28,6 +26,7 @@ import {
   SkillsStep,
   SummaryStep,
 } from "./sections";
+import { StartScreen } from "./start-screen";
 
 const steps = [
   { id: "personal", label: "Personal", Comp: PersonalStep },
@@ -332,62 +331,6 @@ export function Builder() {
 }
 
 /* ------------------------------------------------------------------ */
-
-function StartScreen({ onBlank, onExample }: { onBlank: () => void; onExample: (slug: string) => void }) {
-  return (
-    <div className="min-h-screen">
-      <header className="flex h-16 items-center justify-between px-4 sm:px-6">
-        <Logo />
-        <Link href="/" className="text-sm text-fg/60 hover:text-fg">
-          ← Back to home
-        </Link>
-      </header>
-      <main className="mx-auto max-w-5xl px-4 pb-24 pt-10 sm:px-6 sm:pt-16">
-        <div className="text-center">
-          <h1 className="text-3xl font-medium tracking-tight text-fg sm:text-5xl">How do you want to start?</h1>
-          <p className="mx-auto mt-4 max-w-xl text-fg/60 sm:text-lg">
-            Pick your course to start from a full example CV and swap in your details, or begin with a blank page.
-          </p>
-        </div>
-
-        <div className="mt-12 grid gap-4 lg:grid-cols-[1fr_2fr]">
-          <button
-            type="button"
-            onClick={onBlank}
-            className="group flex flex-col items-start rounded-2xl border border-fg/10 bg-fg/[0.03] p-6 text-left transition-all hover:-translate-y-0.5 hover:border-brand-400/50"
-          >
-            <span className="grid size-11 place-items-center rounded-lg bg-fg/10 text-xl text-fg">+</span>
-            <h2 className="mt-5 text-lg font-medium text-fg">Start blank</h2>
-            <p className="mt-2 text-sm text-fg/55">An empty CV with every section ready. We’ll guide you step by step.</p>
-            <span className="mt-auto pt-6 text-sm font-medium text-brand-300 group-hover:text-fg">Start writing →</span>
-          </button>
-
-          <div className="rounded-2xl border border-brand-400/30 bg-linear-to-b from-brand-600/15 to-transparent p-6">
-            <h2 className="text-lg font-medium text-fg">Start from my course</h2>
-            <p className="mt-2 text-sm text-fg/55">The fastest way. Everything is filled in, so you just change it to match you.</p>
-            <ul className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {cvExamples.map((e) => (
-                <li key={e.slug}>
-                  <button
-                    type="button"
-                    onClick={() => onExample(e.slug)}
-                    className="flex w-full items-center gap-2 rounded-lg border border-fg/10 bg-fg/[0.03] px-2.5 py-2 text-left text-sm text-fg/80 transition-colors hover:border-brand-400/60 hover:text-fg"
-                  >
-                    <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-500/15 text-brand-300">
-                      <CvIcon name={e.icon} size={14} />
-                    </span>
-                    <span className="truncate">{e.course}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <p className="mt-8 text-center text-xs text-fg/40">Your CV is saved on this device only. No account needed.</p>
-      </main>
-    </div>
-  );
-}
 
 function StrengthMeter({
   strength,
