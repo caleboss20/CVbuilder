@@ -10,6 +10,7 @@ import { CvIcon } from "@/components/cv/cv-icon";
 import { Logo } from "@/components/ui/logo";
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { PortalGlow } from "./portal-glow";
 import { SkyBackground } from "./sky-background";
 
 const perks = [
@@ -46,7 +47,7 @@ export function StartScreen({
       <SkyBackground />
       {/* Same atmosphere as the homepage hero */}
       <div aria-hidden="true" className="bg-grid absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_70%_50%_at_50%_0%,black,transparent)]" />
-      <div aria-hidden="true" className="absolute left-1/2 top-0 -z-10 h-[460px] w-[900px] max-w-full -translate-x-1/2 rounded-full bg-brand-600/20 blur-[120px]" />
+      <PortalGlow />
 
       <header className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-20 sm:px-6 lg:px-8">
         <Logo />
@@ -59,7 +60,7 @@ export function StartScreen({
       </header>
 
       <main className="mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 sm:pt-10 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
+        <div className="cv11-rise mx-auto max-w-2xl text-center">
           <p className="inline-flex items-center gap-1.5 rounded-full border border-fg/10 bg-fg/[0.04] px-3 py-1 text-xs text-fg/70">
             <SparkleIcon className="text-brand-300" />
             Free CV builder for students
