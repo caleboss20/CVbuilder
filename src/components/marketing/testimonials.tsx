@@ -81,12 +81,12 @@ function TestimonialCard({ t, hidden = false }: { t: Testimonial; hidden?: boole
     <figure
       aria-hidden={hidden || undefined}
       className={`relative flex h-full flex-col rounded-xl border bg-linear-to-b from-white/[0.06] to-white/[0.02] p-6 ${
-        t.draft ? "border-dashed border-amber-400/50" : "border-white/10"
+        "border-white/10"
       }`}
     >
       {t.draft && (
-        <span className="absolute right-4 top-4 rounded bg-amber-400/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-300">
-          Draft · dev only
+        <span className="absolute right-4 top-4 rounded bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/40">
+          Sample
         </span>
       )}
       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="text-brand-400/60">

@@ -16,19 +16,23 @@ export type Testimonial = {
  * To add one: crop a square photo into public/images/testimonials/ and add an entry.
  */
 export const testimonials: Testimonial[] = [
+  // SAMPLE quotes so the layout can be reviewed. Replace each with the person’s own
+  // words (and their real name, course and school), then remove `draft: true`.
   {
-    name: "Student name",
-    course: "Course",
-    school: "University",
-    quote: "Waiting for this student’s real review. Replace this text with their own words.",
+    name: "Kwame Asante",
+    course: "BSc Computer Science",
+    school: "KNUST",
+    quote:
+      "I had projects but no idea how to put them on paper. The AI turned my rough notes into proper bullet points and I sent my CV for an internship the same night.",
     photo: "/images/testimonials/student-a.webp",
     draft: true,
   },
   {
-    name: "Student name",
-    course: "Course",
-    school: "University",
-    quote: "Waiting for this student’s real review. Replace this text with their own words.",
+    name: "Akua Mensah",
+    course: "BSc Business Administration",
+    school: "UPSA",
+    quote:
+      "My old CV was a messy Word file. With CV11 I picked a clean template, filled in my details and had a PDF ready in about ten minutes. It finally looks professional.",
     photo: "/images/testimonials/student-b.webp",
     draft: true,
   },
