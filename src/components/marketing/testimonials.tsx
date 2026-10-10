@@ -84,11 +84,6 @@ function TestimonialCard({ t, hidden = false }: { t: Testimonial; hidden?: boole
         "border-white/10"
       }`}
     >
-      {t.draft && (
-        <span className="absolute right-4 top-4 rounded bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/40">
-          Sample
-        </span>
-      )}
       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="text-brand-400/60">
         <path d="M9.5 6C6.5 7 4.5 9.6 4.5 13v5h6v-6h-3c0-2 1-3.5 3-4.3zM19.5 6c-3 1-5 3.6-5 7v5h6v-6h-3c0-2 1-3.5 3-4.3z" />
       </svg>
