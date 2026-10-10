@@ -103,7 +103,7 @@ function ElegantCv({ doc, role }: TemplateProps) {
               ))}
             </ul>
           </div>
-          {extraLists(doc).map((l) => (
+          {extraLists(doc, ["Awards"]).map((l) => (
             <div key={l.title}>
               <ElegantHeading>{l.title}</ElegantHeading>
               <ul className="mt-3 space-y-1.5 text-[11.5px]">
@@ -115,7 +115,7 @@ function ElegantCv({ doc, role }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="space-y-7 @xl:pl-7">
+        <main className="flex flex-col justify-between space-y-7 @xl:pl-7">
           <div>
             <ElegantHeading>Profile</ElegantHeading>
             <p className="mt-3 text-justify">{doc.summary}</p>
@@ -138,6 +138,12 @@ function ElegantCv({ doc, role }: TemplateProps) {
             <div>
               <ElegantHeading>Projects</ElegantHeading>
               <ProjectsList projects={doc.projects} className="mt-3" />
+            </div>
+          ) : null}
+          {doc.awards?.length ? (
+            <div>
+              <ElegantHeading>Achievements</ElegantHeading>
+              <Bullets items={doc.awards ?? []} className="mt-3" />
             </div>
           ) : null}
           {doc.references?.length ? (
@@ -198,7 +204,17 @@ function BandCv({ doc, role }: TemplateProps) {
 
       <div className="grid flex-1 gap-7 px-6 py-8 @xl:grid-cols-[34%_1fr] @xl:gap-0 @xl:px-10">
         <aside className="space-y-6 @xl:border-r @xl:border-slate-300 @xl:pr-6">
-          {[...groups.map((g) => ({ title: g.label || "Skills", items: g.items })), ...extraLists(doc)].map(
+          <div>
+            <BandHeading>Education</BandHeading>
+            {doc.education.map((e) => (
+              <div key={e.degree} className="mt-3 text-[11.5px]">
+                <p className="font-semibold uppercase text-slate-800">{e.school}</p>
+                <p>{e.degree}</p>
+                <p>{e.date}</p>
+              </div>
+            ))}
+          </div>
+          {[...groups.map((g) => ({ title: g.label || "Skills", items: g.items })), ...extraLists(doc, ["Awards"])].map(
             (g, i) => (
               <div key={g.title + i}>
                 <BandHeading>{g.title}</BandHeading>
@@ -211,18 +227,8 @@ function BandCv({ doc, role }: TemplateProps) {
             ),
           )}
         </aside>
-        <main className="space-y-6 @xl:pl-7">
+        <main className="flex flex-col justify-between space-y-6 @xl:pl-7">
           <div>
-            <BandHeading>Education</BandHeading>
-            {doc.education.map((e) => (
-              <div key={e.degree} className="mt-3">
-                <p className="font-semibold uppercase text-slate-800">{e.school}</p>
-                <p>{e.degree}</p>
-                <p>{e.date}</p>
-              </div>
-            ))}
-          </div>
-          <div className="border-t border-slate-300 pt-5">
             <BandHeading>Relevant Experience</BandHeading>
             <div className="mt-3 space-y-4">
               {doc.experience.map((j) => (
@@ -240,6 +246,12 @@ function BandCv({ doc, role }: TemplateProps) {
             <div className="border-t border-slate-300 pt-5">
               <BandHeading>Projects</BandHeading>
               <ProjectsList projects={doc.projects} className="mt-3" />
+            </div>
+          ) : null}
+          {doc.awards?.length ? (
+            <div className="border-t border-slate-300 pt-5">
+              <BandHeading>Achievements</BandHeading>
+              <Bullets items={doc.awards ?? []} className="mt-3" />
             </div>
           ) : null}
           {doc.references?.length ? (
@@ -301,7 +313,7 @@ function TimelineCv({ doc, role }: TemplateProps) {
             <BoldHeading>Skills</BoldHeading>
             <Bullets items={skillGroups(doc.skills).flatMap((g) => g.items)} className="mt-3" />
           </div>
-          {extraLists(doc).map((l) => (
+          {extraLists(doc, ["Awards"]).map((l) => (
             <div key={l.title}>
               <BoldHeading>{l.title}</BoldHeading>
               <Bullets items={l.items} className="mt-3" />
@@ -309,7 +321,7 @@ function TimelineCv({ doc, role }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="space-y-8">
+        <main className="flex flex-col justify-between space-y-8">
           <div>
             <BoldHeading rule>Profile</BoldHeading>
             <p className="mt-3 text-justify">{doc.summary}</p>
@@ -326,6 +338,12 @@ function TimelineCv({ doc, role }: TemplateProps) {
             <div>
               <BoldHeading rule>Projects</BoldHeading>
               <ProjectsList projects={doc.projects} className="mt-3" />
+            </div>
+          ) : null}
+          {doc.awards?.length ? (
+            <div>
+              <BoldHeading rule>Achievements</BoldHeading>
+              <Bullets items={doc.awards ?? []} className="mt-3" />
             </div>
           ) : null}
           {doc.references?.length ? (
@@ -430,7 +448,7 @@ function PhotoCv({ doc, role, photo }: TemplateProps) {
           )}
         </aside>
 
-        <main className="space-y-8">
+        <main className="flex flex-col justify-between space-y-8">
           <div>
             <PhotoHeading>Profile</PhotoHeading>
             <p className="mt-4">{doc.summary}</p>

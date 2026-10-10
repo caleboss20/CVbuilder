@@ -68,13 +68,13 @@ export function Bullets({ items, className = "" }: { items: string[]; className?
 
 
 /** Short list sections (languages, certifications, awards, interests) that exist on this CV. */
-export function extraLists(doc: CvDoc) {
+export function extraLists(doc: CvDoc, skip: string[] = []) {
   return [
     { title: "Languages", items: doc.languages ?? [] },
     { title: "Certifications", items: doc.certifications ?? [] },
     { title: "Awards", items: doc.awards ?? [] },
     { title: "Interests", items: doc.interests ?? [] },
-  ].filter((s) => s.items.length > 0);
+  ].filter((s) => s.items.length > 0 && !skip.includes(s.title));
 }
 
 export function ProjectsList({ projects, className = "" }: { projects: CvDoc["projects"]; className?: string }) {

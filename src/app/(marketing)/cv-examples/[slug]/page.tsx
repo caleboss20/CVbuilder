@@ -8,6 +8,9 @@ import { CvTemplate } from "@/components/cv/cv-templates";
 import { CvIcon } from "@/components/cv/cv-icon";
 import { ButtonLink } from "@/components/ui/button";
 
+// Every course page is prebuilt from generateStaticParams, so reading params here is fine
+export const instant = false;
+
 export function generateStaticParams() {
   return cvExamples.map((e) => ({ slug: e.slug }));
 }

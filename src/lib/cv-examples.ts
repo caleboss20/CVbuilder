@@ -1,4 +1,5 @@
 import { cvExtras } from "./cv-example-extras";
+import { cvMore } from "./cv-example-more";
 
 export type CvIcon =
   | "health"
@@ -787,6 +788,11 @@ const looks: Record<string, Pick<CvExample, "role" | "template" | "photo">> = {
 function withExtras(e: BaseExample): BaseExample {
   const x = cvExtras[e.slug];
   if (!x) return e;
+  const more = cvMore[e.slug] ?? {};
+  const baseJobs = e.cv.experience.map((job, i) => ({
+    ...job,
+    bullets: [...job.bullets, ...(more.bullets?.[i] ?? [])],
+  }));
   const name = x.name ?? e.cv.name;
   const contact = x.name
     ? e.cv.contact.map((c) =>
@@ -802,11 +808,11 @@ function withExtras(e: BaseExample): BaseExample {
       name,
       contact,
       skills,
-      experience: [...e.cv.experience, ...(x.experience ?? [])],
+      experience: [...baseJobs, ...(x.experience ?? [])],
       education: [...e.cv.education, ...(x.education ?? [])],
       languages: x.languages,
       certifications: x.certifications,
-      projects: x.projects,
+      projects: [...(x.projects ?? []), ...(more.projects ?? [])],
       awards: x.awards,
       interests: x.interests,
       references: x.references,

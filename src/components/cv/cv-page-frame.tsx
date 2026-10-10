@@ -27,10 +27,20 @@ export function CvPageFrame({ children }: { children: ReactNode }) {
       setScale(s);
       setHeight(page.offsetHeight * s);
     };
+    // Streamed pages can hydrate while the layout is still settling, so measure
+    // after the first paint, on any resize, and whenever the container changes.
+    fit();
     const ro = new ResizeObserver(fit);
     ro.observe(outer);
     ro.observe(page);
-    return () => ro.disconnect();
+    if (outer.parentElement) ro.observe(outer.parentElement);
+    const frame = requestAnimationFrame(fit);
+    window.addEventListener("resize", fit);
+    return () => {
+      ro.disconnect();
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", fit);
+    };
   }, []);
 
   return (

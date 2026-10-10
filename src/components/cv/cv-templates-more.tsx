@@ -153,7 +153,7 @@ export function DarkHeaderCv({ doc, role, photo }: TemplateProps) {
                 ))}
               </div>
             </DarkBlock>
-            {extraLists(doc).map((l) => (
+            {extraLists(doc, ["Awards"]).map((l) => (
               <DarkBlock key={l.title} title={l.title}>
                 <Bullets items={l.items} />
               </DarkBlock>
@@ -161,7 +161,7 @@ export function DarkHeaderCv({ doc, role, photo }: TemplateProps) {
           </div>
         </aside>
 
-        <main className="space-y-9 px-6 py-10 @xl:px-9">
+        <main className="flex flex-col justify-between space-y-9 px-6 py-10 @xl:px-9">
           <DarkBlock title="About Me">
             <p className="text-justify">{doc.summary}</p>
           </DarkBlock>
@@ -182,6 +182,11 @@ export function DarkHeaderCv({ doc, role, photo }: TemplateProps) {
           {doc.projects?.length ? (
             <DarkBlock title="Projects">
               <ProjectsList projects={doc.projects} />
+            </DarkBlock>
+          ) : null}
+          {doc.awards?.length ? (
+            <DarkBlock title="Achievements">
+              <Bullets items={doc.awards ?? []} />
             </DarkBlock>
           ) : null}
           {doc.references?.length ? (
@@ -280,7 +285,7 @@ export function AccentPortraitCv({ doc, role, photo }: TemplateProps) {
           </div>
         </aside>
 
-        <main className="space-y-7 @xl:border-l @xl:border-slate-800 @xl:pl-8">
+        <main className="flex flex-col justify-between space-y-7 @xl:border-l @xl:border-slate-800 @xl:pl-8">
           <div>
             <AccentHeading>Work Experience</AccentHeading>
             <div className="mt-3 space-y-5">
@@ -374,7 +379,7 @@ export function MonoSplitCv({ doc, role, photo }: TemplateProps) {
       </header>
 
       <div className="mt-10 grid gap-10 @xl:grid-cols-[1fr_32%]">
-        <main className="space-y-8">
+        <main className="flex flex-col justify-between space-y-8">
           <div>
             <MonoHeading>Summary</MonoHeading>
             <p className="mt-3 border-l border-slate-500 pl-4 text-justify">{doc.summary}</p>
@@ -397,6 +402,12 @@ export function MonoSplitCv({ doc, role, photo }: TemplateProps) {
             <div>
               <MonoHeading>Projects</MonoHeading>
               <ProjectsList projects={doc.projects} className="mt-3" />
+            </div>
+          ) : null}
+          {doc.awards?.length ? (
+            <div>
+              <MonoHeading>Achievements</MonoHeading>
+              <Bullets items={doc.awards ?? []} className="mt-3" />
             </div>
           ) : null}
           {doc.references?.length ? (
@@ -437,7 +448,7 @@ export function MonoSplitCv({ doc, role, photo }: TemplateProps) {
                 <Bullets items={g.items} className="mt-1" />
               </div>
             ))}
-            {extraLists(doc).map((l) => (
+            {extraLists(doc, ["Awards"]).map((l) => (
               <div key={l.title} className="mb-3">
                 <p className="font-medium text-slate-900">{l.title}</p>
                 <Bullets items={l.items} className="mt-1" />
@@ -540,6 +551,20 @@ export function NavyPanelCv({ doc, role, photo }: TemplateProps) {
               ))}
             </ul>
           </NavySide>
+          {doc.awards?.length ? (
+            <NavySide title="Awards">
+              <Bullets items={doc.awards} />
+            </NavySide>
+          ) : null}
+          {doc.interests?.length ? (
+            <NavySide title="Interests">
+              <ul className="space-y-1.5">
+                {doc.interests.map((s) => (
+                  <li key={s}>{s}</li>
+                ))}
+              </ul>
+            </NavySide>
+          ) : null}
           {doc.languages?.length ? (
             <NavySide title="Language">
               <ul className="space-y-1.5">
@@ -551,7 +576,7 @@ export function NavyPanelCv({ doc, role, photo }: TemplateProps) {
           ) : null}
         </aside>
 
-        <main className="space-y-8 px-6 py-9 @xl:px-9">
+        <main className="flex flex-col justify-between space-y-8 px-6 py-9 @xl:px-9">
           <NavyMain title="About me">
             <p className="text-justify">{doc.summary}</p>
           </NavyMain>
@@ -667,7 +692,7 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
               ))}
             </ul>
           </RingSide>
-          {extraLists(doc).map((l) => (
+          {extraLists(doc, ["Awards"]).map((l) => (
             <RingSide key={l.title} title={l.title}>
               <ul className="space-y-1">
                 {l.items.map((s) => (
@@ -678,7 +703,7 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="space-y-7 @xl:border-l-2 @xl:border-slate-400 @xl:pl-8">
+        <main className="flex flex-col justify-between space-y-7 @xl:border-l-2 @xl:border-slate-400 @xl:pl-8">
           <header className="pt-2 @xl:pt-16">
             <p className="text-[34px] font-black uppercase leading-none text-[color:var(--cv-accent,#1c2b4a)] @xl:text-[42px]">{doc.name}</p>
             <p className="mt-2 text-[17px] uppercase tracking-wide text-slate-800">{role}</p>
@@ -702,6 +727,11 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
           {doc.projects?.length ? (
             <RingSide title="Projects">
               <ProjectsList projects={doc.projects} />
+            </RingSide>
+          ) : null}
+          {doc.awards?.length ? (
+            <RingSide title="Achievements">
+              <Bullets items={doc.awards ?? []} />
             </RingSide>
           ) : null}
           {doc.references?.length ? (
@@ -773,7 +803,7 @@ export function BlueDiagonalCv({ doc, role, photo }: TemplateProps) {
           <BlueHeading icon="M10 3h4v4h4v4h-2a2 2 0 1 0 0 4h2v4h-4v-2a2 2 0 1 0-4 0v2H6v-4h2a2 2 0 1 0 0-4H6V7h4z" title="Skills">
             <Bullets items={skillGroups(doc.skills).flatMap((g) => g.items)} />
           </BlueHeading>
-          {extraLists(doc)
+          {extraLists(doc, ["Awards"])
             .slice(0, 2)
             .map((l) => (
               <BlueHeading key={l.title} icon="M5 12l5 5L20 7" title={l.title}>
@@ -783,7 +813,7 @@ export function BlueDiagonalCv({ doc, role, photo }: TemplateProps) {
         </div>
       </aside>
 
-      <main className="space-y-9 px-6 py-10 @xl:px-9">
+      <main className="flex flex-col justify-between space-y-9 px-6 py-10 @xl:px-9">
         <BlueHeading icon="M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5" title="Education">
           <BlueTimeline
             items={doc.education.map((e) => ({
@@ -808,6 +838,11 @@ export function BlueDiagonalCv({ doc, role, photo }: TemplateProps) {
         {doc.projects?.length ? (
           <BlueHeading icon="M4 5h16v14H4zM4 9h16" title="Projects">
             <ProjectsList projects={doc.projects} />
+          </BlueHeading>
+        ) : null}
+        {doc.awards?.length ? (
+          <BlueHeading icon="M4 5h16v14H4zM4 9h16" title="Achievements">
+            <Bullets items={doc.awards ?? []} />
           </BlueHeading>
         ) : null}
         {doc.references?.length ? (
@@ -920,7 +955,7 @@ export function SlateBandCv({ doc, role, photo }: TemplateProps) {
           </div>
           <SlateHeading>Skills</SlateHeading>
           <Bullets items={skillGroups(doc.skills).flatMap((g) => g.items)} className="-mt-4 text-[11.5px]" />
-          {extraLists(doc).map((l) => (
+          {extraLists(doc, ["Awards"]).map((l) => (
             <div key={l.title} className="space-y-3">
               <SlateHeading>{l.title}</SlateHeading>
               <Bullets items={l.items} className="text-[11.5px]" />
@@ -928,7 +963,7 @@ export function SlateBandCv({ doc, role, photo }: TemplateProps) {
           ))}
         </aside>
 
-        <main className="space-y-7 @xl:pr-10">
+        <main className="flex flex-col justify-between space-y-7 @xl:pr-10">
           <div>
             <SlateHeading>Profile</SlateHeading>
             <p className="mt-2 text-justify">{doc.summary}</p>
@@ -953,6 +988,12 @@ export function SlateBandCv({ doc, role, photo }: TemplateProps) {
             <div>
               <SlateHeading>Projects</SlateHeading>
               <ProjectsList projects={doc.projects} className="mt-2" />
+            </div>
+          ) : null}
+          {doc.awards?.length ? (
+            <div>
+              <SlateHeading>Achievements</SlateHeading>
+              <Bullets items={doc.awards ?? []} className="mt-2" />
             </div>
           ) : null}
           {doc.references?.length ? (
