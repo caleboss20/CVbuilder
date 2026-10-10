@@ -1,6 +1,7 @@
 import { AiDemo } from "@/components/marketing/ai-demo";
 import { CvExamplesMarquee } from "@/components/marketing/cv-examples-marquee";
 import { Faq } from "@/components/marketing/faq";
+import { FinalCta } from "@/components/marketing/final-cta";
 import { Hero } from "@/components/marketing/hero";
 import { HowItWorks } from "@/components/marketing/how-it-works";
 import { Problems } from "@/components/marketing/problems";
@@ -34,6 +35,7 @@ export default function HomePage() {
       <CvExamplesMarquee />
       <Testimonials />
       <Faq />
+      <FinalCta />
     </>
   );
 }

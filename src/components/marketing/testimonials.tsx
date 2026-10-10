@@ -117,25 +117,25 @@ function UniversityStrip() {
             <ul
               key={copy}
               aria-hidden={copy === 1 || undefined}
-              className="flex shrink-0 animate-marquee items-center gap-10 pr-10 [animation-duration:50s] group-hover/uni:[animation-play-state:paused]"
+              className="flex shrink-0 animate-marquee items-start gap-8 pr-8 [animation-duration:50s] group-hover/uni:[animation-play-state:paused]"
             >
               {[...universities, ...universities].map((u, i) => (
                 <li
                   key={u.name + i}
-                  className="flex items-center gap-3 whitespace-nowrap opacity-70 transition-opacity hover:opacity-100"
+                  className="flex w-32 flex-col items-center gap-4 opacity-75 transition-opacity hover:opacity-100"
                 >
-                  {u.logo && (
-                    <span className="grid size-12 place-items-center rounded-xl bg-white p-1.5 shadow-[0_0_20px_-6px_rgb(255_255_255/0.4)]">
+                  <span className="block size-16 rounded-2xl bg-white p-2.5 shadow-[0_0_24px_-6px_rgb(255_255_255/0.35)]">
+                    <span className="relative block size-full">
                       <Image
                         src={u.logo}
                         alt={copy === 0 && i < universities.length ? `${u.name} logo` : ""}
-                        width={44}
-                        height={44}
-                        className="max-h-full w-auto object-contain"
+                        fill
+                        sizes="44px"
+                        className="object-contain"
                       />
                     </span>
-                  )}
-                  <span className="text-lg font-semibold tracking-tight text-white/70 sm:text-xl">{u.name}</span>
+                  </span>
+                  <span className="text-center text-[13px] font-medium leading-snug tracking-wide text-white/75">{u.name}</span>
                 </li>
               ))}
             </ul>
