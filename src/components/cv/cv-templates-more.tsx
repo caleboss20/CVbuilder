@@ -23,7 +23,7 @@ export function SimpleBoldCv({ doc, role }: TemplateProps) {
           {doc.name}
         </p>
         <p className="mt-2 text-[18px] uppercase text-slate-800 @xl:text-[20px]">{role}</p>
-        <div className="mt-2 h-[3px] bg-slate-900" />
+        <div className="mt-2 h-[3px] bg-[var(--cv-accent,#0f172a)]" />
         <p className="mt-2 text-[12px] text-slate-700">{doc.contact.join(" | ")}</p>
       </header>
 
@@ -91,7 +91,7 @@ export function SimpleBoldCv({ doc, role }: TemplateProps) {
 function SimpleSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-6">
-      <h3 className="border-b border-slate-700 pb-0.5 text-[15px] font-semibold uppercase text-slate-900">
+      <h3 className="border-b border-[color:var(--cv-accent,#334155)] pb-0.5 text-[15px] font-semibold uppercase text-[color:var(--cv-accent,#0f172a)]">
         {title}
       </h3>
       <div className="mt-2">{children}</div>
@@ -106,7 +106,7 @@ function SimpleSection({ title, children }: { title: string; children: ReactNode
 export function DarkHeaderCv({ doc, role, photo }: TemplateProps) {
   return (
     <div className="flex h-full flex-col bg-white text-[12.5px] leading-relaxed text-slate-600">
-      <header className="grid bg-[#3b3b3b] px-6 pb-32 pt-10 @xl:grid-cols-[40%_1fr] @xl:px-0 @xl:py-12">
+      <header className="grid bg-[var(--cv-accent,#3b3b3b)] px-6 pb-32 pt-10 @xl:grid-cols-[40%_1fr] @xl:px-0 @xl:py-12">
         <div />
         <div className="@xl:pr-10">
           <p className="text-[32px] font-bold uppercase leading-none tracking-wide text-white @xl:text-[40px]">
@@ -125,7 +125,7 @@ export function DarkHeaderCv({ doc, role, photo }: TemplateProps) {
               alt=""
               width={200}
               height={200}
-              className="absolute -top-28 left-1/2 size-48 -translate-x-1/2 rounded-full object-cover ring-[7px] ring-[#3b3b3b] grayscale"
+              className="absolute -top-28 left-1/2 size-48 -translate-x-1/2 rounded-full object-cover ring-[7px] ring-[color:var(--cv-accent,#3b3b3b)] grayscale"
             />
           )}
           <div className="space-y-8">
@@ -210,7 +210,7 @@ function DarkBlock({ title, children }: { title: string; children: ReactNode }) 
 /* 3. Accent Portrait: tall grey portrait, yellow accent, split name   */
 /* ================================================================== */
 
-const YELLOW = "bg-[#f2b705]";
+const YELLOW = "bg-[var(--cv-accent,#f2b705)]";
 
 export function AccentPortraitCv({ doc, role, photo }: TemplateProps) {
   const parts = doc.name.split(" ");
@@ -354,7 +354,7 @@ export function MonoSplitCv({ doc, role, photo }: TemplateProps) {
   const last = parts.pop();
   return (
     <div className="relative h-full bg-white px-6 py-12 text-[12.5px] leading-relaxed text-slate-600 @xl:pl-14 @xl:pr-10">
-      <span className="absolute left-0 top-20 hidden h-36 w-4 bg-slate-950 @xl:block" />
+      <span className="absolute left-0 top-20 hidden h-36 w-4 bg-[var(--cv-accent,#020617)] @xl:block" />
       <header className="flex flex-wrap items-start justify-between gap-6">
         <div>
           <p className="text-[30px] font-light uppercase leading-tight text-slate-900 @xl:text-[34px]">
@@ -453,7 +453,7 @@ export function MonoSplitCv({ doc, role, photo }: TemplateProps) {
 function MonoHeading({ children, underline = false }: { children: ReactNode; underline?: boolean }) {
   return (
     <h3
-      className={`text-[16px] font-bold uppercase tracking-wide text-slate-950 ${
+      className={`text-[16px] font-bold uppercase tracking-wide text-[color:var(--cv-accent,#020617)] ${
         underline ? "inline-block border-b border-slate-800 pb-1 pr-10" : ""
       }`}
     >
@@ -465,7 +465,7 @@ function MonoHeading({ children, underline = false }: { children: ReactNode; und
 function MonoSide({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section>
-      <h3 className="flex items-center gap-3 text-[16px] font-bold uppercase tracking-wide text-slate-950">
+      <h3 className="flex items-center gap-3 text-[16px] font-bold uppercase tracking-wide text-[color:var(--cv-accent,#020617)]">
         {title}
         <span className="h-px flex-1 bg-slate-800" />
       </h3>
@@ -478,14 +478,14 @@ function MonoSide({ title, children }: { title: string; children: ReactNode }) {
 /* 5. Navy Panel: rounded navy photo panel, contact pill, navy sidebar */
 /* ================================================================== */
 
-const NAVY = "#2c3a55";
+const NAVY = "var(--cv-accent,#2c3a55)";
 
 export function NavyPanelCv({ doc, role, photo }: TemplateProps) {
   const [first, ...rest] = doc.name.split(" ");
   return (
     <div className="flex h-full flex-col bg-white text-[12.5px] leading-relaxed text-slate-600">
       <header className="grid @xl:grid-cols-[38%_1fr]">
-        <div className="flex items-center justify-center rounded-br-[44px] bg-[#2c3a55] px-6 py-8">
+        <div className="flex items-center justify-center rounded-br-[44px] bg-[var(--cv-accent,#2c3a55)] px-6 py-8">
           {photo && (
             <Image
               src={photo}
@@ -497,7 +497,7 @@ export function NavyPanelCv({ doc, role, photo }: TemplateProps) {
           )}
         </div>
         <div className="flex flex-col justify-center px-6 py-8 @xl:px-10">
-          <p className="font-serif text-[30px] font-black uppercase leading-tight text-[#2c3a55] @xl:text-[38px]">
+          <p className="font-serif text-[30px] font-black uppercase leading-tight text-[color:var(--cv-accent,#2c3a55)] @xl:text-[38px]">
             {first}
             <br />
             {rest.join(" ")}
@@ -506,7 +506,7 @@ export function NavyPanelCv({ doc, role, photo }: TemplateProps) {
         </div>
       </header>
 
-      <div className="mx-4 mt-2 flex flex-wrap justify-around gap-x-6 gap-y-2 rounded-full bg-[#2c3a55] px-6 py-3 text-[11px] text-white @xl:mx-6">
+      <div className="mx-4 mt-2 flex flex-wrap justify-around gap-x-6 gap-y-2 rounded-full bg-[var(--cv-accent,#2c3a55)] px-6 py-3 text-[11px] text-white @xl:mx-6">
         {doc.contact.map((c) => (
           <p key={c} className="flex items-center gap-2 break-all">
             <ContactIcon kind={contactKind(c)} className="text-white" />
@@ -516,7 +516,7 @@ export function NavyPanelCv({ doc, role, photo }: TemplateProps) {
       </div>
 
       <div className="mt-6 grid flex-1 @xl:grid-cols-[38%_1fr]">
-        <aside className="space-y-7 rounded-tr-[44px] bg-[#2c3a55] px-6 py-9 text-white/85 @xl:px-8">
+        <aside className="space-y-7 rounded-tr-[44px] bg-[var(--cv-accent,#2c3a55)] px-6 py-9 text-white/85 @xl:px-8">
           <NavySide title="Education">
             <div className="space-y-3">
               {doc.education.map((e) => (
@@ -615,14 +615,14 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
   return (
     <div className="relative h-full overflow-hidden bg-linear-to-br from-white via-[#f3f4f7] to-[#e9ebf0] px-6 pb-32 pt-10 text-[12.5px] leading-relaxed text-slate-700 @xl:px-10">
       {/* Decorative shapes and wave lines */}
-      <span className="absolute -right-10 -top-6 h-10 w-72 -skew-x-[30deg] bg-[#1c2b4a]" />
+      <span className="absolute -right-10 -top-6 h-10 w-72 -skew-x-[30deg] bg-[var(--cv-accent,#1c2b4a)]" />
       <span className="absolute right-24 top-0 h-6 w-56 -skew-x-[30deg] bg-slate-300" />
       <svg aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full text-slate-300" preserveAspectRatio="none" viewBox="0 0 100 140">
         {[0, 3, 6, 9, 12].map((o) => (
           <path key={o} d={`M-5 ${118 + o} C 25 ${100 + o}, 55 ${135 + o}, 105 ${112 + o}`} fill="none" stroke="currentColor" strokeWidth="0.15" />
         ))}
       </svg>
-      <span className="absolute -bottom-10 -left-10 h-24 w-[70%] rounded-[100%] bg-[#1c2b4a]" />
+      <span className="absolute -bottom-10 -left-10 h-24 w-[70%] rounded-[100%] bg-[var(--cv-accent,#1c2b4a)]" />
 
       <div className="relative grid gap-8 @xl:grid-cols-[42%_1fr]">
         <aside className="space-y-6">
@@ -632,14 +632,14 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
               alt=""
               width={220}
               height={220}
-              className="mx-auto size-44 rounded-full border-[12px] border-[#1c2b4a] object-cover @xl:size-52"
+              className="mx-auto size-44 rounded-full border-[12px] border-[color:var(--cv-accent,#1c2b4a)] object-cover @xl:size-52"
             />
           )}
           <RingSide title="Contact">
             <div className="space-y-2.5">
               {doc.contact.map((c) => (
                 <p key={c} className="flex items-center gap-3 break-all">
-                  <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#1c2b4a] text-white">
+                  <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[var(--cv-accent,#1c2b4a)] text-white">
                     <ContactIcon kind={contactKind(c)} />
                   </span>
                   {c}
@@ -652,8 +652,8 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
             <div className="space-y-3">
               {doc.education.map((e) => (
                 <div key={e.degree}>
-                  <p className="text-[14px] font-bold text-[#1c2b4a]">{e.degree}</p>
-                  <p className="font-semibold text-[#1c2b4a]">{e.school}</p>
+                  <p className="text-[14px] font-bold text-[color:var(--cv-accent,#1c2b4a)]">{e.degree}</p>
+                  <p className="font-semibold text-[color:var(--cv-accent,#1c2b4a)]">{e.school}</p>
                   <p>{e.date}</p>
                 </div>
               ))}
@@ -680,7 +680,7 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
 
         <main className="space-y-7 @xl:border-l-2 @xl:border-slate-400 @xl:pl-8">
           <header className="pt-2 @xl:pt-16">
-            <p className="text-[34px] font-black uppercase leading-none text-[#1c2b4a] @xl:text-[42px]">{doc.name}</p>
+            <p className="text-[34px] font-black uppercase leading-none text-[color:var(--cv-accent,#1c2b4a)] @xl:text-[42px]">{doc.name}</p>
             <p className="mt-2 text-[17px] uppercase tracking-wide text-slate-800">{role}</p>
             <div className="mt-4 h-0.5 w-4/5 bg-slate-400" />
           </header>
@@ -691,7 +691,7 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
             <div className="space-y-5">
               {doc.experience.map((j) => (
                 <div key={j.title + j.place}>
-                  <p className="text-[14.5px] font-bold text-[#1c2b4a]">{j.place}</p>
+                  <p className="text-[14.5px] font-bold text-[color:var(--cv-accent,#1c2b4a)]">{j.place}</p>
                   <p className="text-[14px]">{j.title}</p>
                   <p>{j.date}</p>
                   <Bullets items={j.bullets} className="mt-1.5" />
@@ -706,7 +706,7 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
           ) : null}
           {doc.references?.length ? (
             <RingSide title="References">
-              <ReferencesGrid refs={doc.references} nameClass="font-bold text-[#1c2b4a]" />
+              <ReferencesGrid refs={doc.references} nameClass="font-bold text-[color:var(--cv-accent,#1c2b4a)]" />
             </RingSide>
           ) : null}
         </main>
@@ -718,7 +718,7 @@ export function NavyRingCv({ doc, role, photo }: TemplateProps) {
 function RingSide({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section>
-      <h3 className="text-[22px] font-black uppercase text-[#1c2b4a]">{title}</h3>
+      <h3 className="text-[22px] font-black uppercase text-[color:var(--cv-accent,#1c2b4a)]">{title}</h3>
       <div className="mt-2">{children}</div>
     </section>
   );
@@ -728,14 +728,14 @@ function RingSide({ title, children }: { title: string; children: ReactNode }) {
 /* 7. Blue Diagonal: blue corner, name in sidebar, blue timelines      */
 /* ================================================================== */
 
-const BLUE = "#0b4aa2";
+const BLUE = "var(--cv-accent,#0b4aa2)";
 
 export function BlueDiagonalCv({ doc, role, photo }: TemplateProps) {
   const [first, ...rest] = doc.name.split(" ");
   return (
     <div className="grid h-full bg-white text-[12.5px] leading-relaxed text-slate-700 @xl:grid-cols-[38%_1fr]">
       <aside className="relative overflow-hidden bg-[#f4f5f7] px-6 pb-10 pt-8 @xl:px-7">
-        <span className="absolute left-0 top-0 size-56 bg-[#0b4aa2] [clip-path:polygon(0_0,100%_0,0_100%)]" />
+        <span className="absolute left-0 top-0 size-56 bg-[var(--cv-accent,#0b4aa2)] [clip-path:polygon(0_0,100%_0,0_100%)]" />
         {photo && (
           <Image
             src={photo}
@@ -863,7 +863,7 @@ function BlueTimeline({
 /* 8. Slate Band: grey column, slate band with role, square markers    */
 /* ================================================================== */
 
-const SLATE = "#5d7178";
+const SLATE = "var(--cv-accent,#5d7178)";
 
 export function SlateBandCv({ doc, role, photo }: TemplateProps) {
   return (

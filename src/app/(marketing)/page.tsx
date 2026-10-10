@@ -5,6 +5,7 @@ import { FinalCta } from "@/components/marketing/final-cta";
 import { Hero } from "@/components/marketing/hero";
 import { HowItWorks } from "@/components/marketing/how-it-works";
 import { Problems } from "@/components/marketing/problems";
+import { TemplatesSection } from "@/components/marketing/templates-section";
 import { Testimonials } from "@/components/marketing/testimonials";
 import { siteConfig } from "@/lib/site";
 
@@ -32,6 +33,7 @@ export default function HomePage() {
       <Problems />
       <AiDemo />
       <HowItWorks />
+      <TemplatesSection />
       <CvExamplesMarquee />
       <Testimonials />
       <Faq />

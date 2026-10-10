@@ -71,7 +71,7 @@ function ElegantCv({ doc, role }: TemplateProps) {
         </p>
         <p className="mt-2 text-[11px] uppercase tracking-[0.35em] text-slate-500">{role}</p>
       </header>
-      <div className="mt-7 h-[3px] bg-[#b59a72]" />
+      <div className="mt-7 h-[3px] bg-[var(--cv-accent,#b59a72)]" />
 
       <div className="mt-7 grid flex-1 gap-7 @xl:grid-cols-[34%_1fr] @xl:gap-0">
         <aside className="space-y-7 @xl:border-r @xl:border-slate-300 @xl:pr-6">
@@ -257,7 +257,7 @@ function BandCv({ doc, role }: TemplateProps) {
 }
 
 function BandHeading({ children }: { children: ReactNode }) {
-  return <h3 className="text-[11.5px] uppercase tracking-[0.4em] text-slate-700">{children}</h3>;
+  return <h3 className="text-[11.5px] uppercase tracking-[0.4em] text-[color:var(--cv-accent,#334155)]">{children}</h3>;
 }
 
 /* ------------------------------------------------------------------ */
@@ -316,7 +316,7 @@ function TimelineCv({ doc, role }: TemplateProps) {
           </div>
           <div>
             <BoldHeading rule>Work Experience</BoldHeading>
-            <ol className="relative mt-4 space-y-6 border-l-2 border-slate-700 pl-6">
+            <ol className="relative mt-4 space-y-6 border-l-2 border-[color:var(--cv-accent,#334155)] pl-6">
               {doc.experience.map((j) => (
                 <TimelineItem key={j.title + j.place} job={j} />
               ))}
@@ -345,7 +345,7 @@ function TimelineCv({ doc, role }: TemplateProps) {
 function TimelineItem({ job }: { job: CvJob }) {
   return (
     <li className="relative">
-      <span className="absolute -left-[31px] top-1.5 size-2.5 rounded-full bg-slate-800" />
+      <span className="absolute -left-[31px] top-1.5 size-2.5 rounded-full bg-[var(--cv-accent,#1e293b)]" />
       <div className="flex justify-between gap-3">
         <p className="text-[14px] font-semibold text-slate-700">{job.place}</p>
         <p className="shrink-0 text-[11.5px] uppercase text-slate-600">{job.date}</p>
@@ -359,8 +359,8 @@ function TimelineItem({ job }: { job: CvJob }) {
 function BoldHeading({ children, rule = false }: { children: ReactNode; rule?: boolean }) {
   return (
     <h3
-      className={`text-[17px] font-extrabold uppercase tracking-[0.12em] text-slate-950 ${
-        rule ? "border-b-2 border-slate-800 pb-1" : ""
+      className={`text-[17px] font-extrabold uppercase tracking-[0.12em] text-[color:var(--cv-accent,#020617)] ${
+        rule ? "border-b-2 border-[color:var(--cv-accent,#1e293b)] pb-1" : ""
       }`}
     >
       {children}
@@ -486,5 +486,5 @@ function PhotoCv({ doc, role, photo }: TemplateProps) {
 }
 
 function PhotoHeading({ children }: { children: ReactNode }) {
-  return <h3 className="text-[17px] font-bold uppercase text-slate-950">{children}</h3>;
+  return <h3 className="text-[17px] font-bold uppercase text-[color:var(--cv-accent,#020617)]">{children}</h3>;
 }

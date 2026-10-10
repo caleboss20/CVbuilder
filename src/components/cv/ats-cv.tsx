@@ -90,7 +90,7 @@ export function AtsCv({ doc, role }: { doc: CvDoc; role?: string }) {
 function AtsSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-6">
-      <h3 className="border-b-2 border-slate-800 pb-1 text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-900">
+      <h3 className="border-b-2 border-[color:var(--cv-accent,#1e293b)] pb-1 text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--cv-accent,#0f172a)]">
         {title}
       </h3>
       <div className="mt-2.5">{children}</div>
