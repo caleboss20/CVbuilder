@@ -47,18 +47,18 @@ export const testimonials: Testimonial[] = [
   },
 ];
 
-/** Universities shown in the "Made for students at" strip (names only, no logos). */
-export const universities = [
-  "KNUST",
-  "University of Ghana",
-  "UCC",
-  "UHAS",
-  "UEW",
-  "UPSA",
-  "UDS",
-  "Ashesi",
-  "GCTU",
-  "UMaT",
-  "UENR",
-  "Central University",
+/** Universities shown in the "Made for students at" strip. Crests from Wikimedia where available. */
+export const universities: { name: string; logo?: string }[] = [
+  { name: "KNUST", logo: "/images/universities/knust.webp" },
+  { name: "University of Ghana", logo: "/images/universities/ug.webp" },
+  { name: "UCC", logo: "/images/universities/ucc.webp" },
+  { name: "UEW", logo: "/images/universities/uew.webp" },
+  { name: "UPSA", logo: "/images/universities/upsa.webp" },
+  { name: "UHAS" },
+  { name: "UDS" },
+  { name: "Ashesi" },
+  { name: "GCTU" },
+  { name: "UMaT" },
+  { name: "UENR" },
+  { name: "Central University" },
 ];

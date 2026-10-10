@@ -117,14 +117,25 @@ function UniversityStrip() {
             <ul
               key={copy}
               aria-hidden={copy === 1 || undefined}
-              className="flex shrink-0 animate-marquee items-center gap-12 pr-12 [animation-duration:40s] group-hover/uni:[animation-play-state:paused]"
+              className="flex shrink-0 animate-marquee items-center gap-10 pr-10 [animation-duration:50s] group-hover/uni:[animation-play-state:paused]"
             >
               {[...universities, ...universities].map((u, i) => (
                 <li
-                  key={u + i}
-                  className="whitespace-nowrap text-lg font-semibold tracking-tight text-white/35 transition-colors hover:text-white/80 sm:text-xl"
+                  key={u.name + i}
+                  className="flex items-center gap-3 whitespace-nowrap opacity-70 transition-opacity hover:opacity-100"
                 >
-                  {u}
+                  {u.logo && (
+                    <span className="grid size-12 place-items-center rounded-xl bg-white p-1.5 shadow-[0_0_20px_-6px_rgb(255_255_255/0.4)]">
+                      <Image
+                        src={u.logo}
+                        alt={copy === 0 && i < universities.length ? `${u.name} logo` : ""}
+                        width={44}
+                        height={44}
+                        className="max-h-full w-auto object-contain"
+                      />
+                    </span>
+                  )}
+                  <span className="text-lg font-semibold tracking-tight text-white/70 sm:text-xl">{u.name}</span>
                 </li>
               ))}
             </ul>
