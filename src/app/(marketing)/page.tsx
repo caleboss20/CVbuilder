@@ -3,6 +3,7 @@ import { CvExamplesMarquee } from "@/components/marketing/cv-examples-marquee";
 import { Hero } from "@/components/marketing/hero";
 import { HowItWorks } from "@/components/marketing/how-it-works";
 import { Problems } from "@/components/marketing/problems";
+import { Testimonials } from "@/components/marketing/testimonials";
 import { siteConfig } from "@/lib/site";
 
 const jsonLd = {
@@ -30,6 +31,7 @@ export default function HomePage() {
       <AiDemo />
       <HowItWorks />
       <CvExamplesMarquee />
+      <Testimonials />
     </>
   );
 }

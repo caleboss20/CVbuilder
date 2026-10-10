@@ -19,6 +19,16 @@
   --animate-float-delayed: float 7s ease-in-out 1.5s infinite;
   --animate-fade-up: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-marquee: marquee 45s linear infinite;
+  --animate-scroll-up: scroll-up 45s linear infinite;
+
+  @keyframes scroll-up {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-50%);
+    }
+  }
 
   @keyframes marquee {
     from {
