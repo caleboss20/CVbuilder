@@ -29,6 +29,9 @@ export type BuilderCv = {
   awards: string[];
   interests: string[];
   references: Referee[];
+  /** Active building time in ms, and when the CV was first downloaded. */
+  timeSpent?: number;
+  finishedAt?: number;
 };
 
 /** Short random id. Works on plain http too, where crypto.randomUUID is missing. */

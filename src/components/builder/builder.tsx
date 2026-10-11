@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { cvExamples, type CvTemplateName } from "@/lib/cv-examples";
 import { accentSwatches, templates } from "@/lib/templates";
 import {
@@ -29,6 +29,8 @@ import {
 } from "./sections";
 import { StartScreen } from "./start-screen";
 import { JobMatchPanel } from "./job-match-panel";
+import { BuildTimer, readBest, saveBest } from "./build-timer";
+import { CompletionCard, type Completion } from "./completion-card";
 import Link from "next/link";
 
 const steps = [
@@ -51,6 +53,9 @@ export function Builder() {
   const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [matchOpen, setMatchOpen] = useState(false);
+  const [completion, setCompletion] = useState<Completion | null>(null);
+  const timeRef = useRef(0);
+  const persistTime = useCallback((ms: number) => setCv((c) => (c.timeSpent === ms ? c : { ...c, timeSpent: ms })), []);
   const [saved, setSaved] = useState(true);
   const [fit, setFit] = useState(1);
   const [requested, setRequested] = useState<CvTemplateName | null>(null);
@@ -70,6 +75,7 @@ export function Builder() {
     }
      
     if (stored) {
+      timeRef.current = stored.timeSpent ?? 0;
       setCv(picked ? { ...stored, template: picked } : stored);
       setStatus("editing");
     } else {
@@ -100,6 +106,7 @@ export function Builder() {
   const templateName = templates.find((t) => t.id === cv.template)?.name ?? "Template";
 
   function begin(next: BuilderCv) {
+    timeRef.current = 0;
     setCv(requested ? { ...next, template: requested } : next);
     setStep(0);
     setStatus("editing");
@@ -120,6 +127,15 @@ export function Builder() {
     document.title = `${(cv.name || "My").trim().replace(/\s+/g, "_")}_CV`;
     window.print();
     document.title = prev;
+
+    // First download marks the CV as complete and shows the summary
+    if (!cv.finishedAt) {
+      const ms = timeRef.current;
+      const best = readBest();
+      if (best === null || ms < best) saveBest(ms);
+      update({ finishedAt: Date.now(), timeSpent: ms });
+      setCompletion({ ms, score: strength.score, template: templateName, best, newBest: best !== null && ms < best });
+    }
   }
 
   if (status === "loading") {
@@ -152,6 +168,7 @@ export function Builder() {
             )}
           </span>
           <div className="ml-auto flex items-center gap-2">
+            <BuildTimer timeRef={timeRef} initialMs={cv.timeSpent ?? 0} finished={!!cv.finishedAt} onPersist={persistTime} />
             <ThemeToggle className="hidden sm:grid" />
             <button
               type="button"
@@ -342,6 +359,7 @@ export function Builder() {
         </button>
       </div>
 
+      {completion && <CompletionCard data={completion} onClose={() => setCompletion(null)} />}
       {matchOpen && <JobMatchPanel cv={cv} update={update} onClose={() => setMatchOpen(false)} />}
 
       {pickerOpen && (
