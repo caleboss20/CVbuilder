@@ -121,6 +121,11 @@ export function Builder() {
     setStatus("start");
   }
 
+  async function downloadWord() {
+    const { downloadDocx } = await import("@/lib/docx-export");
+    await downloadDocx(doc, cv.role.trim(), cv.accent, `${(cv.name || "My").trim().replace(/\s+/g, "_")}_CV`);
+  }
+
   function download() {
     const prev = document.title;
     // The browser uses the page title as the PDF file name
@@ -184,6 +189,14 @@ export function Builder() {
             >
               <span className="hidden sm:inline">Template: </span>
               {templateName}
+            </button>
+            <button
+              type="button"
+              onClick={downloadWord}
+              title="Editable Word file, for employers who ask for .docx"
+              className="hidden rounded-md px-3 py-2 text-sm font-medium text-fg ring-1 ring-fg/15 hover:bg-fg/5 sm:block"
+            >
+              Word
             </button>
             <button
               type="button"
@@ -349,11 +362,18 @@ export function Builder() {
       </div>
 
       {/* Mobile sticky download */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-fg/10 bg-ink-950/95 p-3 backdrop-blur-xl sm:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-fg/10 bg-ink-950/95 p-3 backdrop-blur-xl sm:hidden">
+        <button
+          type="button"
+          onClick={downloadWord}
+          className="shrink-0 rounded-md px-4 py-3 text-sm font-medium text-fg ring-1 ring-fg/15"
+        >
+          Word
+        </button>
         <button
           type="button"
           onClick={download}
-          className="w-full rounded-md bg-brand-600 py-3 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)]"
+          className="flex-1 rounded-md bg-brand-600 py-3 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)]"
         >
           Download PDF · {strength.score}% strong
         </button>
