@@ -11,6 +11,7 @@ import {
   type BuilderCv,
 } from "@/lib/builder";
 import { AddButton, Field, ItemCard, PhotoInput, TagInput, TextArea } from "./fields";
+import { VoiceInput } from "./voice-input";
 
 export type Update = (patch: Partial<BuilderCv>) => void;
 type StepProps = { cv: BuilderCv; update: Update };
@@ -83,6 +84,7 @@ export function SummaryStep({ cv, update }: StepProps) {
   return (
     <div className="space-y-5">
       <StepIntro title="Professional summary">Two or three sentences that sum up who you are and what you want.</StepIntro>
+      <VoiceInput kind="summary" onAdd={([summary]) => summary && update({ summary })} />
       <TextArea
         label="Summary"
         rows={5}
@@ -150,6 +152,10 @@ export function ExperienceStep({ cv, update }: StepProps) {
             <Field label="Organisation and town" value={job.place} onChange={(place) => set(patchAt(list, i, { place }))} placeholder="GCB Bank, Kumasi" />
             <Field label="Dates" value={job.date} onChange={(date) => set(patchAt(list, i, { date }))} placeholder="Jun – Sep 2025" />
           </div>
+          <VoiceInput
+            kind="bullets"
+            onAdd={(lines) => set(patchAt(list, i, { bullets: [...job.bullets.filter((b) => b.trim()), ...lines] }))}
+          />
           <div>
             <p className="mb-1.5 text-sm font-medium text-fg/80">What you did</p>
             <div className="space-y-2">
@@ -214,6 +220,7 @@ export function ProjectsStep({ cv, update }: StepProps) {
           onDown={i < list.length - 1 ? () => set(move(list, i, 1)) : undefined}
         >
           <Field label="Project name" value={p.name} onChange={(name) => set(patchAt(list, i, { name }))} placeholder="Campus Marketplace App" />
+          <VoiceInput kind="project" onAdd={([detail]) => detail && set(patchAt(list, i, { detail }))} />
           <TextArea
             label="What it was and what it achieved"
             rows={2}
