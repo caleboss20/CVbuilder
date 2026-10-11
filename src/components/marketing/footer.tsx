@@ -20,6 +20,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "CV Builder", href: "/builder" },
       { label: "CV Templates", href: "/templates" },
       { label: "CV Examples", href: "/cv-examples" },
+      { label: "Cover Letter Builder", href: "/cover-letter" },
       { label: "How to Write a CV", href: "/blog/how-to-write-a-cv" },
       { label: "CV Help", href: "/blog" },
     ],

@@ -16,6 +16,7 @@ import { CvTemplateView } from "@/components/cv/cv-templates";
 import { HideEmptySections } from "@/components/cv/hide-empty-sections";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { CheckIcon } from "@/components/ui/check-icon";
 import {
   EducationStep,
   ExperienceStep,
@@ -27,6 +28,8 @@ import {
   SummaryStep,
 } from "./sections";
 import { StartScreen } from "./start-screen";
+import { JobMatchPanel } from "./job-match-panel";
+import Link from "next/link";
 
 const steps = [
   { id: "personal", label: "Personal", Comp: PersonalStep },
@@ -47,6 +50,7 @@ export function Builder() {
   const [step, setStep] = useState(0);
   const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [matchOpen, setMatchOpen] = useState(false);
   const [saved, setSaved] = useState(true);
   const [fit, setFit] = useState(1);
   const [requested, setRequested] = useState<CvTemplateName | null>(null);
@@ -138,8 +142,14 @@ export function Builder() {
       <header className="sticky top-0 z-30 border-b border-fg/10 bg-ink-950/90 backdrop-blur-xl">
         <div className="flex h-16 items-center gap-2 px-3 sm:gap-3 sm:px-6">
           <Logo />
-          <span className="hidden text-xs text-fg/40 sm:inline" aria-live="polite">
-            {saved ? "✓ Saved on this device" : "Saving…"}
+          <span className="hidden items-center gap-1.5 text-xs text-fg/45 sm:inline-flex" aria-live="polite">
+            {saved ? (
+              <>
+                <CheckIcon size={14} /> Saved on this device
+              </>
+            ) : (
+              "Saving…"
+            )}
           </span>
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle className="hidden sm:grid" />
@@ -267,6 +277,28 @@ export function Builder() {
           className={`min-w-0 ${mobileView === "preview" ? "block" : "hidden"} border-fg/10 bg-fg/[0.025] lg:block lg:border-l`}
         >
           <div className="sticky top-16 max-h-[calc(100vh-4rem)] overflow-y-auto px-4 pb-32 pt-6 sm:px-8">
+            <div className="mb-4 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setMatchOpen(true)}
+                className="flex items-center justify-center gap-2 rounded-lg border border-fg/12 bg-fg/[0.04] px-3 py-2.5 text-sm font-medium text-fg hover:border-brand-400/50"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" className="text-brand-300">
+                  <circle cx="12" cy="12" r="8" />
+                  <circle cx="12" cy="12" r="3.5" />
+                </svg>
+                Match a job
+              </button>
+              <Link
+                href="/cover-letter"
+                className="flex items-center justify-center gap-2 rounded-lg border border-fg/12 bg-fg/[0.04] px-3 py-2.5 text-sm font-medium text-fg hover:border-brand-400/50"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="text-brand-300">
+                  <path d="M3 6h18v12H3zM3 6l9 7 9-7" />
+                </svg>
+                Cover letter
+              </Link>
+            </div>
             <StrengthMeter strength={strength} onGo={(id) => {
               const i = steps.findIndex((s) => s.id === id);
               if (i >= 0) {
@@ -309,6 +341,8 @@ export function Builder() {
           Download PDF · {strength.score}% strong
         </button>
       </div>
+
+      {matchOpen && <JobMatchPanel cv={cv} update={update} onClose={() => setMatchOpen(false)} />}
 
       {pickerOpen && (
         <TemplatePicker
