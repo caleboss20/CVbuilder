@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { getCvExample } from "@/lib/cv-examples";
 import { accentSwatches, templateFilters, templates, type TemplateTag } from "@/lib/templates";
 import { CvPageFrame } from "@/components/cv/cv-page-frame";
@@ -9,7 +9,8 @@ import { CvTemplate } from "@/components/cv/cv-templates";
 
 /**
  * Real templates rendered as full A4 pages, with filter tabs and an accent
- * colour picker. "row" scrolls sideways (homepage), "grid" shows them all.
+ * colour picker. On phones it is a swipeable carousel; from the sm breakpoint
+ * up it is a grid ("row" shows the first six on the homepage, "grid" shows all).
  */
 export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }) {
   const [filter, setFilter] = useState<"all" | TemplateTag>("all");
@@ -17,6 +18,40 @@ export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }
 
   const shown = templates.filter((t) => filter === "all" || t.tags.includes(filter));
   const accentStyle = accent ? ({ "--cv-accent": accent } as CSSProperties) : undefined;
+
+  const listRef = useRef<HTMLUListElement>(null);
+  const [active, setActive] = useState(0);
+
+  /** Which card sits closest to the middle of the carousel. */
+  const onScroll = () => {
+    const list = listRef.current;
+    if (!list) return;
+    const mid = list.scrollLeft + list.clientWidth / 2;
+    let best = 0;
+    let bestDist = Infinity;
+    Array.from(list.children).forEach((el, i) => {
+      const c = el as HTMLElement;
+      const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid);
+      if (d < bestDist) {
+        bestDist = d;
+        best = i;
+      }
+    });
+    setActive(best);
+  };
+
+  const goTo = (i: number) => {
+    const list = listRef.current;
+    const card = list?.children[i] as HTMLElement | undefined;
+    if (!list || !card) return;
+    list.scrollTo({ left: card.offsetLeft - (list.clientWidth - card.offsetWidth) / 2, behavior: "smooth" });
+  };
+
+  const pickFilter = (id: "all" | TemplateTag) => {
+    setFilter(id);
+    setActive(0);
+    listRef.current?.scrollTo({ left: 0 });
+  };
 
   return (
     <div>
@@ -28,7 +63,7 @@ export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }
               type="button"
               role="tab"
               aria-selected={filter === f.id}
-              onClick={() => setFilter(f.id)}
+              onClick={() => pickFilter(f.id)}
               className={`whitespace-nowrap rounded-md px-4 py-1.5 text-sm transition-colors ${
                 filter === f.id ? "bg-fg/10 text-fg ring-1 ring-fg/15" : "text-fg/55 hover:text-fg"
               }`}
@@ -68,8 +103,11 @@ export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }
       </div>
 
       <ul
+        ref={listRef}
+        onScroll={onScroll}
+        aria-label="CV templates"
         style={accentStyle}
-        className={`mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 ${layout === "row" ? "px-4 sm:px-0" : ""}`}
+        className={`mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-4 pb-2 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3 ${layout === "grid" ? "-mx-4 sm:mx-0" : ""}`}
       >
         {shown.map((t, i) => {
           const example = getCvExample(t.exampleSlug);
@@ -77,14 +115,15 @@ export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }
           return (
             <li
               key={t.id}
-              className={`min-w-0 ${layout === "row" && i >= 6 ? "hidden" : ""}`}
+              data-active={i === active}
+              className={`group w-[78%] max-w-80 shrink-0 snap-center sm:w-auto sm:max-w-none sm:min-w-0 ${layout === "row" && i >= 6 ? "sm:hidden" : ""}`}
             >
-              <article className="group">
-                <div className="relative overflow-hidden rounded-lg bg-white shadow-[0_20px_50px_-20px_rgb(0_0_0/0.5)] ring-1 ring-fg/10 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_0_50px_-12px_rgb(124_128_255/0.7)] group-hover:ring-brand-400/50">
+              <article className="group/card">
+                <div className="relative overflow-hidden rounded-lg bg-white shadow-[0_20px_50px_-20px_rgb(0_0_0/0.5)] ring-1 ring-fg/10 transition-all duration-300 group-hover/card:-translate-y-1 group-hover/card:shadow-[0_0_50px_-12px_rgb(124_128_255/0.7)] group-hover/card:ring-brand-400/50">
                   <CvPageFrame lazy>
                     <CvTemplate example={example} />
                   </CvPageFrame>
-                  <div className="absolute inset-0 flex items-end justify-center bg-linear-to-t from-ink-950/70 via-transparent to-transparent p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
+                  <div className="absolute inset-0 flex items-end justify-center bg-linear-to-t from-ink-950/70 via-transparent to-transparent p-5 opacity-0 transition-opacity duration-300 group-hover/card:opacity-100 group-focus-within/card:opacity-100 max-sm:group-data-[active=true]:opacity-100">
                     <Link
                       href={`/builder?template=${t.id}`}
                       className="rounded-md bg-brand-600 px-5 py-2.5 text-sm font-medium text-white shadow-[0_0_18px_rgb(124_128_255/0.6)] hover:bg-brand-500"
@@ -115,6 +154,43 @@ export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }
           );
         })}
       </ul>
+
+      {/* Carousel controls, phones only */}
+      <div className="mt-6 flex items-center justify-between gap-4 px-4 sm:hidden">
+        <button
+          type="button"
+          onClick={() => goTo(active - 1)}
+          disabled={active === 0}
+          aria-label="Previous template"
+          className="grid size-10 place-items-center rounded-md text-fg ring-1 ring-fg/15 transition-opacity disabled:opacity-30"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M10 3 5 8l5 5" />
+          </svg>
+        </button>
+        <div className="flex flex-1 flex-col items-center gap-2">
+          <p aria-live="polite" className="text-sm tabular-nums text-fg/60">
+            <span className="font-medium text-fg">{shown[active]?.name}</span> · {active + 1} / {shown.length}
+          </p>
+          <div className="h-0.5 w-full max-w-40 overflow-hidden rounded-full bg-fg/10">
+            <div
+              className="h-full rounded-full bg-brand-400 transition-all duration-300"
+              style={{ width: `${((active + 1) / shown.length) * 100}%` }}
+            />
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => goTo(active + 1)}
+          disabled={active >= shown.length - 1}
+          aria-label="Next template"
+          className="grid size-10 place-items-center rounded-md text-fg ring-1 ring-fg/15 transition-opacity disabled:opacity-30"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="m6 3 5 5-5 5" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }
