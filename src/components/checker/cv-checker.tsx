@@ -28,6 +28,7 @@ export function CvChecker() {
   const [advert, setAdvert] = useState("");
   const [industryId, setIndustryId] = useState("");
   const [otherIndustry, setOtherIndustry] = useState("");
+  const [cvType, setCvType] = useState<"standard" | "academic">("standard");
   const [report, setReport] = useState<CvReport | null>(null);
   const [error, setError] = useState("");
   const [reading, setReading] = useState(false);
@@ -84,7 +85,7 @@ export function CvChecker() {
       return;
     }
     setError("");
-    setReport(analyseCv({ cvText, advert, industryId, otherIndustry }));
+    setReport(analyseCv({ cvText, advert, industryId, otherIndustry, cvType }));
     // On phones the results are below the form, so bring them into view
     requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
@@ -226,6 +227,35 @@ export function CvChecker() {
               <p className="mt-1.5 text-xs text-fg/50">We look for the words you type in your CV, so use the terms your field uses.</p>
             </>
           )}
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-fg">4. Type of CV</p>
+          <div role="radiogroup" aria-label="Type of CV" className="grid grid-cols-2 gap-2">
+            {(
+              [
+                ["standard", "Standard", "1 to 2 pages. Jobs, internships, national service."],
+                ["academic", "Academic or research", "Longer, with publications. Grants, MPhil, lecturing."],
+              ] as const
+            ).map(([id, label, hint]) => (
+              <button
+                key={id}
+                type="button"
+                role="radio"
+                aria-checked={cvType === id}
+                onClick={() => {
+                  setCvType(id);
+                  setReport(null);
+                }}
+                className={`rounded-lg border p-3 text-left transition-colors ${
+                  cvType === id ? "border-brand-400/70 bg-brand-500/15" : "border-fg/12 bg-fg/[0.03] hover:border-fg/25"
+                }`}
+              >
+                <span className="block text-sm font-medium text-fg">{label}</span>
+                <span className="mt-0.5 block text-xs text-fg/55">{hint}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {error && (

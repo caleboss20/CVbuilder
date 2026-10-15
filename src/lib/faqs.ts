@@ -19,7 +19,15 @@ export const faqs: Faq[] = [
   },
   {
     q: "Will my CV pass ATS and hiring software?",
-    a: "Yes. Every template exports a clean, text-based PDF that applicant tracking systems can read. If you are applying to a large company or bank and want to be extra safe, choose a one-column template like ATS Classic or Simple Bold.",
+    a: "ATS means Applicant Tracking System, the software some employers use to sort CVs. Every template exports a text-based PDF, and the ones tagged ATS-safe use one column, plain headings and no photo, which software reads most reliably. Two-column and photo designs look great to a person but can confuse some software, so use them when you know someone will read your CV by eye.",
+  },
+  {
+    q: "What is the difference between a CV and a resume?",
+    a: "In Ghana, most employers use the two words to mean the same thing: a short, targeted document of one to two pages. Elsewhere, a resume is the short version for a specific job, while a CV is a longer, complete record of your education, research, publications and awards, mostly used for academic and research roles. For internships, national service and normal jobs, a one to two page CV is what you want.",
+  },
+  {
+    q: "Can you check a CV I already have?",
+    a: "Yes. The free CV checker lets you upload a PDF or Word CV, add the job you want and pick your industry. You get a score out of 100 and clear steps to improve it. Your file is read in your browser and is never uploaded.",
   },
   {
     q: "Can the AI write my whole CV for me?",
@@ -27,7 +35,7 @@ export const faqs: Faq[] = [
   },
   {
     q: "Should I add a photo to my CV?",
-    a: "In Ghana a photo is common and usually fine, especially for local jobs, national service and internships. For international applications or roles that ask for no photo, pick a template without one. CV11 has both.",
+    a: "Most CVs do not need one. Many employers, and almost all international ones, prefer no photo, and plain layouts without one are safest for hiring software. Add a photo only if the employer asks for it or your industry expects it, such as media, hospitality or modelling. CV11 has templates both ways.",
   },
   {
     q: "How long should a student CV be?",

@@ -41,6 +41,12 @@ export type CheckInput = {
   industryId?: string;
   /** What the student typed when they chose "Other". */
   otherIndustry?: string;
+  /**
+   * "standard": the one to two page CV most employers in Ghana expect.
+   * "academic": a longer research or academic CV with publications. Length is not
+   * penalised the same way, and a research section is expected.
+   */
+  cvType?: "standard" | "academic";
 };
 
 export type CvReport = {
@@ -73,7 +79,8 @@ type SectionId =
   | "references"
   | "awards"
   | "interests"
-  | "leadership";
+  | "leadership"
+  | "publications";
 
 /** A line that is only one of these words (case ignored) is a section heading. */
 const HEADINGS: Record<SectionId, RegExp> = {
@@ -88,6 +95,7 @@ const HEADINGS: Record<SectionId, RegExp> = {
   awards: /^(awards?|achievements?|honou?rs)( and .*)?$/,
   interests: /^(interests?|hobbies)$/,
   leadership: /^(volunteer(ing)?|leadership|activities|extracurricular( activities)?|community service)( .*)?$/,
+  publications: /^((selected |peer-reviewed )?publications?|research( experience| interests| projects)?|presentations?|conferences?|posters?)( .*)?$/,
 };
 
 const BULLET_MARK = /^\s*[•\-–—*▪●·◦○■]\s*/;
@@ -431,7 +439,12 @@ export function analyseCv(input: CheckInput): CvReport {
   );
 
   /* ---- Clarity: length and readability ---- */
-  const lengthRatio = words < 150 ? 0.2 : words < 300 ? 0.2 + ((words - 150) / 150) * 0.8 : words <= 750 ? 1 : words <= 950 ? 0.6 : 0.3;
+  // Most employers want one to two pages (about 300 to 750 words). An academic CV may run longer.
+  const academic = input.cvType === "academic";
+  const longest = academic ? 2200 : 750;
+  const tooLongBy = academic ? 600 : 200;
+  const lengthRatio =
+    words < 150 ? 0.2 : words < 300 ? 0.2 + ((words - 150) / 150) * 0.8 : words <= longest ? 1 : words <= longest + tooLongBy ? 0.6 : 0.3;
   checks.push(
     makeCheck(
       "Clarity",
@@ -440,14 +453,27 @@ export function analyseCv(input: CheckInput): CvReport {
       lengthRatio,
       6,
       {
-        good: `About ${words} words is a good length for a student CV (one to two pages).`,
+        good: academic
+          ? `About ${words} words is a reasonable length for an academic CV.`
+          : `About ${words} words is a good length for a student CV (one to two pages).`,
         fix:
           words < 300
             ? `Your CV is only about ${words} words, which looks thin. Add projects, volunteering, leadership roles and more detail on your work.`
-            : `Your CV is about ${words} words, which is long. Keep it to one or two pages and cut older or less relevant detail.`,
+            : academic
+              ? `Your CV is about ${words} words. Even an academic CV reads better when older or minor items are cut.`
+              : `Your CV is about ${words} words, which is long. Keep it to one or two pages and cut older or less relevant detail. (If this is an academic or research CV, choose that type above.)`,
       },
     ),
   );
+
+  if (academic) {
+    checks.push(
+      makeCheck("Structure", "research", "Research and publications", sections.publications ? 1 : 0, 4, {
+        good: "You have a research or publications section, which academic reviewers look for first.",
+        fix: "Add a Research or Publications section: papers, your thesis or dissertation, conference talks and posters, with dates.",
+      }),
+    );
+  }
 
   const yearsFound = (text.match(/\b(19|20)\d{2}\b/g) ?? []).length;
   checks.push(
