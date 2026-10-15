@@ -111,7 +111,7 @@ export function Builder() {
 
   // The picked course's example CV: shown as dimmed placeholders in the form, and as
   // a sample preview until the student types their name. Never saved into their CV.
-  const hints = useMemo(() => courseHints(cv.courseSlug), [cv.courseSlug]);
+  const hints = useMemo(() => courseHints(cv.courseSlug, cv.courseName), [cv.courseSlug, cv.courseName]);
   const previewingSample = !!hints && !cv.name.trim();
   const previewDoc = previewingSample && hints ? toDoc(hints) : doc;
   const previewRole = (previewingSample ? hints?.role : cv.role) || "Your role";
@@ -168,22 +168,23 @@ export function Builder() {
         onCancel={changingCourse ? () => { setChangingCourse(false); setStatus("editing"); } : undefined}
         onBlank={() => {
           if (changingCourse) {
-            update({ courseSlug: undefined });
+            update({ courseSlug: undefined, courseName: undefined });
             setChangingCourse(false);
             setStatus("editing");
           } else {
             begin(blankCv(requested ?? "ats"));
           }
         }}
-        onExample={(slug) => {
+        // courseName is set when the student typed a course we have no example for
+        onExample={(slug, courseName) => {
           const ex = cvExamples.find((e) => e.slug === slug);
           if (!ex) return;
           if (changingCourse) {
-            update({ courseSlug: slug });
+            update({ courseSlug: slug, courseName });
             setChangingCourse(false);
             setStatus("editing");
           } else {
-            begin(cvFromCourse(ex));
+            begin(cvFromCourse(ex, undefined, courseName));
           }
         }}
       />
@@ -305,7 +306,7 @@ export function Builder() {
             {/* Where the dimmed example text comes from, with a way back to the course choice */}
             <p className="mb-5 flex flex-wrap items-center gap-x-2 text-xs text-fg/50">
               {hints
-                ? `Grey example text comes from the ${cvExamples.find((e) => e.slug === cv.courseSlug)?.course ?? "course"} CV.`
+                ? `Grey example text comes from the ${cv.courseName ?? cvExamples.find((e) => e.slug === cv.courseSlug)?.course ?? "course"} CV.`
                 : "Pick your course to see example text for your field."}
               <button
                 type="button"

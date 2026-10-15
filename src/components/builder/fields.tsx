@@ -284,7 +284,9 @@ export function PhotoInput({ value, onChange }: { value?: string; onChange: (v?:
       </div>
       {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
       <p className="mt-2 text-xs text-fg/45">
-        A clear, smiling head-and-shoulders photo works best. Photo templates show it; others skip it.
+        Most CVs don’t need a photo, and plain layouts without one are the safest for applicant tracking systems.
+        Add one only if the employer asks for it or your industry expects it, like media, hospitality or modelling.
+        If you do, use a clear head-and-shoulders photo. Photo templates show it; others skip it.
       </p>
     </div>
   );

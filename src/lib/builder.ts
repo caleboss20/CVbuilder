@@ -1,3 +1,4 @@
+import { exampleForCourse } from "./course-match";
 import { getCvExample, type CvDoc, type CvExample, type CvTemplateName } from "./cv-examples";
 
 export const BUILDER_STORAGE_KEY = "cv11-builder-v1";
@@ -35,6 +36,11 @@ export type BuilderCv = {
    * never ends up in the CV itself.
    */
   courseSlug?: string;
+  /**
+   * Set when the student typed a course we have no example for. The hints then
+   * come from the closest field, relabelled with this name (see course-match.ts).
+   */
+  courseName?: string;
   /** Active building time in ms, and when the CV was first downloaded. */
   timeSpent?: number;
   finishedAt?: number;
@@ -79,13 +85,16 @@ export function blankCv(template: CvTemplateName = "ats"): BuilderCv {
  * used as guidance (placeholders and sample preview), so students never have to
  * delete somebody else's details before writing their own.
  */
-export function cvFromCourse(e: CvExample, template?: CvTemplateName): BuilderCv {
-  return { ...blankCv(template ?? e.template), courseSlug: e.slug };
+export function cvFromCourse(e: CvExample, template?: CvTemplateName, courseName?: string): BuilderCv {
+  return { ...blankCv(template ?? e.template), courseSlug: e.slug, courseName };
 }
 
-/** The full example CV for a course, shaped like the editor state, for use as hints. */
-export function courseHints(slug: string | undefined): BuilderCv | null {
-  const example = slug ? getCvExample(slug) : undefined;
+/**
+ * The full example CV for the student's course, shaped like the editor state, for
+ * use as hints. A typed course name takes the closest example and relabels it.
+ */
+export function courseHints(slug: string | undefined, courseName?: string): BuilderCv | null {
+  const example = courseName ? exampleForCourse(courseName) : slug ? getCvExample(slug) : undefined;
   return example ? cvFromExample(example) : null;
 }
 

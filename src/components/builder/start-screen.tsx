@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { cvExamples, type CvTemplateName } from "@/lib/cv-examples";
+import { exampleForCourse } from "@/lib/course-match";
 import { templates } from "@/lib/templates";
 import { CvPageFrame } from "@/components/cv/cv-page-frame";
 import { CvTemplateView } from "@/components/cv/cv-templates";
@@ -29,7 +30,8 @@ export function StartScreen({
   /** Template picked on the homepage ("Use this template"), if any. */
   template?: CvTemplateName | null;
   onBlank: () => void;
-  onExample: (slug: string) => void;
+  /** `courseName` is set when the student typed a course we have no example for. */
+  onExample: (slug: string, courseName?: string) => void;
   /** Set when reopened from the editor: lets the student go back without changing anything. */
   onCancel?: () => void;
 }) {
@@ -40,7 +42,12 @@ export function StartScreen({
     const q = query.trim().toLowerCase();
     return q ? cvExamples.filter((e) => e.course.toLowerCase().includes(q)) : cvExamples;
   }, [query]);
-  const example = cvExamples.find((e) => e.slug === selected) ?? cvExamples[0];
+  // A course typed in the search box that we have no example for. We borrow the
+  // closest field's example and relabel it, so nobody has to start from nothing.
+  const [custom, setCustom] = useState<string | null>(null);
+  const typed = query.trim();
+  const canUseTyped = typed.length >= 2 && !cvExamples.some((e) => e.course.toLowerCase() === typed.toLowerCase());
+  const example = custom ? exampleForCourse(custom) : (cvExamples.find((e) => e.slug === selected) ?? cvExamples[0]);
   // Preview the course in the template the student already chose, if they chose one
   const activeTemplate = template ?? example.template;
   const templateName = templates.find((t) => t.id === activeTemplate)?.name;
@@ -122,20 +129,47 @@ export function StartScreen({
                 <input
                   id="course-search"
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setCustom(null);
+                  }}
                   placeholder="Search your course, e.g. Nursing"
                   className="w-full rounded-lg border border-fg/12 bg-ink-950/60 py-2.5 pl-10 pr-3 text-[15px] text-fg placeholder:text-fg/35 focus:border-brand-400/70 focus:outline-none"
                 />
               </div>
 
+              {canUseTyped && (
+                <button
+                  type="button"
+                  onClick={() => setCustom(typed)}
+                  aria-pressed={custom !== null}
+                  className={`mt-3 flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-all ${
+                    custom !== null
+                      ? "border-brand-400/70 bg-brand-500/15 text-fg"
+                      : "border-dashed border-brand-400/50 bg-brand-500/[0.07] text-fg/85 hover:border-brand-400/80"
+                  }`}
+                >
+                  <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-500/20 text-brand-300" aria-hidden="true">
+                    +
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate font-medium">Use “{typed}”</span>
+                    <span className="block text-xs text-fg/55">Not on our list yet? We’ll build you a sample CV for it.</span>
+                  </span>
+                </button>
+              )}
+
               <ul className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {shown.map((e) => {
-                  const active = e.slug === selected;
+                  const active = custom === null && e.slug === selected;
                   return (
                     <li key={e.slug}>
                       <button
                         type="button"
-                        onClick={() => setSelected(e.slug)}
+                        onClick={() => {
+                          setSelected(e.slug);
+                          setCustom(null);
+                        }}
                         aria-pressed={active}
                         className={`flex w-full items-center gap-2 rounded-lg border px-2.5 py-2 text-left text-sm transition-all ${
                           active
@@ -151,7 +185,7 @@ export function StartScreen({
                     </li>
                   );
                 })}
-                {shown.length === 0 && (
+                {shown.length === 0 && !canUseTyped && (
                   <li className="col-span-full py-6 text-center text-sm text-fg/50">
                     No match yet. Start blank, or pick the closest course.
                   </li>
@@ -160,7 +194,7 @@ export function StartScreen({
 
               <button
                 type="button"
-                onClick={() => onExample(example.slug)}
+                onClick={() => onExample(example.slug, custom ? example.course : undefined)}
                 className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-brand-600 py-3 text-[15px] font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_22px_rgb(124_128_255/0.5)] transition-colors hover:bg-brand-500"
               >
                 Continue with {example.course}
