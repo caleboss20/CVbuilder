@@ -5,7 +5,7 @@ import { useRef, useState, type CSSProperties } from "react";
 import { getCvExample } from "@/lib/cv-examples";
 import { accentSwatches, templateFilters, templates, type TemplateTag } from "@/lib/templates";
 import { CvPageFrame } from "@/components/cv/cv-page-frame";
-import { CvTemplate } from "@/components/cv/cv-templates";
+import { CvTemplateView } from "@/components/cv/cv-templates";
 
 /**
  * Real templates rendered as full A4 pages, with filter tabs and an accent
@@ -121,7 +121,8 @@ export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }
               <article className="group/card">
                 <div className="relative overflow-hidden rounded-lg bg-white shadow-[0_20px_50px_-20px_rgb(0_0_0/0.5)] ring-1 ring-fg/10 transition-all duration-300 group-hover/card:-translate-y-1 group-hover/card:shadow-[0_0_50px_-12px_rgb(124_128_255/0.7)] group-hover/card:ring-brand-400/50">
                   <CvPageFrame lazy>
-                    <CvTemplate example={example} />
+                    {/* Render this template's own design, using the example CV as sample content */}
+                    <CvTemplateView template={t.id} doc={example.cv} role={example.role} photo={example.photo} />
                   </CvPageFrame>
                   <div className="absolute inset-0 flex items-end justify-center bg-linear-to-t from-ink-950/70 via-transparent to-transparent p-5 opacity-0 transition-opacity duration-300 group-hover/card:opacity-100 group-focus-within/card:opacity-100 max-sm:group-data-[active=true]:opacity-100">
                     <Link

@@ -21,6 +21,24 @@ import {
   SimpleBoldCv,
   SlateBandCv,
 } from "./cv-templates-more";
+import {
+  DateColumnCv,
+  DividedSimpleCv,
+  GreyBarsCv,
+  GridBandCv,
+  GridLeftCv,
+  GridSpacedCv,
+  IconLineCv,
+  LavenderBandCv,
+  PhotoClassicCv,
+  RuledClassicCv,
+  SerifExecutiveCv,
+  SerifNavyCv,
+  SideStripeCv,
+  SidePanelCv,
+  SideTimelineCv,
+  ThinSplitCv,
+} from "./cv-templates-ats";
 import { CleanRuleCv, GreyHeaderCv, SageCv, SoftBarsCv, TealHeaderCv } from "./cv-templates-single";
 
 export type TemplateProps = { doc: CvDoc; role: string; photo?: string };
@@ -73,6 +91,38 @@ export function CvTemplateView({
       return <CleanRuleCv {...props} />;
     case "greyHeader":
       return <GreyHeaderCv {...props} />;
+    case "photoClassic":
+      return <PhotoClassicCv {...props} />;
+    case "ruledClassic":
+      return <RuledClassicCv {...props} />;
+    case "serifExecutive":
+      return <SerifExecutiveCv {...props} />;
+    case "serifNavy":
+      return <SerifNavyCv {...props} />;
+    case "greyBars":
+      return <GreyBarsCv {...props} />;
+    case "dividedSimple":
+      return <DividedSimpleCv {...props} />;
+    case "iconLine":
+      return <IconLineCv {...props} />;
+    case "dateColumn":
+      return <DateColumnCv {...props} />;
+    case "lavenderBand":
+      return <LavenderBandCv {...props} />;
+    case "sideTimeline":
+      return <SideTimelineCv {...props} />;
+    case "sideStripe":
+      return <SideStripeCv {...props} />;
+    case "sidePanel":
+      return <SidePanelCv {...props} />;
+    case "thinSplit":
+      return <ThinSplitCv {...props} />;
+    case "gridLeft":
+      return <GridLeftCv {...props} />;
+    case "gridBand":
+      return <GridBandCv {...props} />;
+    case "gridSpaced":
+      return <GridSpacedCv {...props} />;
     default:
       return <AtsCv doc={doc} role={role} />;
   }

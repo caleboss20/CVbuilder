@@ -59,7 +59,23 @@ export type CvTemplateName =
   | "softBars"
   | "tealHeader"
   | "cleanRule"
-  | "greyHeader";
+  | "greyHeader"
+  | "photoClassic"
+  | "ruledClassic"
+  | "serifExecutive"
+  | "serifNavy"
+  | "greyBars"
+  | "dividedSimple"
+  | "iconLine"
+  | "dateColumn"
+  | "lavenderBand"
+  | "sideTimeline"
+  | "sideStripe"
+  | "sidePanel"
+  | "thinSplit"
+  | "gridLeft"
+  | "gridBand"
+  | "gridSpaced";
 
 export type CvExample = {
   slug: string;

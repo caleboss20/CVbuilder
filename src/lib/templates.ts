@@ -30,6 +30,26 @@ export const templates: TemplateInfo[] = [
   { id: "navyRing", name: "Navy Ring", blurb: "Big ringed photo with a confident, heavy name.", tags: ["photo"], exampleSlug: "national-service" },
   { id: "mono", name: "Mono Split", blurb: "Black and white with the photo in the side column.", tags: ["photo"], exampleSlug: "marketing" },
   { id: "accent", name: "Accent Portrait", blurb: "Tall portrait, accent stripe and a skills footer.", tags: ["photo"], exampleSlug: "data-science" },
+
+  // Plain, recruiter-style layouts. One column and no photo is the safest for applicant tracking systems.
+  { id: "ruledClassic", name: "Ruled Classic", blurb: "Centred name, heavy rules and employer-first entries. Reads like a proper CV.", tags: ["simple", "ats"], exampleSlug: "accounting" },
+  { id: "serifExecutive", name: "Serif Executive", blurb: "Serif name, a strong rule and skills grouped by type.", tags: ["simple", "ats"], exampleSlug: "business-administration" },
+  { id: "serifNavy", name: "Serif Navy", blurb: "The serif layout in navy with one line for your areas of expertise.", tags: ["simple", "ats"], exampleSlug: "data-science" },
+  { id: "greyBars", name: "Grey Bars", blurb: "Soft grey bars behind each heading and skills in three columns.", tags: ["simple", "ats"], exampleSlug: "banking" },
+  { id: "dividedSimple", name: "Divided Simple", blurb: "Light, open name and a thin line above every section.", tags: ["simple", "ats"], exampleSlug: "marketing" },
+  { id: "iconLine", name: "Icon Line", blurb: "Bold centred name with a neat row of contact icons.", tags: ["simple", "ats"], exampleSlug: "economics" },
+  { id: "dateColumn", name: "Date Column", blurb: "Dates on the left so your timeline is clear at a glance.", tags: ["simple", "ats"], exampleSlug: "teaching" },
+  { id: "lavenderBand", name: "Lavender Band", blurb: "Spaced name and soft tinted bands behind each heading.", tags: ["simple", "ats"], exampleSlug: "journalism" },
+  { id: "photoClassic", name: "Photo Classic", blurb: "Photo beside your name and contact details. Only add a photo if the employer expects one.", tags: ["photo"], exampleSlug: "civil-engineering" },
+
+  // Two-column layouts. Neat and modern, though some tracking systems read single columns more reliably.
+  { id: "sideTimeline", name: "Side Timeline", blurb: "Bold name, side column for contacts and skills, experience on a timeline.", tags: ["simple"], exampleSlug: "mechanical-engineering" },
+  { id: "sideStripe", name: "Side Stripe", blurb: "Wide side column with accent strips along the top and bottom.", tags: ["simple"], exampleSlug: "midwifery" },
+  { id: "sidePanel", name: "Side Panel", blurb: "Grey panel with your name on it and a timeline for work and school.", tags: ["simple"], exampleSlug: "pharmacy" },
+  { id: "thinSplit", name: "Thin Split", blurb: "Light name with contacts on the right and a slim side column.", tags: ["simple"], exampleSlug: "law" },
+  { id: "gridLeft", name: "Grid Left", blurb: "Centred name over a ruled grid. Organised and calm.", tags: ["simple"], exampleSlug: "agriculture" },
+  { id: "gridBand", name: "Grid Band", blurb: "Tinted header block with icons, ruled grid and a timeline.", tags: ["simple"], exampleSlug: "medical-laboratory-science" },
+  { id: "gridSpaced", name: "Grid Spaced", blurb: "Widely spaced name and a ruled two-column grid.", tags: ["simple"], exampleSlug: "architecture" },
 ];
 
 export const templateFilters: { id: "all" | TemplateTag; label: string }[] = [
