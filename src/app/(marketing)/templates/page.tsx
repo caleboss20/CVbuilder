@@ -4,7 +4,7 @@ import { TemplateGallery } from "@/components/marketing/template-gallery";
 export const metadata: Metadata = {
   title: "Free CV Templates for Students",
   description:
-    "13 free, professional CV templates for students and graduates in Ghana. Simple, photo and ATS-safe designs you can recolour and download as PDF.",
+    "34 free, professional CV templates for students and graduates in Ghana. Simple, photo and ATS-safe designs you can recolour and download as PDF or Word.",
   alternates: { canonical: "/templates" },
 };
 

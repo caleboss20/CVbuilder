@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: siteConfig.url, changeFrequency: "weekly", priority: 1 },
     { url: `${siteConfig.url}/templates`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${siteConfig.url}/cv-examples`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${siteConfig.url}/cv-checker`, changeFrequency: "monthly", priority: 0.8 },
     ...cvExamples.map((e) => ({
       url: `${siteConfig.url}/cv-examples/${e.slug}`,
       changeFrequency: "monthly" as const,

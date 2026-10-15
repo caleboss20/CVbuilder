@@ -20,6 +20,7 @@ export const siteConfig = {
     { label: "Features", href: "/#features" },
     { label: "Templates", href: "/templates" },
     { label: "CV examples", href: "/cv-examples" },
+    { label: "CV checker", href: "/cv-checker" },
     { label: "How it works", href: "/#how-it-works" },
     { label: "FAQ", href: "/#faq" },
   ],
