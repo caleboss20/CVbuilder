@@ -465,8 +465,16 @@ type SideConfig = {
   accent: string;
   /** left: name top-left · center: name centred · side: name inside the side column · band: tinted block · split: name left, contacts right */
   header: "left" | "center" | "side" | "band" | "split";
+  /** Sections that always sit in the side column. */
   side: SideSection[];
+  /** Sections that always sit in the main column. */
   main: SideSection[];
+  /**
+   * Sections that can go in either column. Each one is placed in whichever column
+   * is currently shorter, so the two columns end at about the same height and
+   * neither is left with blank space (see balanceColumns).
+   */
+  flex: SideSection[];
   sideWidth: number;
   /** Grey panel behind the side column. */
   sideBg?: boolean;
@@ -647,6 +655,138 @@ function sideSections(cfg: SideConfig, doc: CvDoc, where: "side" | "main", ids: 
   return out;
 }
 
+/** Reading order inside a column, whichever column a section ends up in. */
+const SECTION_ORDER: SideSection[] = [
+  "contact",
+  "summary",
+  "experience",
+  "education",
+  "skills",
+  "languages",
+  "projects",
+  "extras",
+  "references",
+];
+
+/**
+ * Rough rendered height (px) of a section in a column of the given text width.
+ * It only has to be good enough to decide which column is shorter, so it counts
+ * wrapped lines at ~6.9px per character and uses fixed heights for headings.
+ */
+function estimateHeight(
+  id: SideSection,
+  doc: CvDoc,
+  where: "side" | "main",
+  textWidth: number,
+  rules: boolean,
+): number {
+  // Calibrated against rendered output. Text sits on a ~21px line. The narrow side
+  // column wraps earlier (and holds wide capitals), so its characters count wider.
+  const perLine = Math.max(12, Math.floor(textWidth / (where === "side" ? 6.7 : 5.9)));
+  const lines = (text: string) => Math.max(1, Math.ceil(text.length / perLine));
+  const HEADING = 40;
+  const LINE = 21;
+  // Space between sections, plus the rule and padding that "ruled" designs add to each one
+  const GAP = 24 + (rules ? 21 : 0);
+
+  const list = (items: string[]) =>
+    where === "main"
+      ? Math.ceil(items.length / 2) * LINE // main column lists use two columns
+      : items.reduce((h, i) => h + lines(i) * LINE, 0);
+
+  switch (id) {
+    case "contact":
+      return doc.contact.length ? HEADING + doc.contact.length * (LINE + 4) + GAP : 0;
+    case "summary":
+      return doc.summary ? HEADING + lines(doc.summary) * LINE + GAP : 0;
+    case "experience":
+      return doc.experience.length
+        ? HEADING + GAP + doc.experience.reduce((h, j) => h + 2 * LINE + j.bullets.reduce((b, t) => b + lines(t) * LINE, 0) + 16, 0)
+        : 0;
+    case "education":
+      return doc.education.length
+        ? HEADING + GAP + doc.education.reduce((h, e) => h + LINE + lines(e.school) * LINE + lines(e.degree) * LINE + 12, 0)
+        : 0;
+    case "skills":
+      return doc.skills.length ? HEADING + GAP + flatSkills(doc).reduce((h, s) => h + lines(s) * LINE, 0) : 0;
+    case "languages": {
+      const items = doc.languages ?? [];
+      return items.length ? HEADING + GAP + list(items) : 0;
+    }
+    case "extras": {
+      const lists = extraLists(doc, ["Languages"]);
+      return lists.reduce((h, l) => h + HEADING + GAP + list(l.items), 0);
+    }
+    case "projects":
+      return doc.projects?.length
+        ? HEADING + GAP + doc.projects.reduce((h, p) => h + lines(`${p.name}: ${p.detail}`) * LINE + 4, 0)
+        : 0;
+    case "references":
+      return doc.references?.length
+        ? HEADING + GAP + (where === "main" ? Math.ceil(doc.references.length / 2) : doc.references.length) * (3 * LINE + 8)
+        : 0;
+  }
+}
+
+/**
+ * Decides which sections go in which column. Fixed sections stay where the design
+ * puts them; each movable section then goes to the column that would end up
+ * shorter. Same input always gives the same result, so server and browser agree.
+ */
+function balanceColumns(cfg: SideConfig, doc: CvDoc): { side: SideSection[]; main: SideSection[] } {
+  const sideText = cfg.sideWidth - 64; // side column has 32px padding each side
+  const mainText = 794 - cfg.sideWidth - 72; // main column has 36px padding each side
+  const est = (id: SideSection, where: "side" | "main") =>
+    estimateHeight(id, doc, where, where === "side" ? sideText : mainText, !!cfg.rules);
+  const height = (ids: SideSection[], where: "side" | "main") =>
+    ids.reduce((h, id) => h + est(id, where), 0);
+
+  const side = [...cfg.side];
+  const main = [...cfg.main];
+  // The name block sits at the top of the side column in the "side" header designs
+  const nameBlock = cfg.header === "side" ? 170 : 0;
+  let sideH = height(side, "side") + nameBlock;
+  let mainH = height(main, "main");
+
+  for (const id of cfg.flex) {
+    const inSide = est(id, "side");
+    const inMain = est(id, "main");
+    // Put it where the taller of the two columns ends up smaller
+    if (Math.max(sideH + inSide, mainH) <= Math.max(sideH, mainH + inMain)) {
+      side.push(id);
+      sideH += inSide;
+    } else {
+      main.push(id);
+      mainH += inMain;
+    }
+  }
+
+  // Refinement: swap a movable section across whenever that brings the columns closer
+  // together. A few passes are plenty for nine sections.
+  for (let pass = 0; pass < 3; pass++) {
+    let moved = false;
+    for (const id of cfg.flex) {
+      const inSideNow = side.includes(id);
+      const outH = est(id, inSideNow ? "side" : "main");
+      const inH = est(id, inSideNow ? "main" : "side");
+      const nextSide = inSideNow ? sideH - outH : sideH + inH;
+      const nextMain = inSideNow ? mainH + inH : mainH - outH;
+      if (Math.abs(nextSide - nextMain) < Math.abs(sideH - mainH) - 1) {
+        const [from, to] = inSideNow ? [side, main] : [main, side];
+        from.splice(from.indexOf(id), 1);
+        to.push(id);
+        sideH = nextSide;
+        mainH = nextMain;
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+
+  const byOrder = (a: SideSection, b: SideSection) => SECTION_ORDER.indexOf(a) - SECTION_ORDER.indexOf(b);
+  return { side: side.sort(byOrder), main: main.sort(byOrder) };
+}
+
 function SidebarHeader({ cfg, doc, role }: { cfg: SideConfig; doc: CvDoc; role: string }) {
   const [first, ...rest] = doc.name.split(" ");
 
@@ -714,6 +854,7 @@ function SidebarHeader({ cfg, doc, role }: { cfg: SideConfig; doc: CvDoc; role: 
 
 function makeSidebar(cfg: SideConfig) {
   return function SidebarCv({ doc, role }: TemplateProps) {
+    const columns = balanceColumns(cfg, doc);
     return (
       <div className="relative flex h-full flex-col bg-white text-[13px] leading-relaxed text-slate-700">
         {cfg.stripe && <div className="h-3 shrink-0" style={{ background: A(cfg.accent) }} />}
@@ -737,10 +878,10 @@ function makeSidebar(cfg: SideConfig) {
                 {role && <p className="mt-3 text-[11px] uppercase tracking-[0.3em] text-slate-500">{role}</p>}
               </div>
             )}
-            {sideSections(cfg, doc, "side", cfg.side)}
+            {sideSections(cfg, doc, "side", columns.side)}
           </aside>
           <main className="flex flex-col [justify-content:var(--cv-justify,space-between)] gap-6 px-9 py-8">
-            {sideSections(cfg, doc, "main", cfg.main)}
+            {sideSections(cfg, doc, "main", columns.main)}
           </main>
         </div>
         {cfg.stripe && <div className="h-3 shrink-0" style={{ background: A(cfg.accent) }} />}
@@ -872,8 +1013,9 @@ export const LavenderBandCv = makeStack({
 export const SideTimelineCv = makeSidebar({
   accent: "#111827",
   header: "left",
-  side: ["contact", "education", "skills", "languages"],
-  main: ["summary", "experience", "projects", "extras", "references"],
+  side: ["contact"],
+  main: ["summary", "experience"],
+  flex: ["education", "skills", "languages", "projects", "extras", "references"],
   sideWidth: 250,
   timeline: true,
   spaced: true,
@@ -886,8 +1028,9 @@ export const SideTimelineCv = makeSidebar({
 export const SideStripeCv = makeSidebar({
   accent: "#64748b",
   header: "side",
-  side: ["contact", "education", "skills", "languages"],
-  main: ["summary", "experience", "projects", "extras", "references"],
+  side: ["contact"],
+  main: ["summary", "experience"],
+  flex: ["education", "skills", "languages", "projects", "extras", "references"],
   sideWidth: 285,
   vline: true,
   spaced: true,
@@ -900,8 +1043,9 @@ export const SideStripeCv = makeSidebar({
 export const SidePanelCv = makeSidebar({
   accent: "#475569",
   header: "side",
-  side: ["contact", "skills", "extras"],
-  main: ["summary", "experience", "education", "projects", "references"],
+  side: ["contact"],
+  main: ["summary", "experience"],
+  flex: ["education", "skills", "languages", "projects", "extras", "references"],
   sideWidth: 235,
   sideBg: true,
   timeline: true,
@@ -913,8 +1057,9 @@ export const SidePanelCv = makeSidebar({
 export const ThinSplitCv = makeSidebar({
   accent: "#334155",
   header: "split",
-  side: ["summary", "skills", "education"],
-  main: ["experience", "projects", "extras", "references"],
+  side: ["summary"],
+  main: ["experience"],
+  flex: ["education", "skills", "languages", "projects", "extras", "references"],
   sideWidth: 225,
   vline: true,
   spaced: true,
@@ -926,8 +1071,9 @@ export const ThinSplitCv = makeSidebar({
 export const GridLeftCv = makeSidebar({
   accent: "#1f2937",
   header: "center",
-  side: ["skills", "education", "languages"],
-  main: ["summary", "experience", "projects", "extras", "references"],
+  side: [],
+  main: ["summary", "experience"],
+  flex: ["education", "skills", "languages", "projects", "extras", "references"],
   sideWidth: 245,
   vline: true,
   rules: true,
@@ -940,8 +1086,9 @@ export const GridLeftCv = makeSidebar({
 export const GridBandCv = makeSidebar({
   accent: "#475569",
   header: "band",
-  side: ["education", "skills", "languages"],
-  main: ["summary", "experience", "projects", "extras", "references"],
+  side: [],
+  main: ["summary", "experience"],
+  flex: ["education", "skills", "languages", "projects", "extras", "references"],
   sideWidth: 250,
   vline: true,
   rules: true,
@@ -955,8 +1102,9 @@ export const GridBandCv = makeSidebar({
 export const GridSpacedCv = makeSidebar({
   accent: "#525252",
   header: "center",
-  side: ["contact", "education", "skills", "languages"],
-  main: ["summary", "experience", "projects", "extras", "references"],
+  side: ["contact"],
+  main: ["summary", "experience"],
+  flex: ["education", "skills", "languages", "projects", "extras", "references"],
   sideWidth: 270,
   vline: true,
   rules: true,
