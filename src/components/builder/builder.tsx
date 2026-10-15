@@ -31,6 +31,7 @@ import {
   SummaryStep,
 } from "./sections";
 import type { ImportResult } from "@/lib/cv-import";
+import { ConfirmDialog } from "./confirm-dialog";
 import { ImportBanner } from "./import-card";
 import { StartScreen } from "./start-screen";
 import { JobMatchPanel } from "./job-match-panel";
@@ -72,6 +73,13 @@ export function Builder() {
   const [importInfo, setImportInfo] = useState<ImportResult | null>(null);
   /** Whether a CV is already saved on this device, so importing can warn before replacing it. */
   const [hasSaved, setHasSaved] = useState(false);
+  /** A pending "are you sure?" pop-up. Nothing destructive happens until the student confirms. */
+  const [confirm, setConfirm] = useState<{
+    title: string;
+    message: string;
+    confirmLabel: string;
+    onConfirm: () => void;
+  } | null>(null);
 
   // Load a saved CV (and a ?template= or ?import= choice from the page that sent us here) after mount
   useEffect(() => {
@@ -132,28 +140,45 @@ export function Builder() {
   // The example's stock photo belongs to somebody else, so it is never previewed
   const previewPhoto = previewingSample ? undefined : cv.photo;
 
-  /** Starts editing `next`. Returns false if the student chose to keep the CV already saved here. */
-  function begin(next: BuilderCv): boolean {
-    // Starting a different CV overwrites the one saved on this device, so ask first
-    if (hasSaved && !window.confirm("Replace the CV saved on this device with a new one?")) return false;
-    setHasSaved(false);
-    setImportMode(false);
-    timeRef.current = 0;
-    setCv(requested ? { ...next, template: requested } : next);
-    setStep(0);
-    setStatus("editing");
-    return true;
+  /**
+   * Starts editing `next` (and shows the import banner if it came from an upload).
+   * Starting a different CV overwrites the one saved on this device, so when there
+   * is one we show a confirmation pop-up first and only continue if they agree.
+   */
+  function begin(next: BuilderCv, imported?: ImportResult) {
+    const start = () => {
+      setHasSaved(false);
+      setImportMode(false);
+      timeRef.current = 0;
+      setCv(requested ? { ...next, template: requested } : next);
+      setStep(0);
+      setImportInfo(imported ?? null);
+      setStatus("editing");
+    };
+    if (!hasSaved) return start();
+    setConfirm({
+      title: imported ? "Replace your saved CV with this upload?" : "Replace your saved CV?",
+      message: "You already have a CV saved on this device. Continuing will replace it. If you opened this by mistake, keep your CV.",
+      confirmLabel: imported ? "Replace with upload" : "Replace my CV",
+      onConfirm: start,
+    });
   }
 
   function startOver() {
-    if (!window.confirm("Start a new CV? Your current CV on this device will be cleared.")) return;
-    try {
-      localStorage.removeItem(BUILDER_STORAGE_KEY);
-    } catch {}
-    setCv(blankCv());
-    setHasSaved(false);
-    setImportInfo(null);
-    setStatus("start");
+    setConfirm({
+      title: "Start a new CV?",
+      message: "Your current CV on this device will be cleared. Download it first if you still need it.",
+      confirmLabel: "Clear and start new",
+      onConfirm: () => {
+        try {
+          localStorage.removeItem(BUILDER_STORAGE_KEY);
+        } catch {}
+        setCv(blankCv());
+        setHasSaved(false);
+        setImportInfo(null);
+        setStatus("start");
+      },
+    });
   }
 
   async function downloadWord() {
@@ -182,8 +207,24 @@ export function Builder() {
     return <div className="grid min-h-screen place-items-center text-sm text-fg/50">Loading your CV…</div>;
   }
 
+  // The same pop-up serves both screens (replacing a saved CV, or clearing it)
+  const confirmDialog = confirm && (
+    <ConfirmDialog
+      title={confirm.title}
+      message={confirm.message}
+      confirmLabel={confirm.confirmLabel}
+      onCancel={() => setConfirm(null)}
+      onConfirm={() => {
+        const action = confirm.onConfirm;
+        setConfirm(null);
+        action();
+      }}
+    />
+  );
+
   if (status === "start") {
     return (
+      <>
       <StartScreen
         template={requested}
         highlightImport={importMode}
@@ -197,9 +238,7 @@ export function Builder() {
               }
             : undefined
         }
-        onImport={(result) => {
-          if (begin(result.cv)) setImportInfo(result);
-        }}
+        onImport={(result) => begin(result.cv, result)}
         onBlank={() => {
           if (changingCourse) {
             update({ courseSlug: undefined, courseName: undefined });
@@ -222,6 +261,8 @@ export function Builder() {
           }
         }}
       />
+      {confirmDialog}
+      </>
     );
   }
 
@@ -498,6 +539,7 @@ export function Builder() {
 
     {/* Full-size copy used only when printing / saving as PDF */}
     <PrintCopy cv={cv} onFit={(f) => setFit((prev) => (Math.abs(prev - f) > 0.005 ? f : prev))} />
+    {confirmDialog}
     </>
   );
 }
