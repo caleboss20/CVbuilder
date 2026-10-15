@@ -13,13 +13,25 @@ import { VoiceInput } from "./voice-input";
 
 const LETTER_KEY = "cv11-letter-v1";
 
+/**
+ * Print rules for the letter. An off-screen full-size copy (#letter-print) is the
+ * only thing the printer sees.
+ *
+ * We hide everything else with `visibility` rather than "display: none on the
+ * body's other children". That older approach turns the PDF blank whenever the
+ * copy is not a direct child of <body> (framework wrappers, some mobile print
+ * engines), because hiding an ancestor hides the copy too. The visible UI is also
+ * hidden with Tailwind's `print:hidden` so it takes up no space on the page.
+ */
 const printCss = `
 #letter-print { position: fixed; left: -10000px; top: 0; visibility: hidden; pointer-events: none; }
 @media print {
   @page { size: A4; margin: 0; }
   html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
-  body > *:not(#letter-print) { display: none !important; }
-  #letter-print { position: static; left: 0; visibility: visible; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  body * { visibility: hidden !important; }
+  #letter-print, #letter-print * { visibility: visible !important; }
+  #letter-print { position: absolute; left: 0; top: 0; width: 794px; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  #letter-print p { break-inside: avoid; }
 }
 `;
 

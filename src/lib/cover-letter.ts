@@ -17,9 +17,17 @@ const noDot = (s: string) => s.trim().replace(/[.!?]+$/, "");
 /** Writes a first draft from the student's CV. They can edit every word after. */
 export function draftLetter(cv: BuilderCv, input: LetterInput): string[] {
   const company = input.company.trim() || "your organisation";
-  const role = input.role.trim() || "the advertised role";
-  const what =
-    input.kind === "internship"
+  const role = input.role.trim();
+  // What the student is applying for, worded to match the category they picked.
+  // With no role typed we fall back to generic wording that still reads naturally
+  // (the role is never spliced into a sentence as an empty or duplicated "the").
+  const what = !role
+    ? input.kind === "service"
+      ? "a national service placement"
+      : input.kind === "internship"
+        ? "the advertised internship"
+        : "the advertised position"
+    : input.kind === "internship"
       ? /intern/i.test(role)
         ? `the ${role} position`
         : `the ${role} internship`
