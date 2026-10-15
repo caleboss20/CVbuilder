@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ButtonLink } from "@/components/ui/button";
 import { Magnetic } from "@/components/ui/magnetic";
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
@@ -111,16 +112,18 @@ export function Hero() {
             </ButtonLink>
           </Magnetic>
           <Magnetic className="w-full sm:w-auto">
-            <ButtonLink
-              href="/templates"
-              variant="ghost"
-              size="lg"
-              className="w-full"
-            >
-              Browse templates
+            {/* For students who already have a CV: goes straight to the upload step */}
+            <ButtonLink href="/builder?import=1" variant="ghost" size="lg" className="w-full">
+              Import my CV
             </ButtonLink>
           </Magnetic>
         </div>
+        <p className="animate-fade-up relative z-10 mt-4 text-sm text-fg/55 [animation-delay:300ms]">
+          or{" "}
+          <Link href="/templates" className="text-brand-300 underline-offset-4 hover:text-fg hover:underline">
+            browse the templates
+          </Link>
+        </p>
       </div>
 
       <div className="animate-fade-up relative -mt-24 px-4 [animation-delay:320ms] sm:-mt-28">

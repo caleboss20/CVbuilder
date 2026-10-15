@@ -11,6 +11,8 @@ import { CvIcon } from "@/components/cv/cv-icon";
 import { Logo } from "@/components/ui/logo";
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import type { ImportResult } from "@/lib/cv-import";
+import { ImportCard } from "./import-card";
 import { PortalGlow } from "./portal-glow";
 import { SkyBackground } from "./sky-background";
 
@@ -26,6 +28,8 @@ export function StartScreen({
   onBlank,
   onExample,
   onCancel,
+  onImport,
+  highlightImport,
 }: {
   /** Template picked on the homepage ("Use this template"), if any. */
   template?: CvTemplateName | null;
@@ -34,6 +38,10 @@ export function StartScreen({
   onExample: (slug: string, courseName?: string) => void;
   /** Set when reopened from the editor: lets the student go back without changing anything. */
   onCancel?: () => void;
+  /** Called with a CV imported from an uploaded file. */
+  onImport: (result: ImportResult) => void;
+  /** True when the student came from an "Import my CV" button. */
+  highlightImport?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(cvExamples[0].slug);
@@ -105,6 +113,9 @@ export function StartScreen({
         <div className="mt-12 grid gap-6 lg:mt-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-10">
           {/* Choices */}
           <div className="min-w-0 space-y-5">
+            {/* From the "Import my CV" button, this comes first so it is the obvious next step */}
+            {highlightImport && <ImportCard template={template} highlight onImport={onImport} />}
+
             <section
               aria-labelledby="from-course"
               className="relative overflow-hidden rounded-2xl border border-brand-400/30 bg-linear-to-b from-brand-600/20 via-ink-900/60 to-ink-900/40 p-5 shadow-[0_0_60px_-25px_rgb(124_128_255/0.6)] sm:p-7"
@@ -202,6 +213,8 @@ export function StartScreen({
                 <span aria-hidden="true">→</span>
               </button>
             </section>
+
+            {!highlightImport && <ImportCard template={template} onImport={onImport} />}
 
             <button
               type="button"

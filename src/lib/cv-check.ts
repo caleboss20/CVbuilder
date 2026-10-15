@@ -68,7 +68,7 @@ export type CvReport = {
 /* Reading the CV text                                                 */
 /* ------------------------------------------------------------------ */
 
-type SectionId =
+export type SectionId =
   | "summary"
   | "experience"
   | "education"
@@ -98,7 +98,7 @@ const HEADINGS: Record<SectionId, RegExp> = {
   publications: /^((selected |peer-reviewed )?publications?|research( experience| interests| projects)?|presentations?|conferences?|posters?)( .*)?$/,
 };
 
-const BULLET_MARK = /^\s*[•\-–—*▪●·◦○■]\s*/;
+export const BULLET_MARK = /^\s*[•\-–—*▪●·◦○■]\s*/;
 
 /** Words a strong bullet point usually starts with. Past tense, because the work is done. */
 const ACTION_VERBS = new Set(
@@ -125,7 +125,7 @@ const IRREGULAR_VERBS = new Set(
  * present tense for current ones ("Train"), so we accept both by trying the
  * likely past forms of the word.
  */
-function isActionWord(raw: string): boolean {
+export function isActionWord(raw: string): boolean {
   const w = raw.toLowerCase().replace(/[^a-z]/g, "");
   if (!w) return false;
   if (ACTION_VERBS.has(w) || IRREGULAR_VERBS.has(w)) return true;
@@ -143,12 +143,12 @@ function isActionWord(raw: string): boolean {
 const WEAK_PHRASES =
   /responsible for|duties (included|include)|worked on|tasked with|in charge of|hard[- ]working|team player|results[- ]oriented|go[- ]getter|references available (up)?on request/gi;
 
-const EMAIL = /[\w.+-]+@[\w-]+\.[\w.-]+/;
+export const EMAIL = /[\w.+-]+@[\w-]+\.[\w.-]+/;
 // Ghana mobile numbers (024 123 4567, +233 24 123 4567) and other long digit runs
-const PHONE = /(\+?233|\b0)[\s-]?\d{2}[\s-]?\d{3}[\s-]?\d{4}|\+?\d[\d\s-]{8,}\d/;
+export const PHONE = /(\+?233|\b0)[\s-]?\d{2}[\s-]?\d{3}[\s-]?\d{4}|\+?\d[\d\s-]{8,}\d/;
 
-const wordCount = (s: string) => s.split(/\s+/).filter(Boolean).length;
-const clean = (line: string) => line.replace(/\s+/g, " ").trim();
+export const wordCount = (s: string) => s.split(/\s+/).filter(Boolean).length;
+export const clean = (line: string) => line.replace(/\s+/g, " ").trim();
 
 /** Letters only, lowercased: "WORK EXPERIENCE:" -> "work experience". */
 const headingKey = (line: string) => line.toLowerCase().replace(/[^a-z& ]/g, "").replace(/\s+/g, " ").trim();
@@ -165,7 +165,7 @@ function headingOf(line: string): SectionId | null {
 }
 
 /** Splits the CV into lines grouped under the section heading above them. */
-function splitSections(lines: string[]) {
+export function splitSections(lines: string[]) {
   const sections: Partial<Record<SectionId, string[]>> = {};
   const header: string[] = []; // lines before the first heading: name and contact details
   let current: SectionId | null = null;

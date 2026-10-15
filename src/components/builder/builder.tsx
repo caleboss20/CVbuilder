@@ -30,6 +30,8 @@ import {
   SkillsStep,
   SummaryStep,
 } from "./sections";
+import type { ImportResult } from "@/lib/cv-import";
+import { ImportBanner } from "./import-card";
 import { StartScreen } from "./start-screen";
 import { JobMatchPanel } from "./job-match-panel";
 import { BuildTimer, readBest, saveBest } from "./build-timer";
@@ -64,13 +66,22 @@ export function Builder() {
   const [requested, setRequested] = useState<CvTemplateName | null>(null);
   /** True while the student reopens the course picker from inside the editor. */
   const [changingCourse, setChangingCourse] = useState(false);
+  /** True when the student arrived from an "Import my CV" button (?import=1). */
+  const [importMode, setImportMode] = useState(false);
+  /** What we found when the student uploaded their CV, shown as a banner in the editor. */
+  const [importInfo, setImportInfo] = useState<ImportResult | null>(null);
+  /** Whether a CV is already saved on this device, so importing can warn before replacing it. */
+  const [hasSaved, setHasSaved] = useState(false);
 
-  // Load a saved CV (and a ?template= choice from the gallery) after mount
+  // Load a saved CV (and a ?template= or ?import= choice from the page that sent us here) after mount
   useEffect(() => {
-    const t = new URLSearchParams(window.location.search).get("template");
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get("template");
     const picked = t && templates.some((x) => x.id === t) ? (t as CvTemplateName) : null;
+    const wantsImport = params.get("import") === "1";
     // eslint-disable-next-line react-hooks/set-state-in-effect -- read once from the URL after mount
     setRequested(picked);
+    setImportMode(wantsImport);
     let stored: BuilderCv | null = null;
     try {
       const raw = localStorage.getItem(BUILDER_STORAGE_KEY);
@@ -82,7 +93,9 @@ export function Builder() {
     if (stored) {
       timeRef.current = stored.timeSpent ?? 0;
       setCv(picked ? { ...stored, template: picked } : stored);
-      setStatus("editing");
+      setHasSaved(true);
+      // "Import my CV" shows the upload screen even when a CV is saved; a back button returns to it
+      setStatus(wantsImport ? "start" : "editing");
     } else {
       setStatus("start");
     }
@@ -119,11 +132,17 @@ export function Builder() {
   // The example's stock photo belongs to somebody else, so it is never previewed
   const previewPhoto = previewingSample ? undefined : cv.photo;
 
-  function begin(next: BuilderCv) {
+  /** Starts editing `next`. Returns false if the student chose to keep the CV already saved here. */
+  function begin(next: BuilderCv): boolean {
+    // Starting a different CV overwrites the one saved on this device, so ask first
+    if (hasSaved && !window.confirm("Replace the CV saved on this device with a new one?")) return false;
+    setHasSaved(false);
+    setImportMode(false);
     timeRef.current = 0;
     setCv(requested ? { ...next, template: requested } : next);
     setStep(0);
     setStatus("editing");
+    return true;
   }
 
   function startOver() {
@@ -132,6 +151,8 @@ export function Builder() {
       localStorage.removeItem(BUILDER_STORAGE_KEY);
     } catch {}
     setCv(blankCv());
+    setHasSaved(false);
+    setImportInfo(null);
     setStatus("start");
   }
 
@@ -165,8 +186,20 @@ export function Builder() {
     return (
       <StartScreen
         template={requested}
-        // When reopened from the editor, keep everything the student already typed
-        onCancel={changingCourse ? () => { setChangingCourse(false); setStatus("editing"); } : undefined}
+        highlightImport={importMode}
+        // The student's saved CV is kept when they came back to this screen from the editor, or from an import button
+        onCancel={
+          changingCourse || (importMode && hasSaved)
+            ? () => {
+                setChangingCourse(false);
+                setImportMode(false);
+                setStatus("editing");
+              }
+            : undefined
+        }
+        onImport={(result) => {
+          if (begin(result.cv)) setImportInfo(result);
+        }}
         onBlank={() => {
           if (changingCourse) {
             update({ courseSlug: undefined, courseName: undefined });
@@ -308,8 +341,10 @@ export function Builder() {
           </nav>
 
           <div className="mx-auto max-w-2xl px-4 pb-32 pt-6 sm:px-6 sm:pt-8">
+            {importInfo && <ImportBanner info={importInfo} onDismiss={() => setImportInfo(null)} />}
+
             {/* Where the dimmed example text comes from, with a way back to the course choice */}
-            <p className="mb-5 flex flex-wrap items-center gap-x-2 text-xs text-fg/50">
+            <p className={`mb-5 flex-wrap items-center gap-x-2 text-xs text-fg/50 ${importInfo && !hints ? "hidden" : "flex"}`}>
               {hints
                 ? `Grey example text comes from the ${cv.courseName ?? cvExamples.find((e) => e.slug === cv.courseSlug)?.course ?? "course"} CV.`
                 : "Pick your course to see example text for your field."}
