@@ -1,5 +1,6 @@
 import { cvExtras } from "./cv-example-extras";
 import { cvMore } from "./cv-example-more";
+import { courseExamples } from "./cv-example-courses";
 
 export type CvIcon =
   | "health"
@@ -845,10 +846,14 @@ function withExtras(e: BaseExample): BaseExample {
   };
 }
 
-export const cvExamples: CvExample[] = baseExamples.map((e) => ({
-  ...withExtras(e),
-  ...(looks[e.slug] ?? { role: `${e.course} Student`, template: "ats" as const }),
-}));
+export const cvExamples: CvExample[] = [
+  ...baseExamples.map((e) => ({
+    ...withExtras(e),
+    ...(looks[e.slug] ?? { role: `${e.course} Student`, template: "ats" as const }),
+  })),
+  // Extra courses are written out in full, with their own role and template
+  ...courseExamples,
+];
 
 export function getCvExample(slug: string) {
   return cvExamples.find((e) => e.slug === slug);

@@ -46,7 +46,8 @@ export function StartScreen({
   // closest field's example and relabel it, so nobody has to start from nothing.
   const [custom, setCustom] = useState<string | null>(null);
   const typed = query.trim();
-  const canUseTyped = typed.length >= 2 && !cvExamples.some((e) => e.course.toLowerCase() === typed.toLowerCase());
+  // Only offered when nothing in the list matches what they typed
+  const canUseTyped = typed.length >= 2 && shown.length === 0;
   const example = custom ? exampleForCourse(custom) : (cvExamples.find((e) => e.slug === selected) ?? cvExamples[0]);
   // Preview the course in the template the student already chose, if they chose one
   const activeTemplate = template ?? example.template;

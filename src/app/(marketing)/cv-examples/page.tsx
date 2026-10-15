@@ -20,7 +20,7 @@ export default function CvExamplesPage() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h1 className="text-4xl font-medium tracking-tight text-fg sm:text-5xl">
-            CV examples for every course
+            CV examples for different courses and careers
           </h1>
           <p className="mt-4 text-base text-fg/65 sm:text-lg">
             Real examples written for students in Ghana. Open one, see what a strong CV looks like

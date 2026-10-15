@@ -11,10 +11,19 @@ import { cvExamples, type CvExample } from "./cv-examples";
 
 /** Words that point to a field. Matched at the start of a word, so "biolog" finds "biological". */
 const FIELD_KEYWORDS: ReadonlyArray<readonly [slug: string, words: readonly string[]]> = [
+  // Most specific fields first: the first row with a matching word wins
+  ["electrical-engineering", ["electrical", "electronic", "telecom", "mechatron", "power system"]],
+  ["human-resource-management", ["human resource", "hr", "personnel", "industrial relations"]],
+  ["public-health", ["public health", "community health", "epidemiolog", "health promotion"]],
+  ["environmental-science", ["environment", "geograph", "climate", "ecolog", "geolog", "earth science"]],
+  ["physics", ["physic", "astronom", "applied science"]],
+  ["psychology", ["psycholog", "counsel", "behavio"]],
+  ["english", ["english", "linguist", "literature", "language"]],
+  ["biological-sciences", ["biolog", "biochem", "microbio", "biotech", "zoolog", "botan", "genetic", "life science"]],
   ["midwifery", ["midwif"]],
-  ["nursing", ["nurs", "health", "physio", "dental", "dentist", "medicine", "medical doctor", "optom", "dietet", "public health"]],
+  ["nursing", ["nurs", "health", "physio", "dental", "dentist", "medicine", "medical doctor", "optom", "dietet"]],
   ["pharmacy", ["pharm"]],
-  ["medical-laboratory-science", ["laboratory", "biolog", "biochem", "microbio", "chemi", "physic", "biomedical", "biotech", "environmental", "natural science", "science"]],
+  ["medical-laboratory-science", ["laboratory", "chemi", "biomedical", "natural science", "science"]],
   ["computer-science", ["computer", "software", "information tech", "ict", "cyber", "informatics", "programming"]],
   ["data-science", ["data", "statistic", "mathemat", "actuar", "analytics"]],
   ["civil-engineering", ["civil", "construction", "geomatic", "geodetic", "surveying", "quantity survey"]],
@@ -28,7 +37,7 @@ const FIELD_KEYWORDS: ReadonlyArray<readonly [slug: string, words: readonly stri
   ["teaching", ["teach", "education", "pedagog", "early childhood"]],
   ["agriculture", ["agric", "agro", "forest", "animal", "crop", "soil", "fisher", "horticult", "food science", "nutrition"]],
   ["graphic-design", ["design", "graphic", "fashion", "textile", "fine art", "creative art", "film", "music", "theatre", "photograph"]],
-  ["journalism", ["journal", "communicat", "media", "english", "language", "literature", "linguist", "history", "sociolog", "psycholog", "politic", "social", "religio", "philosoph", "theolog", "geograph", "library", "publishing"]],
+  ["journalism", ["journal", "communicat", "media", "history", "sociolog", "psycholog", "politic", "social", "religio", "philosoph", "theolog", "geograph", "library", "publishing"]],
   ["business-administration", ["business", "management", "administration", "human resource", "hospitality", "tourism", "leadership", "project management"]],
 ];
 

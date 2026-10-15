@@ -201,14 +201,18 @@ export function Builder() {
       <header className="sticky top-0 z-30 border-b border-fg/10 bg-ink-950/90 backdrop-blur-xl">
         <div className="flex h-16 items-center gap-2 px-3 sm:gap-3 sm:px-6">
           <Logo />
-          <span className="hidden items-center gap-1.5 text-xs text-fg/45 sm:inline-flex" aria-live="polite">
+          {/* Save status. On phones only the icon shows; the words are for screen readers and larger screens. */}
+          <span
+            className="inline-flex items-center gap-1.5 text-xs text-fg/45"
+            aria-live="polite"
+            title={saved ? "Saved on this device" : "Saving…"}
+          >
             {saved ? (
-              <>
-                <CheckIcon size={14} /> Saved on this device
-              </>
+              <CheckIcon size={14} />
             ) : (
-              "Saving…"
+              <span className="size-2 animate-pulse rounded-full bg-amber-400" aria-hidden="true" />
             )}
+            <span className="sr-only sm:not-sr-only">{saved ? "Saved on this device" : "Saving…"}</span>
           </span>
           <div className="ml-auto flex items-center gap-2">
             <BuildTimer timeRef={timeRef} initialMs={cv.timeSpent ?? 0} finished={!!cv.finishedAt} onPersist={persistTime} />

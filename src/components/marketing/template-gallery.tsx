@@ -102,6 +102,28 @@ export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }
         </div>
       </div>
 
+      {/* Plain-language explanation of the ATS-safe tag, since many students have not heard the term */}
+      <details className="group/ats mx-4 mt-6 rounded-lg border border-fg/10 bg-fg/[0.03] px-4 py-3 text-sm sm:mx-0">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-medium text-fg">
+          What does “ATS-safe” mean?
+          <span className="text-fg/45 transition-transform group-open/ats:rotate-45" aria-hidden="true">
+            +
+          </span>
+        </summary>
+        <div className="mt-3 space-y-2 leading-relaxed text-fg/65">
+          <p>
+            ATS stands for Applicant Tracking System. It is software some employers use to scan and sort CVs before a person reads
+            them.
+          </p>
+          <p>
+            ATS-safe templates use one column, plain headings and no photo, so the software reads every section in the right
+            order. A photo does not get you rejected, but a plain layout is the safer choice. Two-column and photo designs look
+            great when a person reads them, so use them when the employer will read your CV by eye.
+          </p>
+          <p>When in doubt, follow what the job advert asks for.</p>
+        </div>
+      </details>
+
       <ul
         ref={listRef}
         onScroll={onScroll}
@@ -116,7 +138,7 @@ export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }
             <li
               key={t.id}
               data-active={i === active}
-              className={`group w-[78%] max-w-80 shrink-0 snap-center sm:w-auto sm:max-w-none sm:min-w-0 ${layout === "row" && i >= 6 ? "sm:hidden" : ""}`}
+              className={`group w-[68%] max-w-64 shrink-0 snap-center sm:w-auto sm:max-w-none sm:min-w-0 ${layout === "row" && i >= 6 ? "sm:hidden" : ""}`}
             >
               <article className="group/card">
                 <div className="relative overflow-hidden rounded-lg bg-white shadow-[0_20px_50px_-20px_rgb(0_0_0/0.5)] ring-1 ring-fg/10 transition-all duration-300 group-hover/card:-translate-y-1 group-hover/card:shadow-[0_0_50px_-12px_rgb(124_128_255/0.7)] group-hover/card:ring-brand-400/50">
@@ -139,7 +161,10 @@ export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }
                     <p className="mt-1 text-sm text-fg/55">{t.blurb}</p>
                   </div>
                   {t.tags.includes("ats") && (
-                    <span className="shrink-0 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[11px] font-medium text-emerald-300">
+                    <span
+                      title="Applicant Tracking System friendly: one column, plain headings, no photo"
+                      className="shrink-0 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[11px] font-medium text-emerald-300"
+                    >
                       ATS-safe
                     </span>
                   )}
