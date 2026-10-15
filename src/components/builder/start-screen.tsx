@@ -24,11 +24,14 @@ export function StartScreen({
   template,
   onBlank,
   onExample,
+  onCancel,
 }: {
   /** Template picked on the homepage ("Use this template"), if any. */
   template?: CvTemplateName | null;
   onBlank: () => void;
   onExample: (slug: string) => void;
+  /** Set when reopened from the editor: lets the student go back without changing anything. */
+  onCancel?: () => void;
 }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(cvExamples[0].slug);
@@ -53,9 +56,15 @@ export function StartScreen({
         <Logo />
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          <Link href="/" className="hidden text-sm text-fg/60 hover:text-fg sm:inline">
-            ← Back to home
-          </Link>
+          {onCancel ? (
+            <button type="button" onClick={onCancel} className="text-sm text-fg/70 hover:text-fg">
+              ← Back to my CV
+            </button>
+          ) : (
+            <Link href="/" className="hidden text-sm text-fg/60 hover:text-fg sm:inline">
+              ← Back to home
+            </Link>
+          )}
         </div>
       </header>
 
@@ -69,7 +78,7 @@ export function StartScreen({
             <span className="bg-linear-to-b from-fg to-fg/60 bg-clip-text text-transparent">Let’s build your CV</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-fg/60 sm:text-lg">
-            Start from a real CV for your course and make it yours, or begin with a clean page. Either way you’ll be done in minutes.
+            Pick your course and get example wording for your field as you write, or begin with a clean page. Either way you’ll be done in minutes.
           </p>
           <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             {perks.map((p) => (
@@ -100,7 +109,7 @@ export function StartScreen({
                   Fastest · Recommended
                 </span>
               </div>
-              <p className="mt-1.5 text-sm text-fg/60">Pick your course, check the preview, then swap in your own details.</p>
+              <p className="mt-1.5 text-sm text-fg/60">Pick your course and check the preview. Examples show in grey as you fill in your own details.</p>
 
               <label htmlFor="course-search" className="sr-only">
                 Search courses
@@ -154,7 +163,7 @@ export function StartScreen({
                 onClick={() => onExample(example.slug)}
                 className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-brand-600 py-3 text-[15px] font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_22px_rgb(124_128_255/0.5)] transition-colors hover:bg-brand-500"
               >
-                Start with the {example.course} CV
+                Continue with {example.course}
                 <span aria-hidden="true">→</span>
               </button>
             </section>

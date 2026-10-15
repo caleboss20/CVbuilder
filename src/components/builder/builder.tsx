@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -6,7 +7,8 @@ import { accentSwatches, templates } from "@/lib/templates";
 import {
   BUILDER_STORAGE_KEY,
   blankCv,
-  cvFromExample,
+  courseHints,
+  cvFromCourse,
   cvStrength,
   toDoc,
   type BuilderCv,
@@ -59,6 +61,8 @@ export function Builder() {
   const [saved, setSaved] = useState(true);
   const [fit, setFit] = useState(1);
   const [requested, setRequested] = useState<CvTemplateName | null>(null);
+  /** True while the student reopens the course picker from inside the editor. */
+  const [changingCourse, setChangingCourse] = useState(false);
 
   // Load a saved CV (and a ?template= choice from the gallery) after mount
   useEffect(() => {
@@ -105,6 +109,15 @@ export function Builder() {
   const accentStyle = cvStyle(cv, strength.score);
   const templateName = templates.find((t) => t.id === cv.template)?.name ?? "Template";
 
+  // The picked course's example CV: shown as dimmed placeholders in the form, and as
+  // a sample preview until the student types their name. Never saved into their CV.
+  const hints = useMemo(() => courseHints(cv.courseSlug), [cv.courseSlug]);
+  const previewingSample = !!hints && !cv.name.trim();
+  const previewDoc = previewingSample && hints ? toDoc(hints) : doc;
+  const previewRole = (previewingSample ? hints?.role : cv.role) || "Your role";
+  // The example's stock photo belongs to somebody else, so it is never previewed
+  const previewPhoto = previewingSample ? undefined : cv.photo;
+
   function begin(next: BuilderCv) {
     timeRef.current = 0;
     setCv(requested ? { ...next, template: requested } : next);
@@ -148,10 +161,33 @@ export function Builder() {
   }
 
   if (status === "start") {
-    return <StartScreen template={requested} onBlank={() => begin(blankCv(requested ?? "ats"))} onExample={(slug) => {
-      const ex = cvExamples.find((e) => e.slug === slug);
-      if (ex) begin(cvFromExample(ex));
-    }} />;
+    return (
+      <StartScreen
+        template={requested}
+        // When reopened from the editor, keep everything the student already typed
+        onCancel={changingCourse ? () => { setChangingCourse(false); setStatus("editing"); } : undefined}
+        onBlank={() => {
+          if (changingCourse) {
+            update({ courseSlug: undefined });
+            setChangingCourse(false);
+            setStatus("editing");
+          } else {
+            begin(blankCv(requested ?? "ats"));
+          }
+        }}
+        onExample={(slug) => {
+          const ex = cvExamples.find((e) => e.slug === slug);
+          if (!ex) return;
+          if (changingCourse) {
+            update({ courseSlug: slug });
+            setChangingCourse(false);
+            setStatus("editing");
+          } else {
+            begin(cvFromCourse(ex));
+          }
+        }}
+      />
+    );
   }
 
   const Current = steps[step].Comp;
@@ -266,7 +302,23 @@ export function Builder() {
           </nav>
 
           <div className="mx-auto max-w-2xl px-4 pb-32 pt-6 sm:px-6 sm:pt-8">
-            <Current cv={cv} update={update} />
+            {/* Where the dimmed example text comes from, with a way back to the course choice */}
+            <p className="mb-5 flex flex-wrap items-center gap-x-2 text-xs text-fg/50">
+              {hints
+                ? `Grey example text comes from the ${cvExamples.find((e) => e.slug === cv.courseSlug)?.course ?? "course"} CV.`
+                : "Pick your course to see example text for your field."}
+              <button
+                type="button"
+                onClick={() => {
+                  setChangingCourse(true);
+                  setStatus("start");
+                }}
+                className="font-medium text-brand-300 hover:text-fg"
+              >
+                {hints ? "Change course" : "Choose course"}
+              </button>
+            </p>
+            <Current cv={cv} update={update} hints={hints} />
 
             <div className="mt-10 flex items-center justify-between gap-3 border-t border-fg/10 pt-6">
               <button
@@ -353,10 +405,15 @@ export function Builder() {
             <div style={accentStyle} className="mx-auto mt-3 max-w-[640px] overflow-hidden rounded-md bg-white shadow-[0_20px_60px_-20px_rgb(0_0_0/0.6)] ring-1 ring-fg/10">
               <CvPageFrame key={mobileView}>
                 <HideEmptySections>
-                  <CvTemplateView template={cv.template} doc={doc} role={cv.role || "Your role"} photo={cv.photo} />
+                  <CvTemplateView template={cv.template} doc={previewDoc} role={previewRole} photo={previewPhoto} />
                 </HideEmptySections>
               </CvPageFrame>
             </div>
+            {previewingSample && (
+              <p className="mt-3 text-center text-xs text-fg/50">
+                Sample preview for your course. Type your name and it becomes your own CV.
+              </p>
+            )}
           </div>
         </aside>
       </div>
@@ -385,6 +442,9 @@ export function Builder() {
       {pickerOpen && (
         <TemplatePicker
           cv={cv}
+          doc={previewDoc}
+          role={previewRole}
+          photo={previewPhoto}
           onPick={(template) => {
             update({ template });
             setPickerOpen(false);
@@ -467,14 +527,20 @@ function AccentPicker({ value, onChange }: { value: string | null; onChange: (v:
 
 function TemplatePicker({
   cv,
+  doc,
+  role,
+  photo,
   onPick,
   onClose,
 }: {
   cv: BuilderCv;
+  /** What the thumbnails show: the student's CV, or the course sample while it is still empty. */
+  doc: ReturnType<typeof toDoc>;
+  role: string;
+  photo?: string;
   onPick: (t: CvTemplateName) => void;
   onClose: () => void;
 }) {
-  const doc = useMemo(() => toDoc(cv), [cv]);
   const accentStyle = cvStyle(cv, cvStrength(cv).score);
 
   useEffect(() => {
@@ -506,7 +572,7 @@ function TemplatePicker({
               >
                 <CvPageFrame>
                   <HideEmptySections>
-                    <CvTemplateView template={t.id} doc={doc} role={cv.role || "Your role"} photo={cv.photo} />
+                    <CvTemplateView template={t.id} doc={doc} role={role} photo={photo} />
                   </HideEmptySections>
                 </CvPageFrame>
               </div>
@@ -555,6 +621,7 @@ const A4_WIDTH = 794;
 const A4_HEIGHT = 1123;
 /** Smallest shrink we allow before letting a very long CV run onto a second page. */
 const MIN_FIT = 0.72;
+
 
 /**
  * Full-size copy of the CV that only the printer sees. If the CV is taller than

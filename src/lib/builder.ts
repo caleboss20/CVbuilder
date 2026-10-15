@@ -1,4 +1,4 @@
-import type { CvDoc, CvExample, CvTemplateName } from "./cv-examples";
+import { getCvExample, type CvDoc, type CvExample, type CvTemplateName } from "./cv-examples";
 
 export const BUILDER_STORAGE_KEY = "cv11-builder-v1";
 
@@ -29,6 +29,12 @@ export type BuilderCv = {
   awards: string[];
   interests: string[];
   references: Referee[];
+  /**
+   * Slug of the course the student picked at the start. Used only to show that
+   * course's example as dimmed placeholder text and as the sample preview. It
+   * never ends up in the CV itself.
+   */
+  courseSlug?: string;
   /** Active building time in ms, and when the CV was first downloaded. */
   timeSpent?: number;
   finishedAt?: number;
@@ -68,7 +74,22 @@ export function blankCv(template: CvTemplateName = "ats"): BuilderCv {
   };
 }
 
-/** Starts a CV from one of the course examples. */
+/**
+ * Starts an EMPTY CV that remembers the chosen course. The course example is only
+ * used as guidance (placeholders and sample preview), so students never have to
+ * delete somebody else's details before writing their own.
+ */
+export function cvFromCourse(e: CvExample, template?: CvTemplateName): BuilderCv {
+  return { ...blankCv(template ?? e.template), courseSlug: e.slug };
+}
+
+/** The full example CV for a course, shaped like the editor state, for use as hints. */
+export function courseHints(slug: string | undefined): BuilderCv | null {
+  const example = slug ? getCvExample(slug) : undefined;
+  return example ? cvFromExample(example) : null;
+}
+
+/** Starts a CV from one of the course examples, fully filled in. */
 export function cvFromExample(e: CvExample, template?: CvTemplateName): BuilderCv {
   const contact = e.cv.contact;
   const email = contact.find((c) => c.includes("@")) ?? "";

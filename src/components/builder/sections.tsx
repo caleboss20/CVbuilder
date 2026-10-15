@@ -14,7 +14,14 @@ import { AddButton, Field, ItemCard, PhotoInput, TagInput, TextArea } from "./fi
 import { VoiceInput } from "./voice-input";
 
 export type Update = (patch: Partial<BuilderCv>) => void;
-type StepProps = { cv: BuilderCv; update: Update };
+/**
+ * `hints` is the example CV for the course the student picked. It is only used
+ * for dimmed placeholder text, never written into the student's own CV.
+ */
+type StepProps = { cv: BuilderCv; update: Update; hints?: BuilderCv | null };
+
+/** Placeholder text: the course hint if there is one, otherwise a generic example. */
+const ph = (hint: string | undefined, fallback: string) => hint?.trim() || fallback;
 
 function move<T>(list: T[], i: number, dir: -1 | 1): T[] {
   const j = i + dir;
@@ -50,28 +57,28 @@ function Tip({ children }: { children: ReactNode }) {
 
 /* ------------------------------------------------------------------ */
 
-export function PersonalStep({ cv, update }: StepProps) {
+export function PersonalStep({ cv, update, hints }: StepProps) {
   return (
     <div className="space-y-5">
       <StepIntro title="Personal details">How recruiters will find and contact you.</StepIntro>
       <PhotoInput value={cv.photo} onChange={(photo) => update({ photo })} />
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Full name" value={cv.name} onChange={(name) => update({ name })} placeholder="Ama Mensah" autoComplete="name" />
+        <Field label="Full name" value={cv.name} onChange={(name) => update({ name })} placeholder={ph(hints?.name, "Ama Mensah")} autoComplete="name" />
         <Field
           label="Role or title"
           value={cv.role}
           onChange={(role) => update({ role })}
-          placeholder="Computer Science Student"
+          placeholder={ph(hints?.role, "Computer Science Student")}
           hint="Your course, or the job you want."
         />
-        <Field label="Phone" value={cv.phone} onChange={(phone) => update({ phone })} placeholder="024 000 0000" type="tel" autoComplete="tel" />
-        <Field label="Email" value={cv.email} onChange={(email) => update({ email })} placeholder="ama.mensah@email.com" type="email" autoComplete="email" />
-        <Field label="Location" value={cv.location} onChange={(location) => update({ location })} placeholder="Kumasi, Ghana" />
+        <Field label="Phone" value={cv.phone} onChange={(phone) => update({ phone })} placeholder={ph(hints?.phone, "024 000 0000")} type="tel" autoComplete="tel" />
+        <Field label="Email" value={cv.email} onChange={(email) => update({ email })} placeholder={ph(hints?.email, "ama.mensah@email.com")} type="email" autoComplete="email" />
+        <Field label="Location" value={cv.location} onChange={(location) => update({ location })} placeholder={ph(hints?.location, "Kumasi, Ghana")} />
         <Field
           label="LinkedIn, GitHub or portfolio"
           value={cv.links[0] ?? ""}
           onChange={(v) => update({ links: v ? [v, ...cv.links.slice(1)] : cv.links.slice(1) })}
-          placeholder="linkedin.com/in/amamensah"
+          placeholder={ph(hints?.links[0], "linkedin.com/in/amamensah")}
         />
       </div>
       <Tip>Use a professional email, ideally your name. Skip your home address and date of birth; recruiters don’t need them.</Tip>
@@ -79,7 +86,7 @@ export function PersonalStep({ cv, update }: StepProps) {
   );
 }
 
-export function SummaryStep({ cv, update }: StepProps) {
+export function SummaryStep({ cv, update, hints }: StepProps) {
   const words = cv.summary.split(/\s+/).filter(Boolean).length;
   return (
     <div className="space-y-5">
@@ -90,7 +97,10 @@ export function SummaryStep({ cv, update }: StepProps) {
         rows={5}
         value={cv.summary}
         onChange={(summary) => update({ summary })}
-        placeholder="Final-year Computer Science student at KNUST with hands-on experience building web and mobile apps, looking for a software engineering internship."
+        placeholder={ph(
+          hints?.summary,
+          "Final-year Computer Science student at KNUST with hands-on experience building web and mobile apps, looking for a software engineering internship.",
+        )}
         hint={
           <span className={words > 60 ? "text-amber-300" : ""}>
             {words} words · aim for 25 to 60
@@ -105,7 +115,7 @@ export function SummaryStep({ cv, update }: StepProps) {
   );
 }
 
-export function EducationStep({ cv, update }: StepProps) {
+export function EducationStep({ cv, update, hints }: StepProps) {
   const list = cv.education;
   const set = (education: typeof list) => update({ education });
   return (
@@ -120,9 +130,9 @@ export function EducationStep({ cv, update }: StepProps) {
           onDown={i < list.length - 1 ? () => set(move(list, i, 1)) : undefined}
         >
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Degree or certificate" value={s.degree} onChange={(degree) => set(patchAt(list, i, { degree }))} placeholder="BSc Computer Science" />
-            <Field label="School" value={s.school} onChange={(school) => set(patchAt(list, i, { school }))} placeholder="KNUST, Kumasi" />
-            <Field label="Dates" value={s.date} onChange={(date) => set(patchAt(list, i, { date }))} placeholder="2022 – 2026" />
+            <Field label="Degree or certificate" value={s.degree} onChange={(degree) => set(patchAt(list, i, { degree }))} placeholder={ph(hints?.education[i]?.degree, "BSc Computer Science")} />
+            <Field label="School" value={s.school} onChange={(school) => set(patchAt(list, i, { school }))} placeholder={ph(hints?.education[i]?.school, "KNUST, Kumasi")} />
+            <Field label="Dates" value={s.date} onChange={(date) => set(patchAt(list, i, { date }))} placeholder={ph(hints?.education[i]?.date, "2022 – 2026")} />
           </div>
         </ItemCard>
       ))}
@@ -131,7 +141,7 @@ export function EducationStep({ cv, update }: StepProps) {
   );
 }
 
-export function ExperienceStep({ cv, update }: StepProps) {
+export function ExperienceStep({ cv, update, hints }: StepProps) {
   const list = cv.experience;
   const set = (experience: typeof list) => update({ experience });
   return (
@@ -148,9 +158,9 @@ export function ExperienceStep({ cv, update }: StepProps) {
           onDown={i < list.length - 1 ? () => set(move(list, i, 1)) : undefined}
         >
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Role" value={job.title} onChange={(title) => set(patchAt(list, i, { title }))} placeholder="Finance Intern" />
-            <Field label="Organisation and town" value={job.place} onChange={(place) => set(patchAt(list, i, { place }))} placeholder="GCB Bank, Kumasi" />
-            <Field label="Dates" value={job.date} onChange={(date) => set(patchAt(list, i, { date }))} placeholder="Jun – Sep 2025" />
+            <Field label="Role" value={job.title} onChange={(title) => set(patchAt(list, i, { title }))} placeholder={ph(hints?.experience[i]?.title, "Finance Intern")} />
+            <Field label="Organisation and town" value={job.place} onChange={(place) => set(patchAt(list, i, { place }))} placeholder={ph(hints?.experience[i]?.place, "GCB Bank, Kumasi")} />
+            <Field label="Dates" value={job.date} onChange={(date) => set(patchAt(list, i, { date }))} placeholder={ph(hints?.experience[i]?.date, "Jun – Sep 2025")} />
           </div>
           <VoiceInput
             kind="bullets"
@@ -166,7 +176,10 @@ export function ExperienceStep({ cv, update }: StepProps) {
                     rows={2}
                     value={b}
                     aria-label={`Bullet ${bi + 1}`}
-                    placeholder={bi === 0 ? "Prepared daily cash reconciliations for 3 branch accounts." : "Another thing you did, with a number if you can."}
+                    placeholder={ph(
+                      hints?.experience[i]?.bullets[bi],
+                      bi === 0 ? "Prepared daily cash reconciliations for 3 branch accounts." : "Another thing you did, with a number if you can.",
+                    )}
                     onChange={(e) => {
                       const bullets = [...job.bullets];
                       bullets[bi] = e.target.value;
@@ -205,7 +218,7 @@ export function ExperienceStep({ cv, update }: StepProps) {
   );
 }
 
-export function ProjectsStep({ cv, update }: StepProps) {
+export function ProjectsStep({ cv, update, hints }: StepProps) {
   const list = cv.projects;
   const set = (projects: typeof list) => update({ projects });
   return (
@@ -219,14 +232,17 @@ export function ProjectsStep({ cv, update }: StepProps) {
           onUp={i > 0 ? () => set(move(list, i, -1)) : undefined}
           onDown={i < list.length - 1 ? () => set(move(list, i, 1)) : undefined}
         >
-          <Field label="Project name" value={p.name} onChange={(name) => set(patchAt(list, i, { name }))} placeholder="Campus Marketplace App" />
+          <Field label="Project name" value={p.name} onChange={(name) => set(patchAt(list, i, { name }))} placeholder={ph(hints?.projects[i]?.name, "Campus Marketplace App")} />
           <VoiceInput kind="project" onAdd={([detail]) => detail && set(patchAt(list, i, { detail }))} />
           <TextArea
             label="What it was and what it achieved"
             rows={2}
             value={p.detail}
             onChange={(detail) => set(patchAt(list, i, { detail }))}
-            placeholder="Co-built a React Native app where students buy and sell items on campus, used by 500+ students."
+            placeholder={ph(
+              hints?.projects[i]?.detail,
+              "Co-built a React Native app where students buy and sell items on campus, used by 500+ students.",
+            )}
           />
         </ItemCard>
       ))}
@@ -236,7 +252,7 @@ export function ProjectsStep({ cv, update }: StepProps) {
   );
 }
 
-export function SkillsStep({ cv, update }: StepProps) {
+export function SkillsStep({ cv, update, hints }: StepProps) {
   const list = cv.skills;
   const set = (skills: typeof list) => update({ skills });
   return (
@@ -245,12 +261,12 @@ export function SkillsStep({ cv, update }: StepProps) {
       {list.map((g, i) => (
         <ItemCard key={g.id} title={g.label || `Skill group ${i + 1}`} onRemove={() => set(list.filter((_, k) => k !== i))}>
           <div className="grid gap-4 sm:grid-cols-[0.6fr_1.4fr]">
-            <Field label="Group name" value={g.label} onChange={(label) => set(patchAt(list, i, { label }))} placeholder="Software" />
+            <Field label="Group name" value={g.label} onChange={(label) => set(patchAt(list, i, { label }))} placeholder={ph(hints?.skills[i]?.label, "Software")} />
             <Field
               label="Skills (separate with commas)"
               value={g.items}
               onChange={(items) => set(patchAt(list, i, { items }))}
-              placeholder="Excel, QuickBooks, Canva"
+              placeholder={ph(hints?.skills[i]?.items, "Excel, QuickBooks, Canva")}
             />
           </div>
         </ItemCard>
@@ -261,7 +277,7 @@ export function SkillsStep({ cv, update }: StepProps) {
   );
 }
 
-export function ExtrasStep({ cv, update }: StepProps) {
+export function ExtrasStep({ cv, update, hints }: StepProps) {
   return (
     <div className="space-y-6">
       <StepIntro title="Extras">The small things that make you stand out. Leave any of these empty and they won’t show.</StepIntro>
@@ -276,25 +292,25 @@ export function ExtrasStep({ cv, update }: StepProps) {
         label="Certifications"
         values={cv.certifications}
         onChange={(certifications) => update({ certifications })}
-        placeholder="Google Data Analytics Certificate"
+        placeholder={ph(hints?.certifications[0], "Google Data Analytics Certificate")}
       />
       <TagInput
         label="Awards and achievements"
         values={cv.awards}
         onChange={(awards) => update({ awards })}
-        placeholder="Dean’s List, 2024/2025"
+        placeholder={ph(hints?.awards[0], "Dean’s List, 2024/2025")}
       />
       <TagInput
         label="Interests"
         values={cv.interests}
         onChange={(interests) => update({ interests })}
-        placeholder="Football, Debate, Volunteering"
+        placeholder={ph(hints?.interests.join(", "), "Football, Debate, Volunteering")}
       />
     </div>
   );
 }
 
-export function ReferencesStep({ cv, update }: StepProps) {
+export function ReferencesStep({ cv, update, hints }: StepProps) {
   const list = cv.references;
   const set = (references: typeof list) => update({ references });
   return (
@@ -303,9 +319,9 @@ export function ReferencesStep({ cv, update }: StepProps) {
       {list.map((r, i) => (
         <ItemCard key={r.id} title={r.name || `Reference ${i + 1}`} onRemove={() => set(list.filter((_, k) => k !== i))}>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Name" value={r.name} onChange={(name) => set(patchAt(list, i, { name }))} placeholder="Dr. Kwame Owusu" />
-            <Field label="Role and organisation" value={r.role} onChange={(role) => set(patchAt(list, i, { role }))} placeholder="Senior Lecturer, KNUST" />
-            <Field label="Phone or email" value={r.phone} onChange={(phone) => set(patchAt(list, i, { phone }))} placeholder="020 000 0000" />
+            <Field label="Name" value={r.name} onChange={(name) => set(patchAt(list, i, { name }))} placeholder={ph(hints?.references[i]?.name, "Dr. Kwame Owusu")} />
+            <Field label="Role and organisation" value={r.role} onChange={(role) => set(patchAt(list, i, { role }))} placeholder={ph(hints?.references[i]?.role, "Senior Lecturer, KNUST")} />
+            <Field label="Phone or email" value={r.phone} onChange={(phone) => set(patchAt(list, i, { phone }))} placeholder={ph(hints?.references[i]?.phone, "020 000 0000")} />
           </div>
         </ItemCard>
       ))}
