@@ -14,6 +14,7 @@ import {
   type BuilderCv,
 } from "@/lib/builder";
 import { CvPageFrame } from "@/components/cv/cv-page-frame";
+import { A4_HEIGHT, A4_WIDTH, fillWidth } from "@/lib/page-fit";
 import { CvTemplateView } from "@/components/cv/cv-templates";
 import { HideEmptySections } from "@/components/cv/hide-empty-sections";
 import { Logo } from "@/components/ui/logo";
@@ -404,7 +405,7 @@ export function Builder() {
               <AccentPicker value={cv.accent} onChange={(accent) => update({ accent })} />
             </div>
             <div style={accentStyle} className="mx-auto mt-3 max-w-[640px] overflow-hidden rounded-md bg-white shadow-[0_20px_60px_-20px_rgb(0_0_0/0.6)] ring-1 ring-fg/10">
-              <CvPageFrame key={mobileView}>
+              <CvPageFrame key={mobileView} fill={strength.score >= FILL_FROM_SCORE || previewingSample}>
                 <HideEmptySections>
                   <CvTemplateView template={cv.template} doc={previewDoc} role={previewRole} photo={previewPhoto} />
                 </HideEmptySections>
@@ -608,18 +609,20 @@ const printCss = `
 `;
 
 /**
- * Accent colour plus how sections are spaced. A nearly complete CV spreads its
- * sections to fill the page; a half-filled one keeps them together at the top.
+ * From this CV strength up, the page is stretched to fill the sheet: sections are
+ * spread out and a short CV is scaled up. A half-filled CV stays top-aligned and
+ * unscaled, so the text does not jump around while the student is still typing.
  */
+const FILL_FROM_SCORE = 80;
+
+/** Accent colour plus how sections are spaced (see FILL_FROM_SCORE). */
 function cvStyle(cv: BuilderCv, score: number): CSSProperties {
   return {
     ...(cv.accent ? { "--cv-accent": cv.accent } : {}),
-    "--cv-justify": score >= 80 ? "space-between" : "flex-start",
+    "--cv-justify": score >= FILL_FROM_SCORE ? "space-between" : "flex-start",
   } as CSSProperties;
 }
 
-const A4_WIDTH = 794;
-const A4_HEIGHT = 1123;
 /** Smallest shrink we allow before letting a very long CV run onto a second page. */
 const MIN_FIT = 0.72;
 
@@ -632,7 +635,10 @@ const MIN_FIT = 0.72;
 function PrintCopy({ cv, onFit }: { cv: BuilderCv; onFit: (scale: number) => void }) {
   const doc = useMemo(() => toDoc(cv), [cv]);
   const pageRef = useRef<HTMLDivElement>(null);
-  const accentStyle = cvStyle(cv, cvStrength(cv).score);
+  const score = cvStrength(cv).score;
+  const accentStyle = cvStyle(cv, score);
+  // Same rule as the preview: only a nearly complete CV is scaled up to fill the page
+  const fill = score >= FILL_FROM_SCORE;
 
   useLayoutEffect(() => {
     const el = pageRef.current;
@@ -657,8 +663,12 @@ function PrintCopy({ cv, onFit }: { cv: BuilderCv; onFit: (scale: number) => voi
         width = hi;
       }
     }
+    // A short CV is laid out narrower and zoomed up so it fills the sheet
+    if (fill && width === A4_WIDTH) width = fillWidth(el);
     el.style.width = `${width}px`;
     el.style.zoom = String(A4_WIDTH / width);
+    // Keep the sheet exactly one A4 page tall after the zoom
+    el.style.minHeight = `${(1121 * width) / A4_WIDTH}px`;
     onFit(A4_WIDTH / width);
   });
 

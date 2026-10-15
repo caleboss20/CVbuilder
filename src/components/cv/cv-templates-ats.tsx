@@ -438,7 +438,7 @@ function makeStack(cfg: StackConfig) {
           <StackHeader cfg={cfg} doc={doc} role={role} photo={photo} />
         </div>
         {/* --cv-justify spreads the sections down the page once the CV is nearly complete */}
-        <div className="flex flex-1 flex-col justify-[var(--cv-justify,space-between)] space-y-5 px-12 pb-10 pt-6">
+        <div className="flex flex-1 flex-col [justify-content:var(--cv-justify,space-between)] space-y-5 px-12 pb-10 pt-6">
           {stackSections(cfg, doc)}
         </div>
       </div>
@@ -455,7 +455,8 @@ type SideSection =
   | "summary"
   | "education"
   | "skills"
-  | "extras"
+  | "languages" // just the languages list
+  | "extras" // certifications, awards and interests
   | "experience"
   | "projects"
   | "references";
@@ -575,12 +576,16 @@ function sideSections(cfg: SideConfig, doc: CvDoc, where: "side" | "main", ids: 
             </ul>,
           );
         break;
+      case "languages":
       case "extras":
-        extraLists(doc).forEach((x) =>
+        // "languages" shows only the languages list; "extras" shows the other short lists
+        extraLists(doc)
+          .filter((x) => (id === "languages") === (x.title === "Languages"))
+          .forEach((x) =>
           section(
             x.title,
             x.title,
-            <ul className="list-disc space-y-1 pl-5">
+            <ul className={`list-disc gap-y-1 pl-5 ${where === "main" ? "grid grid-cols-2 gap-x-8" : "space-y-1"}`}>
               {x.items.map((i) => (
                 <li key={i}>{i}</li>
               ))}
@@ -716,7 +721,7 @@ function makeSidebar(cfg: SideConfig) {
 
         <div className="grid flex-1" style={{ gridTemplateColumns: `${cfg.sideWidth}px 1fr` }}>
           <aside
-            className={`space-y-6 px-8 py-8 ${cfg.sideBg ? "bg-slate-100" : ""} ${
+            className={`flex flex-col [justify-content:var(--cv-justify,space-between)] gap-6 px-8 py-8 ${cfg.sideBg ? "bg-slate-100" : ""} ${
               cfg.vline ? "border-r border-slate-300" : ""
             }`}
           >
@@ -734,7 +739,7 @@ function makeSidebar(cfg: SideConfig) {
             )}
             {sideSections(cfg, doc, "side", cfg.side)}
           </aside>
-          <main className="flex flex-col justify-[var(--cv-justify,flex-start)] space-y-6 px-9 py-8">
+          <main className="flex flex-col [justify-content:var(--cv-justify,space-between)] gap-6 px-9 py-8">
             {sideSections(cfg, doc, "main", cfg.main)}
           </main>
         </div>
@@ -867,8 +872,8 @@ export const LavenderBandCv = makeStack({
 export const SideTimelineCv = makeSidebar({
   accent: "#111827",
   header: "left",
-  side: ["contact", "education", "skills", "extras"],
-  main: ["summary", "experience", "projects", "references"],
+  side: ["contact", "education", "skills", "languages"],
+  main: ["summary", "experience", "projects", "extras", "references"],
   sideWidth: 250,
   timeline: true,
   spaced: true,
@@ -881,8 +886,8 @@ export const SideTimelineCv = makeSidebar({
 export const SideStripeCv = makeSidebar({
   accent: "#64748b",
   header: "side",
-  side: ["contact", "education", "skills", "extras"],
-  main: ["summary", "experience", "projects", "references"],
+  side: ["contact", "education", "skills", "languages"],
+  main: ["summary", "experience", "projects", "extras", "references"],
   sideWidth: 285,
   vline: true,
   spaced: true,
@@ -921,8 +926,8 @@ export const ThinSplitCv = makeSidebar({
 export const GridLeftCv = makeSidebar({
   accent: "#1f2937",
   header: "center",
-  side: ["skills", "education", "extras"],
-  main: ["summary", "experience", "projects", "references"],
+  side: ["skills", "education", "languages"],
+  main: ["summary", "experience", "projects", "extras", "references"],
   sideWidth: 245,
   vline: true,
   rules: true,
@@ -935,8 +940,8 @@ export const GridLeftCv = makeSidebar({
 export const GridBandCv = makeSidebar({
   accent: "#475569",
   header: "band",
-  side: ["education", "skills", "extras"],
-  main: ["summary", "experience", "projects", "references"],
+  side: ["education", "skills", "languages"],
+  main: ["summary", "experience", "projects", "extras", "references"],
   sideWidth: 250,
   vline: true,
   rules: true,
@@ -950,8 +955,8 @@ export const GridBandCv = makeSidebar({
 export const GridSpacedCv = makeSidebar({
   accent: "#525252",
   header: "center",
-  side: ["contact", "education", "skills", "extras"],
-  main: ["summary", "experience", "projects", "references"],
+  side: ["contact", "education", "skills", "languages"],
+  main: ["summary", "experience", "projects", "extras", "references"],
   sideWidth: 270,
   vline: true,
   rules: true,

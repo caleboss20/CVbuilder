@@ -1,21 +1,34 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { A4_HEIGHT, A4_WIDTH, fillWidth } from "@/lib/page-fit";
 
-/** A4 width at 96 dpi. Templates always lay out at this size. */
-const PAGE_WIDTH = 794;
-const PAGE_MIN_HEIGHT = 1123;
+const PAGE_WIDTH = A4_WIDTH;
+const PAGE_MIN_HEIGHT = A4_HEIGHT;
 
 /**
  * Shows a CV like a PDF preview: the full page is laid out at real A4 width,
  * then scaled to fit the available space, so phones see the same complete page
  * a recruiter would, never a cut-off or reflowed version.
+ *
+ * With `fill` (the default), a short CV is laid out a little narrower and scaled
+ * up so it fills the whole sheet instead of leaving blank space at the bottom.
  */
-export function CvPageFrame({ children, lazy = false }: { children: ReactNode; lazy?: boolean }) {
+export function CvPageFrame({
+  children,
+  lazy = false,
+  fill = true,
+}: {
+  children: ReactNode;
+  lazy?: boolean;
+  fill?: boolean;
+}) {
   const outerRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [height, setHeight] = useState<number>();
+  /** Width the CV is laid out at. A4 width, or narrower when a short CV is scaled up to fill. */
+  const [layoutWidth, setLayoutWidth] = useState(PAGE_WIDTH);
   // Lazy frames render a blank A4 placeholder until they come near the screen
   const [shown, setShown] = useState(!lazy);
 
@@ -42,7 +55,10 @@ export function CvPageFrame({ children, lazy = false }: { children: ReactNode; l
     if (!shown || !outer || !page) return;
 
     const fit = () => {
-      const s = Math.min(outer.clientWidth / PAGE_WIDTH, 1);
+      const w = fill ? fillWidth(page) : PAGE_WIDTH;
+      setLayoutWidth(w);
+      // Zoom so the layout spans the page width (>1 when stretched), never wider than the container
+      const s = Math.min(outer.clientWidth / w, PAGE_WIDTH / w);
       setScale(s);
       setHeight(page.offsetHeight * s);
     };
@@ -60,7 +76,7 @@ export function CvPageFrame({ children, lazy = false }: { children: ReactNode; l
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", fit);
     };
-  }, [shown]);
+  }, [shown, fill]);
 
   if (!shown) {
     return <div ref={outerRef} className="aspect-[210/297] w-full" aria-hidden="true" />;
@@ -72,8 +88,9 @@ export function CvPageFrame({ children, lazy = false }: { children: ReactNode; l
         ref={pageRef}
         className="@container flex flex-col [&>*]:flex-1"
         style={{
-          width: PAGE_WIDTH,
-          minHeight: PAGE_MIN_HEIGHT,
+          width: layoutWidth,
+          // Keeps the page exactly A4-tall once it has been scaled
+          minHeight: (PAGE_MIN_HEIGHT * layoutWidth) / PAGE_WIDTH,
           transform: `scale(${scale})`,
           transformOrigin: "top left",
         }}
