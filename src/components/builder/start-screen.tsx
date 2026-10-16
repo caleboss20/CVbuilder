@@ -13,6 +13,7 @@ import { Logo } from "@/components/ui/logo";
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import type { ImportResult } from "@/lib/cv-import";
+import { AuthNav } from "@/components/auth/auth-nav";
 import { BackupCard } from "./backup-card";
 import { ImportCard } from "./import-card";
 import { PortalGlow } from "./portal-glow";
@@ -88,6 +89,7 @@ export function StartScreen({
         <Logo />
         <div className="flex items-center gap-3">
           <ThemeToggle />
+          <AuthNav className="text-sm text-fg/70 hover:text-fg" />
           {onCancel ? (
             <button type="button" onClick={onCancel} className="text-sm text-fg/70 hover:text-fg">
               ← Back to my CV

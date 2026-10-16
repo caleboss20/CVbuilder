@@ -43,6 +43,7 @@ import { JobMatchPanel } from "./job-match-panel";
 import { BuildTimer, readBest, saveBest } from "./build-timer";
 import { CompletionCard, type Completion } from "./completion-card";
 import { trackEvent } from "@/lib/track";
+import { AuthNav } from "@/components/auth/auth-nav";
 import { BackupCard } from "./backup-card";
 import { ShareNudge } from "@/components/ui/share-nudge";
 import Link from "next/link";
@@ -379,6 +380,7 @@ export function Builder() {
           <div className="ml-auto flex items-center gap-2">
             <BuildTimer timeRef={timeRef} initialMs={cv.timeSpent ?? 0} finished={!!cv.finishedAt} onPersist={persistTime} />
             <ThemeToggle className="hidden sm:grid" />
+            <AuthNav className="rounded-md px-2 py-2 text-sm text-fg/60 hover:text-fg sm:px-3" />
             <button
               type="button"
               onClick={startOver}

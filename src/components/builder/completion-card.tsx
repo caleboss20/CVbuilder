@@ -6,6 +6,8 @@ import { siteConfig } from "@/lib/site";
 import { CheckIcon } from "@/components/ui/check-icon";
 import { trackEvent } from "@/lib/track";
 import { downloadBackup } from "@/lib/backup";
+import { authConfigured } from "@/lib/supabase";
+import { useUser } from "@/components/auth/use-user";
 import { formatDuration } from "./build-timer";
 
 export type Completion = {
@@ -18,6 +20,7 @@ export type Completion = {
 
 /** Summary shown once a CV is downloaded for the first time: time, strength, next steps. */
 export function CompletionCard({ data, onClose }: { data: Completion; onClose: () => void }) {
+  const { user, loading } = useUser();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
@@ -67,6 +70,17 @@ export function CompletionCard({ data, onClose }: { data: Completion; onClose: (
             <p className="mt-3 text-xs text-emerald-300">New personal best on this device.</p>
           ) : (
             data.best && <p className="mt-3 text-xs text-fg/45">Your fastest CV so far: {formatDuration(data.best)}</p>
+          )}
+
+          {/* The best moment to ask: they have a finished CV they would hate to lose */}
+          {authConfigured && !loading && !user && (
+            <p className="mt-4 rounded-lg border border-brand-400/30 bg-brand-500/[0.08] p-3 text-sm leading-relaxed text-fg/75">
+              Keep this CV safe and open it on any phone.{" "}
+              <Link href="/signup" className="font-medium text-brand-300 underline">
+                Create a free account
+              </Link>
+              .
+            </p>
           )}
 
           <div className="mt-6 space-y-2.5">
