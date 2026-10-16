@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { cvExamples, type CvTemplateName } from "@/lib/cv-examples";
 import { exampleForCourse } from "@/lib/course-match";
+import { courseGroups, groupOf } from "@/lib/course-groups";
 import { templates } from "@/lib/templates";
 import { CvPageFrame } from "@/components/cv/cv-page-frame";
 import { CvTemplateView } from "@/components/cv/cv-templates";
@@ -57,10 +58,13 @@ export function StartScreen({
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(cvExamples[0].slug);
 
+  /** The field chip that is open, or "all". Typing in the search box searches every field. */
+  const [group, setGroup] = useState("all");
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return q ? cvExamples.filter((e) => e.course.toLowerCase().includes(q)) : cvExamples;
-  }, [query]);
+    if (q) return cvExamples.filter((e) => e.course.toLowerCase().includes(q));
+    return group === "all" ? cvExamples : cvExamples.filter((e) => groupOf(e.slug) === group);
+  }, [query, group]);
   // A course typed in the search box that we have no example for. We borrow the
   // closest field's example and relabel it, so nobody has to start from nothing.
   const [custom, setCustom] = useState<string | null>(null);
@@ -188,6 +192,30 @@ export function StartScreen({
                   placeholder="Search your course, e.g. Nursing"
                   className="w-full rounded-lg border border-fg/12 bg-ink-950/60 py-2.5 pl-10 pr-3 text-[15px] text-fg placeholder:text-fg/35 focus:border-brand-400/70 focus:outline-none"
                 />
+              </div>
+
+              {/* Fields: one tap narrows 28 courses to the few that matter. Searching ignores them. */}
+              <div role="group" aria-label="Filter courses by field" className="mt-3 flex flex-wrap gap-1.5">
+                {[{ id: "all", label: "All" }, ...courseGroups].map((g) => {
+                  const active = !query.trim() && group === g.id;
+                  return (
+                    <button
+                      key={g.id}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => {
+                        setGroup(g.id);
+                        setQuery("");
+                        setCustom(null);
+                      }}
+                      className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                        active ? "bg-brand-500/25 text-fg ring-1 ring-brand-400/60" : "bg-fg/[0.06] text-fg/60 hover:text-fg"
+                      }`}
+                    >
+                      {g.label}
+                    </button>
+                  );
+                })}
               </div>
 
               {canUseTyped && (
