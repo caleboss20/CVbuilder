@@ -40,6 +40,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
     title: "Support",
     links: [
       { label: "About", href: "/about" },
+      { label: "Pricing", href: "/pricing" },
       // Only when a WhatsApp number is configured
       ...(whatsappLink() ? [{ label: "WhatsApp support", href: whatsappLink() as string }] : []),
       { label: "FAQ", href: "/#faq" },

@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteConfig.url}/tracker`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteConfig.url}/national-service`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteConfig.url}/sign-letter`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${siteConfig.url}/pricing`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${siteConfig.url}/interview-prep`, changeFrequency: "monthly", priority: 0.7 },
     ...fieldPrep.map((f) => ({ url: `${siteConfig.url}/interview-prep/${f.id}`, changeFrequency: "monthly" as const, priority: 0.6 })),
     { url: `${siteConfig.url}/blog`, changeFrequency: "monthly", priority: 0.7 },

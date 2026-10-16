@@ -22,12 +22,22 @@ export const siteConfig = {
    * no WhatsApp button or link is shown anywhere.
    */
   whatsapp: (process.env.NEXT_PUBLIC_WHATSAPP ?? "233256599734").replace(/\D/g, ""),
+  /**
+   * The Pro pass shown on the pricing page. These are placeholders to test interest: change the
+   * price and the number of reviews here and the page updates. Nothing is charged yet.
+   */
+  pro: {
+    price: "GH₵ 15",
+    reviews: 5,
+    validDays: 30,
+  },
   nav: [
     { label: "Templates", href: "/templates" },
     { label: "CV examples", href: "/cv-examples" },
     { label: "CV checker", href: "/cv-checker" },
     { label: "Letters", href: "/letters" },
     { label: "Guides", href: "/blog" },
+    { label: "Pricing", href: "/pricing" },
   ],
 } as const;
 
