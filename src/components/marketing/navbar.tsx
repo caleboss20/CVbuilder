@@ -7,6 +7,7 @@ import { siteConfig } from "@/lib/site";
 import { Logo } from "@/components/ui/logo";
 import { ButtonLink } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { AuthNav } from "@/components/auth/auth-nav";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -41,6 +42,7 @@ export function Navbar() {
 
         <div className="hidden items-center gap-5 lg:flex">
           <ThemeToggle />
+          <AuthNav className="text-sm text-fg/70 transition-colors hover:text-fg" />
           <ButtonLink href="/builder">Try for free</ButtonLink>
         </div>
 
@@ -92,6 +94,12 @@ export function Navbar() {
                 </Link>
               </li>
             ))}
+            <li>
+              <AuthNav
+                onNavigate={() => setOpen(false)}
+                className="block rounded-lg px-3 py-2.5 text-sm text-fg/75 hover:bg-fg/5 hover:text-fg"
+              />
+            </li>
           </ul>
           <div className="mt-3 flex gap-3 border-t border-fg/10 pt-4">
             <ButtonLink href="/builder" className="flex-1">
