@@ -55,7 +55,7 @@ export function TypeGuide({
         <Logo />
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          <button type="button" onClick={onSkip} className="text-sm text-fg/60 hover:text-fg">
+          <button type="button" onClick={onSkip} className="px-2 py-2 text-sm text-fg/60 hover:text-fg">
             Skip
           </button>
         </div>

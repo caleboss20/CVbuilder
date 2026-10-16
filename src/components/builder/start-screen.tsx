@@ -208,7 +208,7 @@ export function StartScreen({
                         setQuery("");
                         setCustom(null);
                       }}
-                      className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                      className={`rounded-full px-3 py-2 text-xs transition-colors sm:py-1 ${
                         active ? "bg-brand-500/25 text-fg ring-1 ring-brand-400/60" : "bg-fg/[0.06] text-fg/60 hover:text-fg"
                       }`}
                     >

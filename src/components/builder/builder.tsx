@@ -160,6 +160,14 @@ export function Builder() {
   // The example's stock photo belongs to somebody else, so it is never previewed
   const previewPhoto = previewingSample ? undefined : cv.photo;
 
+  // Until a name is typed a blank CV would show every template as an empty page, which makes the
+  // designs impossible to judge. The picker shows sample text instead, then switches to the student's own.
+  const showingPickerSample = !cv.name.trim();
+  const sampleExample = cvExamples[0];
+  const pickerDoc = !showingPickerSample ? doc : hints ? previewDoc : sampleExample.cv;
+  const pickerRole = !showingPickerSample ? previewRole : hints ? previewRole : sampleExample.role;
+  const pickerPhoto = showingPickerSample ? undefined : cv.photo;
+
   /**
    * Starts editing `next` (and shows the import banner if it came from an upload).
    * Starting a different CV overwrites the one saved on this device, so when there
@@ -597,9 +605,10 @@ export function Builder() {
       {pickerOpen && (
         <TemplatePicker
           cv={cv}
-          doc={previewDoc}
-          role={previewRole}
-          photo={previewPhoto}
+          doc={pickerDoc}
+          role={pickerRole}
+          photo={pickerPhoto}
+          showingSample={showingPickerSample}
           onPick={(template) => {
             update({ template });
             setPickerOpen(false);
@@ -686,10 +695,13 @@ function TemplatePicker({
   doc,
   role,
   photo,
+  showingSample,
   onPick,
   onClose,
 }: {
   cv: BuilderCv;
+  /** True while the thumbnails show sample text because the CV has no name yet. */
+  showingSample: boolean;
   /** What the thumbnails show: the student's CV, or the course sample while it is still empty. */
   doc: ReturnType<typeof toDoc>;
   role: string;
@@ -711,7 +723,7 @@ function TemplatePicker({
         <div>
           <h2 className="text-lg font-medium text-fg">Choose a template</h2>
           <p className="text-sm text-fg/50">
-            Your details stay the same. Only the design changes.
+            {showingSample ? "Showing sample text until you add your name. " : ""}Your details stay the same. Only the design changes.
           </p>
         </div>
         <button type="button" onClick={onClose} className="rounded-md px-3 py-2 text-sm text-fg/70 ring-1 ring-fg/15 hover:text-fg">

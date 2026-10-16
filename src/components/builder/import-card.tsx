@@ -97,7 +97,7 @@ export function ImportCard({
         />
       </label>
 
-      <button type="button" onClick={() => setPasteOpen((v) => !v)} className="mt-3 text-sm text-brand-300 hover:text-fg">
+      <button type="button" onClick={() => setPasteOpen((v) => !v)} className="mt-2 py-2 text-sm text-brand-300 hover:text-fg">
         {pasteOpen ? "Hide pasted text" : "Or paste your CV text"}
       </button>
 

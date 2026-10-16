@@ -88,7 +88,7 @@ export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }
                   aria-label={s.name}
                   title={s.name}
                   onClick={() => setAccent(s.color)}
-                  className={`size-7 rounded-full transition-transform hover:scale-110 ${
+                  className={`size-8 rounded-full transition-transform sm:size-7 hover:scale-110 ${
                     selected ? "ring-2 ring-brand-400 ring-offset-2 ring-offset-ink-950" : "ring-1 ring-fg/20"
                   }`}
                   style={
