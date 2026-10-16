@@ -24,6 +24,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "Cover Letter Builder", href: "/cover-letter" },
       { label: "Application Tracker", href: "/tracker" },
       { label: "National Service Checklist", href: "/national-service" },
+      { label: "Interview Preparation", href: "/interview-prep" },
       { label: "How to Write a CV", href: "/blog/how-to-write-a-cv" },
       { label: "CV Help", href: "/blog" },
     ],
