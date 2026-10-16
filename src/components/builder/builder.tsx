@@ -42,6 +42,7 @@ import { StartScreen } from "./start-screen";
 import { JobMatchPanel } from "./job-match-panel";
 import { BuildTimer, readBest, saveBest } from "./build-timer";
 import { CompletionCard, type Completion } from "./completion-card";
+import { trackEvent } from "@/lib/track";
 import Link from "next/link";
 
 const stepDefs = {
@@ -268,6 +269,7 @@ export function Builder() {
       const ms = timeRef.current;
       const best = readBest();
       if (best === null || ms < best) saveBest(ms);
+      trackEvent("cv_downloaded", { template: templateName, type: cv.cvType, minutes: Math.round(ms / 60000) });
       update({ finishedAt: Date.now(), timeSpent: ms });
       setCompletion({ ms, score: strength.score, template: templateName, best, newBest: best !== null && ms < best });
     }

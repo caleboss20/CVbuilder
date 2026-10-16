@@ -9,6 +9,7 @@ import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
 import { Field, TextArea } from "./fields";
+import { trackEvent } from "@/lib/track";
 import { VoiceInput } from "./voice-input";
 
 const LETTER_KEY = "cv11-letter-v1";
@@ -103,6 +104,7 @@ export function CoverLetterBuilder() {
     document.title = `${(cv?.name || "My").trim().replace(/\s+/g, "_")}_Letter`;
     window.print();
     document.title = prev;
+    trackEvent("letter_downloaded", { kind: input.kind });
   }
 
   if (!cv) return <div className="grid min-h-screen place-items-center text-sm text-fg/50">Loading…</div>;

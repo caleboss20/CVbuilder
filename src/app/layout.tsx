@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { siteConfig } from "@/lib/site";
@@ -53,7 +54,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* No visible scrollbars anywhere (scrolling still works), and no sideways page scroll */}
         <style>{`*{scrollbar-width:none}*::-webkit-scrollbar{display:none}html,body{overflow-x:clip}`}</style>
       </head>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        {children}
+        {/* Anonymous page views and a few key events, so we can see what students use */}
+        <Analytics />
+      </body>
     </html>
   );
 }

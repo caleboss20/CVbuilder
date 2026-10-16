@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { siteConfig } from "@/lib/site";
 import { CheckIcon } from "@/components/ui/check-icon";
+import { trackEvent } from "@/lib/track";
 import { formatDuration } from "./build-timer";
 
 export type Completion = {
@@ -24,7 +25,8 @@ export function CompletionCard({ data, onClose }: { data: Completion; onClose: (
 
   const minutes = Math.max(1, Math.round(data.ms / 60000));
   const share = encodeURIComponent(
-    `I just built my CV in ${minutes} minute${minutes === 1 ? "" : "s"} with ${siteConfig.name}. It's free for students: ${siteConfig.url}`,
+    // ?ref=whatsapp lets analytics show how many visitors arrive from shared CVs
+    `I just built my CV in ${minutes} minute${minutes === 1 ? "" : "s"} with ${siteConfig.name}. It's free for students: ${siteConfig.url}/?ref=whatsapp`,
   );
 
   const stats = [
@@ -83,6 +85,7 @@ export function CompletionCard({ data, onClose }: { data: Completion; onClose: (
               href={`https://wa.me/?text=${share}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackEvent("share_whatsapp")}
               className="flex w-full items-center justify-center gap-2 rounded-md py-2.5 text-sm font-medium text-fg ring-1 ring-fg/15 hover:bg-fg/5"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="text-[#25D366]">
