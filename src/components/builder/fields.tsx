@@ -76,6 +76,45 @@ export function TextArea({
   );
 }
 
+/**
+ * A box where each line is one item (a citation, a talk title, a research project).
+ * Stored as a list, but shown as plain text, so pasting several lines just works.
+ * Empty lines are kept while typing and dropped when the CV is built (see toDoc).
+ */
+export function LinesField({
+  label,
+  values,
+  onChange,
+  placeholder,
+  hint,
+  rows = 4,
+}: {
+  label: string;
+  values: string[];
+  onChange: (v: string[]) => void;
+  placeholder?: string;
+  hint?: ReactNode;
+  rows?: number;
+}) {
+  const id = useId();
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-fg/80">
+        {label}
+      </label>
+      <textarea
+        id={id}
+        rows={rows}
+        value={values.join("\n")}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value.split("\n"))}
+        className={`${inputCls} resize-y leading-relaxed`}
+      />
+      {hint && <div className="mt-1.5 text-xs text-fg/45">{hint}</div>}
+    </div>
+  );
+}
+
 /** Type and press Enter (or comma) to add; click × to remove. */
 export function TagInput({
   label,

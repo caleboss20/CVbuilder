@@ -76,6 +76,14 @@ export const guideQuestions: {
   },
 ];
 
+/** A sensible starting template for each type: plain, one column, easy for hiring software. */
+export const defaultTemplates: Record<CvType, CvTemplateName> = {
+  standard: "ruledClassic",
+  graduate: "dateColumn",
+  skills: "greyBars",
+  academic: "serifExecutive",
+};
+
 export type Recommendation = {
   type: CvType;
   /** One plain sentence saying why, shown to the student. */
@@ -90,14 +98,14 @@ export function recommendCvType(a: GuideAnswers): Recommendation {
     return {
       type: "academic",
       reason: "You are applying for research, postgraduate study or lecturing, so we added research, publications and talks sections and let the CV run longer.",
-      template: "serifExecutive",
+      template: defaultTemplates.academic,
     };
   }
   if (a.strength === "skills") {
     return {
       type: "skills",
       reason: "Your skills are your strongest point, so they and your projects come first, ahead of your work history.",
-      template: "greyBars",
+      template: defaultTemplates.skills,
     };
   }
   if (a.experience === "none" || a.strength === "education") {
@@ -107,13 +115,13 @@ export function recommendCvType(a: GuideAnswers): Recommendation {
         a.experience === "none"
           ? "You have no work history yet, so your education and projects come first. That is what employers look at for a student."
           : "Your degree and projects are your strongest point, so they come first.",
-      template: "dateColumn",
+      template: defaultTemplates.graduate,
     };
   }
   return {
     type: "standard",
     reason: "You have work experience to show, so a standard CV with your experience near the top works best.",
-    template: "ruledClassic",
+    template: defaultTemplates.standard,
   };
 }
 

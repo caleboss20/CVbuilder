@@ -29,7 +29,10 @@ import {
   ReferencesStep,
   SkillsStep,
   SummaryStep,
+  ResearchStep,
 } from "./sections";
+import { CvTypePicker, TypeGuide } from "./type-guide";
+import type { CvType } from "@/lib/cv-type";
 import type { ImportResult } from "@/lib/cv-import";
 import { ConfirmDialog } from "./confirm-dialog";
 import { ImportBanner } from "./import-card";
@@ -39,18 +42,31 @@ import { BuildTimer, readBest, saveBest } from "./build-timer";
 import { CompletionCard, type Completion } from "./completion-card";
 import Link from "next/link";
 
-const steps = [
-  { id: "personal", label: "Personal", Comp: PersonalStep },
-  { id: "summary", label: "Summary", Comp: SummaryStep },
-  { id: "education", label: "Education", Comp: EducationStep },
-  { id: "experience", label: "Experience", Comp: ExperienceStep },
-  { id: "projects", label: "Projects", Comp: ProjectsStep },
-  { id: "skills", label: "Skills", Comp: SkillsStep },
-  { id: "extras", label: "Extras", Comp: ExtrasStep },
-  { id: "references", label: "References", Comp: ReferencesStep },
-] as const;
+const stepDefs = {
+  personal: { label: "Personal", Comp: PersonalStep },
+  summary: { label: "Summary", Comp: SummaryStep },
+  education: { label: "Education", Comp: EducationStep },
+  research: { label: "Research", Comp: ResearchStep },
+  experience: { label: "Experience", Comp: ExperienceStep },
+  projects: { label: "Projects", Comp: ProjectsStep },
+  skills: { label: "Skills", Comp: SkillsStep },
+  extras: { label: "Extras", Comp: ExtrasStep },
+  references: { label: "References", Comp: ReferencesStep },
+} as const;
 
-type Status = "loading" | "start" | "editing";
+type StepId = keyof typeof stepDefs;
+
+/** Which steps a CV type shows, in order. The order is what makes each type different. */
+const stepOrder: Record<CvType, StepId[]> = {
+  standard: ["personal", "summary", "education", "experience", "projects", "skills", "extras", "references"],
+  graduate: ["personal", "summary", "education", "projects", "experience", "skills", "extras", "references"],
+  skills: ["personal", "summary", "skills", "projects", "experience", "education", "extras", "references"],
+  academic: ["personal", "summary", "education", "research", "experience", "projects", "skills", "extras", "references"],
+};
+
+const stepsFor = (type: CvType) => stepOrder[type].map((id) => ({ id, ...stepDefs[id] }));
+
+type Status = "loading" | "start" | "guide" | "editing";
 
 export function Builder() {
   const [status, setStatus] = useState<Status>("loading");
@@ -73,6 +89,8 @@ export function Builder() {
   const [importInfo, setImportInfo] = useState<ImportResult | null>(null);
   /** Whether a CV is already saved on this device, so importing can warn before replacing it. */
   const [hasSaved, setHasSaved] = useState(false);
+  /** A brand-new CV waiting for the student to choose its type in the guide. */
+  const [pending, setPending] = useState<BuilderCv | null>(null);
   /** A pending "are you sure?" pop-up. Nothing destructive happens until the student confirms. */
   const [confirm, setConfirm] = useState<{
     title: string;
@@ -127,6 +145,7 @@ export function Builder() {
 
   const update = (patch: Partial<BuilderCv>) => setCv((c) => ({ ...c, ...patch }));
   const doc = useMemo(() => toDoc(cv), [cv]);
+  const steps = useMemo(() => stepsFor(cv.cvType), [cv.cvType]);
   const strength = useMemo(() => cvStrength(cv), [cv]);
   const accentStyle = cvStyle(cv, strength.score);
   const templateName = templates.find((t) => t.id === cv.template)?.name ?? "Template";
@@ -149,11 +168,13 @@ export function Builder() {
     const start = () => {
       setHasSaved(false);
       setImportMode(false);
-      timeRef.current = 0;
-      setCv(requested ? { ...next, template: requested } : next);
-      setStep(0);
-      setImportInfo(imported ?? null);
-      setStatus("editing");
+      if (imported) {
+        openEditor(next, imported);
+      } else {
+        // A new CV: ask three quick questions first so we can pick the right type
+        setPending(next);
+        setStatus("guide");
+      }
     };
     if (!hasSaved) return start();
     setConfirm({
@@ -162,6 +183,24 @@ export function Builder() {
       confirmLabel: imported ? "Replace with upload" : "Replace my CV",
       onConfirm: start,
     });
+  }
+
+  /** Opens the editor on `next`, from step one. A template chosen on the homepage always wins. */
+  function openEditor(next: BuilderCv, imported?: ImportResult) {
+    timeRef.current = 0;
+    setCv(requested ? { ...next, template: requested } : next);
+    setStep(0);
+    setImportInfo(imported ?? null);
+    setPending(null);
+    setStatus("editing");
+  }
+
+  /** Changes the CV type from inside the editor, staying on the same step when the new type has it. */
+  function changeType(type: CvType) {
+    const currentId = steps[step]?.id;
+    update({ cvType: type });
+    const next = stepsFor(type).findIndex((x) => x.id === currentId);
+    setStep(next >= 0 ? next : 0);
   }
 
   function startOver() {
@@ -221,6 +260,15 @@ export function Builder() {
       }}
     />
   );
+
+  if (status === "guide" && pending) {
+    return (
+      <TypeGuide
+        onDone={(type, template) => openEditor({ ...pending, cvType: type, template })}
+        onSkip={() => openEditor(pending)}
+      />
+    );
+  }
 
   if (status === "start") {
     return (
@@ -383,6 +431,11 @@ export function Builder() {
 
           <div className="mx-auto max-w-2xl px-4 pb-32 pt-6 sm:px-6 sm:pt-8">
             {importInfo && <ImportBanner info={importInfo} onDismiss={() => setImportInfo(null)} />}
+
+            <div className="mb-5">
+              <p className="mb-1.5 text-xs font-medium text-fg/60">CV type</p>
+              <CvTypePicker value={cv.cvType} onChange={changeType} />
+            </div>
 
             {/* Where the dimmed example text comes from, with a way back to the course choice */}
             <p className={`mb-5 flex-wrap items-center gap-x-2 text-xs text-fg/50 ${importInfo && !hints ? "hidden" : "flex"}`}>

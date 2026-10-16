@@ -10,7 +10,7 @@ import {
   emptySkillGroup,
   type BuilderCv,
 } from "@/lib/builder";
-import { AddButton, Field, ItemCard, PhotoInput, TagInput, TextArea } from "./fields";
+import { AddButton, Field, ItemCard, LinesField, PhotoInput, TagInput, TextArea } from "./fields";
 import { VoiceInput } from "./voice-input";
 
 export type Update = (patch: Partial<BuilderCv>) => void;
@@ -306,6 +306,42 @@ export function ExtrasStep({ cv, update, hints }: StepProps) {
         onChange={(interests) => update({ interests })}
         placeholder={ph(hints?.interests.join(", "), "Football, Debate, Volunteering")}
       />
+    </div>
+  );
+}
+
+/** Academic CVs only: the work reviewers read first. One line per item. */
+export function ResearchStep({ cv, update }: StepProps) {
+  return (
+    <div className="space-y-6">
+      <StepIntro title="Research and publications">
+        Academic reviewers look here first. Put each item on its own line, newest first, with the year.
+      </StepIntro>
+      <LinesField
+        label="Research and projects"
+        values={cv.research}
+        onChange={(research) => update({ research })}
+        rows={5}
+        placeholder={"Undergraduate thesis: Mobile money and household savings in Ashanti Region, 2025. Supervisor: Dr. K. Mensah.\nResearch assistant, UG Department of Economics, 2024."}
+        hint="Your thesis or dissertation, research assistant roles, lab or field projects and grants."
+      />
+      <LinesField
+        label="Publications"
+        values={cv.publications}
+        onChange={(publications) => update({ publications })}
+        rows={5}
+        placeholder={"Mensah, A. and Boateng, K. (2025). Mobile money and savings in Ghana. Journal of African Economies, 34(2), 120-141."}
+        hint="Journal articles, conference papers, reports and book chapters. Use the citation style your field uses."
+      />
+      <LinesField
+        label="Presentations and talks"
+        values={cv.presentations}
+        onChange={(presentations) => update({ presentations })}
+        rows={4}
+        placeholder={"Poster: Mobile money use among students, KNUST Research Week, 2025."}
+        hint="Conference talks, posters and seminars, with the event and year."
+      />
+      <Tip>Keep every item true and checkable. Reviewers do look up publications, so list only what you can show.</Tip>
     </div>
   );
 }

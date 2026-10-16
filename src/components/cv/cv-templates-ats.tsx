@@ -1,6 +1,7 @@
 import Image from "next/image";
-import type { ReactNode } from "react";
+import { isValidElement, type ReactNode } from "react";
 import type { CvDoc, CvEducation, CvJob } from "@/lib/cv-examples";
+import type { CvType } from "@/lib/cv-type";
 import type { TemplateProps } from "./cv-templates";
 import { Bullets, ContactIcon, contactKind, extraLists, skillGroups, type ContactKind } from "./cv-parts";
 
@@ -427,7 +428,33 @@ function stackSections(cfg: StackConfig, doc: CvDoc): ReactNode[] {
       ),
     );
   }
-  return out;
+  return orderByType(out, doc.type ?? "standard");
+}
+
+/** Which group of sections a stacked section belongs to, used to order them by CV type. */
+function sectionGroup(key: string): string {
+  if (["summary", "experience", "education", "projects", "references"].includes(key)) return key;
+  if (key.startsWith("skills") || key === "additional") return "skills";
+  if (["Research", "Publications", "Presentations"].includes(key)) return "research";
+  return "rest";
+}
+
+/**
+ * What goes first is what makes a CV type different. A graduate CV leads with
+ * education and projects, a skills-based CV with skills, an academic CV with
+ * education and research. Everything else keeps its normal place.
+ */
+const STACK_ORDERS: Record<CvType, string[]> = {
+  standard: ["summary", "experience", "education", "projects", "skills", "research", "rest", "references"],
+  graduate: ["summary", "education", "projects", "experience", "skills", "research", "rest", "references"],
+  skills: ["summary", "skills", "projects", "experience", "education", "research", "rest", "references"],
+  academic: ["summary", "education", "research", "experience", "projects", "skills", "rest", "references"],
+};
+
+function orderByType(sections: ReactNode[], type: CvType): ReactNode[] {
+  const order = STACK_ORDERS[type];
+  const rank = (node: ReactNode) => order.indexOf(sectionGroup(String(isValidElement(node) ? node.key : "")));
+  return [...sections].sort((a, b) => rank(a) - rank(b)); // sort is stable, so ties keep their order
 }
 
 function makeStack(cfg: StackConfig) {
@@ -655,18 +682,14 @@ function sideSections(cfg: SideConfig, doc: CvDoc, where: "side" | "main", ids: 
   return out;
 }
 
-/** Reading order inside a column, whichever column a section ends up in. */
-const SECTION_ORDER: SideSection[] = [
-  "contact",
-  "summary",
-  "experience",
-  "education",
-  "skills",
-  "languages",
-  "projects",
-  "extras",
-  "references",
-];
+/** Reading order inside a column, whichever column a section ends up in, for each CV type. */
+const SECTION_ORDERS: Record<CvType, SideSection[]> = {
+  standard: ["contact", "summary", "experience", "education", "skills", "languages", "projects", "extras", "references"],
+  graduate: ["contact", "summary", "education", "projects", "experience", "skills", "languages", "extras", "references"],
+  skills: ["contact", "summary", "skills", "projects", "experience", "education", "languages", "extras", "references"],
+  // "extras" holds research, publications and presentations, so it follows education
+  academic: ["contact", "summary", "education", "extras", "experience", "projects", "skills", "languages", "references"],
+};
 
 /**
  * Rough rendered height (px) of a section in a column of the given text width.
@@ -783,7 +806,8 @@ function balanceColumns(cfg: SideConfig, doc: CvDoc): { side: SideSection[]; mai
     if (!moved) break;
   }
 
-  const byOrder = (a: SideSection, b: SideSection) => SECTION_ORDER.indexOf(a) - SECTION_ORDER.indexOf(b);
+  const order = SECTION_ORDERS[doc.type ?? "standard"];
+  const byOrder = (a: SideSection, b: SideSection) => order.indexOf(a) - order.indexOf(b);
   return { side: side.sort(byOrder), main: main.sort(byOrder) };
 }
 

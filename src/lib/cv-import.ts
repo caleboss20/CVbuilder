@@ -328,8 +328,9 @@ export function importCv(text: string, template: CvTemplateName = "ats"): Import
   const education = parseSchools(sections.education ?? [], leftover);
   const skills = parseSkills(sections.skills ?? []);
   const projects = parseProjects(sections.projects ?? []);
-  // Research and publications have no field in the builder yet, so keep the lines for the student
-  leftover.push(...(sections.publications ?? []));
+  // The heading reader groups research, publications and talks together, so they all land in Publications.
+  // The student can move individual lines to Research or Presentations in the academic step.
+  const publications = parseList(sections.publications ?? [], false);
 
   const cv: BuilderCv = {
     ...blankCv(template),
@@ -349,6 +350,9 @@ export function importCv(text: string, template: CvTemplateName = "ats"): Import
     awards: parseList(sections.awards ?? [], false),
     interests: parseList(sections.interests ?? [], true),
     references: parseReferences(sections.references ?? []),
+    publications,
+    // Having a publications section is the clearest sign of an academic CV
+    cvType: publications.length > 0 ? "academic" : "standard",
   };
 
   return {
