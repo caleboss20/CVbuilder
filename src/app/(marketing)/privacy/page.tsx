@@ -50,7 +50,9 @@ export default function PrivacyPage() {
       <p>
         CV11 does not use advertising cookies and does not sell or share personal data. We use Vercel Analytics for anonymous usage
         statistics, such as which pages are visited and how many CVs are downloaded. It does not use cookies and never receives
-        what you write in your CV or letters.
+        what you write in your CV or letters. We also keep our own simple counter of events such as a first visit, a CV started and a CV
+        downloaded, each tied to a random code stored in your browser. It holds no name, email or CV content, and it is how we know how
+        many students use CV11.
       </p>
 
       <h2>Your choices</h2>

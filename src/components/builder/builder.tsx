@@ -193,6 +193,7 @@ export function Builder() {
    */
   function begin(next: BuilderCv, imported?: ImportResult) {
     const start = () => {
+      trackEvent("cv_started", { source: imported ? "upload" : "new" });
       setHasSaved(false);
       setImportMode(false);
       if (imported) {
