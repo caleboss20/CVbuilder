@@ -9,6 +9,13 @@ const PLACEHOLDER = `Paste or type your text here. It can be a letter, an assign
 
 For a letter, start with "Dear..." and finish with "Yours faithfully," and your name.`;
 
+/** Title sizes in points. Body text is 11.5, so Small is only slightly bigger. */
+const TITLE_SIZES = [
+  { id: "small", label: "Small", size: 12.5 },
+  { id: "medium", label: "Medium", size: 16 },
+  { id: "large", label: "Large", size: 20 },
+] as const;
+
 /** The three layouts, with a line saying what each one does. */
 const MODES: { id: LetterMode; label: string; hint: string }[] = [
   { id: "letter", label: "Letter", hint: "Formal letter layout. A heading under “Dear…” is bold and underlined, and your signature goes under the closing." },
@@ -35,6 +42,8 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
   const [boldTitle, setBoldTitle] = useState(true);
   // null means "follow the layout": capitals for a letter's heading, as typed for anything else
   const [capsChoice, setCapsChoice] = useState<boolean | null>(null);
+  // null means "follow the layout": small for a letter's heading, medium for the title of other text
+  const [sizeChoice, setSizeChoice] = useState<(typeof TITLE_SIZES)[number]["id"] | null>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const [pages, setPages] = useState<PreviewPage[]>([]);
   const [bytes, setBytes] = useState<Uint8Array | null>(null);
@@ -53,6 +62,8 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
   // A letter is signed by default. Other text only gets the signature if the student asks for it.
   const signatureForPdf = mode === "letter" || addSignature ? signature : "";
   const caps = capsChoice ?? mode === "letter";
+  const sizeId = sizeChoice ?? (mode === "letter" ? "small" : "medium");
+  const titleSize = TITLE_SIZES.find((t) => t.id === sizeId)?.size ?? 16;
 
   // Rebuild the preview a moment after the student stops typing
   useEffect(() => {
@@ -71,7 +82,7 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
           align,
           mode,
           title,
-          titleStyle: { align: titleAlign, underline, bold: boldTitle, caps },
+          titleStyle: { align: titleAlign, underline, bold: boldTitle, caps, size: titleSize },
         });
         const rendered = await renderPages(built.bytes);
         // A newer edit may have started while this one was building: ignore the stale result
@@ -85,7 +96,7 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
       }
     }, 400);
     return () => clearTimeout(timer);
-  }, [text, title, titleAlign, underline, boldTitle, caps, signatureForPdf, align, mode]);
+  }, [text, title, titleAlign, underline, boldTitle, caps, titleSize, signatureForPdf, align, mode]);
 
   async function openFile(file: File | undefined) {
     if (!file) return;
@@ -207,6 +218,20 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
                   className={`rounded-md px-3 py-1.5 capitalize transition-colors ${titleAlign === side ? "bg-fg/10 text-fg ring-1 ring-fg/15" : "text-fg/55 hover:text-fg"}`}
                 >
                   {side === "center" ? "Centre" : side}
+                </button>
+              ))}
+            </div>
+            <div role="radiogroup" aria-label="Title size" className="flex gap-1 rounded-lg bg-fg/5 p-1">
+              {TITLE_SIZES.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={sizeId === t.id}
+                  onClick={() => setSizeChoice(t.id)}
+                  className={`rounded-md px-3 py-1.5 transition-colors ${sizeId === t.id ? "bg-fg/10 text-fg ring-1 ring-fg/15" : "text-fg/55 hover:text-fg"}`}
+                >
+                  {t.label}
                 </button>
               ))}
             </div>

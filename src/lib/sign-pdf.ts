@@ -330,7 +330,7 @@ export function detectTextMode(text: string): LetterMode {
 }
 
 /** How a title looks: where it sits, and whether it is underlined, bold or in capitals. */
-export type TitleStyle = { align: "left" | "center" | "right"; underline: boolean; bold: boolean; caps: boolean };
+export type TitleStyle = { align: "left" | "center" | "right"; underline: boolean; bold: boolean; caps: boolean; size: number };
 
 /** Everything that shapes the PDF besides the text itself. */
 export type BuildOptions = {
@@ -519,14 +519,15 @@ export async function buildLetterPdf(text: string, options: BuildOptions): Promi
       if (titleStyle.underline) {
         page.drawLine({ start: { x, y: y - size - 2 }, end: { x: x + w, y: y - size - 2 }, thickness: 0.8, color: ink });
       }
-      y -= LEADING + (size > 13 ? 4 : 1);
+      // Each row of a title takes room for its own size, so a large title never touches the text below
+      y -= Math.max(LEADING + 1, size * 1.3 + 4);
     }
-    y -= 4;
+    y -= 4 + size * 0.4;
   };
 
   // A title typed in its own box. In a letter it goes under "Dear…", elsewhere at the very top.
   const boxTitle = title.trim();
-  const titleSize = isLetter ? 12.5 : 16;
+  const titleSize = titleStyle.size;
   const salutationIndex = isLetter ? lines.findIndex((l) => SALUTATION.test(l.trim())) : -1;
   if (boxTitle && salutationIndex < 0) drawTitle(boxTitle, -1, titleSize);
 
