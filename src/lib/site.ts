@@ -16,11 +16,12 @@ export const siteConfig = {
     "CV templates",
   ],
   /**
-   * WhatsApp support number, digits only, with the country code (for Ghana: 233 then the
-   * number without its leading 0, e.g. 233241234567). Set NEXT_PUBLIC_WHATSAPP in the
-   * environment. While it is empty, no WhatsApp button or link is shown anywhere.
+   * WhatsApp support number, digits only, with the country code (Ghana: 233, then the
+   * number without its leading 0). It is a public support line, so it lives here; set
+   * NEXT_PUBLIC_WHATSAPP in the environment to use a different one. If it is ever empty,
+   * no WhatsApp button or link is shown anywhere.
    */
-  whatsapp: (process.env.NEXT_PUBLIC_WHATSAPP ?? "").replace(/\D/g, ""),
+  whatsapp: (process.env.NEXT_PUBLIC_WHATSAPP ?? "233256599734").replace(/\D/g, ""),
   nav: [
     { label: "Home", href: "/" },
     { label: "Features", href: "/#features" },
