@@ -169,7 +169,7 @@ export function SignLetter() {
       {/* 1. The signature */}
       <section>
         <h2 className="flex items-center gap-3 text-lg font-medium text-fg">
-          <span className={step}>1</span> Your signature
+          <span className={step}>1</span> Your signature (only if you need one)
         </h2>
         <div className="mt-4">
           <SignaturePad value={signature} onChange={changeSignature} />
@@ -179,14 +179,14 @@ export function SignLetter() {
       {/* 2. The letter */}
       <section>
         <h2 className="flex items-center gap-3 text-lg font-medium text-fg">
-          <span className={step}>2</span> Your letter
+          <span className={step}>2</span> Your text
         </h2>
 
         {/* Two ways in: edit the words (a PDF or Word file, or typed from scratch), or leave a finished file untouched */}
         <div role="radiogroup" aria-label="How to add your letter" className="mt-4 grid grid-cols-2 gap-1 rounded-lg bg-fg/5 p-1 text-sm">
           {(
             [
-              ["edit", "Write or edit the text"],
+              ["edit", "Paste, write or edit text"],
               ["as-is", "Keep my file as it is"],
             ] as const
           ).map(([id, label]) => (

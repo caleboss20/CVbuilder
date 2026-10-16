@@ -11,6 +11,7 @@ export type TrackedEvent =
   | "cv_downloaded" // a student downloaded their CV as a PDF for the first time
   | "letter_downloaded" // a student downloaded a letter
   | "letter_signed" // signed a letter they already had
+  | "text_pdf_downloaded" // turned pasted text, an assignment or code into a PDF
   | "share_whatsapp" // tapped Share on WhatsApp after finishing
   | "cv_backup_saved"; // saved a backup file of their CV
 

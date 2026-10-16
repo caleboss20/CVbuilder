@@ -298,6 +298,37 @@ export function findTopBlock(lines: string[]): { block: number[]; date: number }
   return block.length || dateOutside >= 0 ? { block, date: dateOutside } : null;
 }
 
+/**
+ * How the text is laid out. "letter" formats a formal letter (heading, sender block, sign-off). "plain" is
+ * ordinary text with its line breaks kept. "code" uses a fixed-width font and keeps every space, so
+ * indentation in code (SQL, Python, Java) comes out exactly as typed.
+ */
+export type LetterMode = "letter" | "plain" | "code";
+
+/**
+ * Guesses how pasted text should be laid out. Code (SQL, Python, Java and so on) is spotted by its
+ * indentation, its keywords and its brackets and semicolons. A letter is spotted by "Dear…" or a closing
+ * such as "Yours faithfully". Anything else is plain text. The student can always change the guess.
+ */
+export function detectTextMode(text: string): LetterMode {
+  const lines = text.replace(/\r/g, "").split("\n").filter((l) => l.trim());
+  if (lines.length === 0) return "plain";
+
+  const share = (test: (line: string) => boolean) => lines.filter(test).length / lines.length;
+  const count = (test: RegExp) => lines.filter((l) => test.test(l)).length;
+
+  const indented = share((l) => /^( {2,}|\t)\S/.test(l));
+  const punctuated = share((l) => /[;{}]\s*$/.test(l.trim()));
+  const sql = count(/^\s*(select|insert\s+into|update|delete\s+from|create\s+(table|database|view|index)|alter\s+table|drop\s+table|group\s+by|order\s+by|where|join|values)\b/i);
+  const keywords = count(/^\s*(def |class |function |import |from \S+ import |#include|public |private |static |for ?\(|while ?\(|if ?\(|const |let |var |return\b)/);
+
+  const looksLikeCode = lines.length >= 3 && (indented >= 0.25 || punctuated >= 0.3 || sql >= 2 || keywords >= 3);
+  if (looksLikeCode) return "code";
+
+  const hasLetterParts = lines.some((l) => SALUTATION.test(l.trim()) || CLOSING.test(l.trim()));
+  return hasLetterParts ? "letter" : "plain";
+}
+
 /** A tappable area of the preview: where one line of the typed text appears on a page, as fractions of the page. */
 export type LetterRegion = { page: number; line: number; x: number; y: number; w: number; h: number };
 
@@ -314,17 +345,20 @@ export type BuiltLetter = { bytes: Uint8Array; regions: LetterRegion[] };
  *    signature and the typed name. The signature gets a fixed-size space directly under the closing line.
  *  - With no closing line found, the signature goes at the end.
  */
-export async function buildLetterPdf(text: string, signaturePng: string, align: "left" | "right"): Promise<BuiltLetter> {
+export async function buildLetterPdf(text: string, signaturePng: string, align: "left" | "right", mode: LetterMode = "letter"): Promise<BuiltLetter> {
   const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const mono = await doc.embedFont(StandardFonts.Courier);
 
   const PAGE_W = 595.28;
   const PAGE_H = 841.89;
-  const MARGIN = 64;
-  const SIZE = 11.5;
-  const LEADING = 16.5;
+  // Code gets smaller type and wider margins, so more of each line fits on the page
+  const code = mode === "code";
+  const MARGIN = code ? 48 : 64;
+  const SIZE = code ? 9.5 : 11.5;
+  const LEADING = code ? 13.5 : 16.5;
   const textWidth = PAGE_W - MARGIN * 2;
   const ink = rgb(0.07, 0.09, 0.15);
 
@@ -380,12 +414,33 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
     return lines;
   };
 
+  /**
+   * Breaks a code line that is too wide for the page. Spaces are never collapsed, and the lines that
+   * continue it are indented a little further than the original, so it is clear they belong together.
+   */
+  const wrapCode = (line: string): string[] => {
+    const max = Math.max(10, Math.floor(textWidth / mono.widthOfTextAtSize("M", SIZE)));
+    if (line.length <= max) return [line];
+    const indent = line.match(/^ */)?.[0] ?? "";
+    const continuation = indent.length + 2 < max / 2 ? `${indent}  ` : "";
+    const rows = [line.slice(0, max)];
+    let rest = line.slice(max);
+    const room = max - continuation.length;
+    while (rest.length > room) {
+      rows.push(continuation + rest.slice(0, room));
+      rest = rest.slice(room);
+    }
+    if (rest) rows.push(continuation + rest);
+    return rows;
+  };
+
   const lines = printable(text).split("\n");
-  const signoff = findSignoff(lines);
-  const titleIndex = findTitleLine(lines, signoff ? signoff.closing : lines.length);
+  const isLetter = mode === "letter";
+  const signoff = isLetter ? findSignoff(lines) : null;
+  const titleIndex = isLetter ? findTitleLine(lines, signoff ? signoff.closing : lines.length) : -1;
   const inSignoff = new Set(signoff?.block ?? []);
   // With right alignment the sender's address and the date form a block at the top right
-  const top = align === "right" ? findTopBlock(lines) : null;
+  const top = isLetter && align === "right" ? findTopBlock(lines) : null;
   const inTop = new Set(top ? [...top.block, ...(top.date >= 0 ? [top.date] : [])] : []);
 
   /** Draws the sender's address, then the date under it, lined up with each other at the right margin. */
@@ -469,17 +524,18 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
       continue;
     }
     if (!line.trim()) {
-      y -= LEADING * 0.7;
+      y -= code ? LEADING : LEADING * 0.7;
       continue;
     }
     if (i === titleIndex) {
       drawTitle(line, i);
       continue;
     }
-    for (const row of wrap(line, font, SIZE)) {
+    const rowFont = code ? mono : font;
+    for (const row of code ? wrapCode(line) : wrap(line, font, SIZE)) {
       if (y - SIZE < MARGIN) nextPage();
-      mark(i, MARGIN, font.widthOfTextAtSize(row, SIZE), y, LEADING);
-      page.drawText(row, { x: MARGIN, y: y - SIZE, size: SIZE, font, color: ink });
+      mark(i, MARGIN, rowFont.widthOfTextAtSize(row, SIZE), y, LEADING);
+      page.drawText(row, { x: MARGIN, y: y - SIZE, size: SIZE, font: rowFont, color: ink });
       y -= LEADING;
     }
   }

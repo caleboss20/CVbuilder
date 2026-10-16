@@ -2,24 +2,32 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CvFileError, readCvFile } from "@/lib/read-cv-file";
-import { buildLetterPdf, reflowLetterText, renderPages, type LetterRegion, type PreviewPage } from "@/lib/sign-pdf";
+import { buildLetterPdf, detectTextMode, reflowLetterText, renderPages, type LetterMode, type LetterRegion, type PreviewPage } from "@/lib/sign-pdf";
 import { trackEvent } from "@/lib/track";
 
-const PLACEHOLDER = `Dear Sir/Madam,
+const PLACEHOLDER = `Paste or type your text here. It can be a letter, an assignment, notes or code.
 
-I am writing to ask for support with my tuition fees this semester...
+For a letter, start with "Dear..." and finish with "Yours faithfully," and your name.`;
 
-Yours faithfully,
-AMA BOATENG`;
+/** The three layouts, with a line saying what each one does. */
+const MODES: { id: LetterMode; label: string; hint: string }[] = [
+  { id: "letter", label: "Letter", hint: "Formal letter layout. A heading under “Dear…” is bold and underlined, and your signature goes under the closing." },
+  { id: "plain", label: "Plain text", hint: "Ordinary text, with your line breaks kept. Good for assignments and notes." },
+  { id: "code", label: "Code", hint: "A fixed-width font that keeps every space, so indentation in SQL, Python or Java comes out as you typed it." },
+];
 
 /**
- * Write a letter from nothing, or bring one in from a PDF or Word file, edit the words, and add a
- * signature. There are no job, internship or scholarship questions: it is just the student's own
- * text. The preview is the real PDF, so what they see is what they download.
+ * Paste, type or import text and download it as a PDF, like a word processor. It can be a letter,
+ * an assignment or code. There are no job, internship or scholarship questions: it is just the
+ * student's own text, and a signature is optional. The preview is the real PDF, so what they see
+ * is what they download.
  */
 export function OwnLetterEditor({ signature }: { signature: string }) {
   const [text, setText] = useState("");
   const [align, setAlign] = useState<"left" | "right">("left");
+  // null means "let the app decide from the text"; a student's own choice always wins
+  const [chosenMode, setChosenMode] = useState<LetterMode | null>(null);
+  const [addSignature, setAddSignature] = useState(false);
   const [pages, setPages] = useState<PreviewPage[]>([]);
   const [bytes, setBytes] = useState<Uint8Array | null>(null);
   // Where each line of the text sits on the preview, so a tap on the preview can find its line
@@ -29,8 +37,13 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
   const textRef = useRef<HTMLTextAreaElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [fileName, setFileName] = useState("letter");
+  const [uploadedName, setUploadedName] = useState("");
   const run = useRef(0);
+
+  const detectedMode = detectTextMode(text);
+  const mode = chosenMode ?? detectedMode;
+  // A letter is signed by default. Other text only gets the signature if the student asks for it.
+  const signatureForPdf = mode === "letter" || addSignature ? signature : "";
 
   // Rebuild the preview a moment after the student stops typing
   useEffect(() => {
@@ -44,7 +57,7 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
     const id = ++run.current;
     const timer = setTimeout(async () => {
       try {
-        const built = await buildLetterPdf(text, signature, align);
+        const built = await buildLetterPdf(text, signatureForPdf, align, mode);
         const rendered = await renderPages(built.bytes);
         // A newer edit may have started while this one was building: ignore the stale result
         if (id !== run.current) return;
@@ -57,18 +70,19 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
       }
     }, 400);
     return () => clearTimeout(timer);
-  }, [text, signature, align]);
+  }, [text, signatureForPdf, align, mode]);
 
   async function openFile(file: File | undefined) {
     if (!file) return;
     setBusy(true);
     setError("");
     try {
-      const raw = await readCvFile(file, "letter");
-      const tidy = reflowLetterText(raw);
+      const raw = await readCvFile(file, "text");
+      // Joining wrapped lines suits letters and notes, but would spoil code, so code is left as it is
+      const tidy = detectTextMode(raw) === "code" ? raw.trim() : reflowLetterText(raw);
       if (!tidy) throw new CvFileError("We found no text in that file. If it is a scan or a photo, use “Keep my file as it is” instead.");
       setText(tidy);
-      setFileName(file.name.replace(/\.[^.]+$/, ""));
+      setUploadedName(file.name.replace(/\.[^.]+$/, ""));
     } catch (e) {
       setError(e instanceof CvFileError ? e.message : "We could not open that file.");
     } finally {
@@ -96,17 +110,18 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
     const url = URL.createObjectURL(new Blob([bytes as BlobPart], { type: "application/pdf" }));
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${fileName}${signature ? "_signed" : ""}.pdf`;
+    const base = uploadedName || (mode === "letter" ? "letter" : "document");
+    link.download = `${base}${signatureForPdf ? "_signed" : ""}.pdf`;
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
-    trackEvent("letter_signed");
+    trackEvent(mode === "letter" ? "letter_signed" : "text_pdf_downloaded", { mode });
   }
 
   return (
     <div className="space-y-5">
       <label className="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-fg/25 bg-fg/[0.03] px-4 py-6 text-center text-sm text-fg/65 hover:text-fg">
-        <span className="font-medium text-fg">Upload a PDF or Word file to edit</span>
-        <span className="text-xs text-fg/50">Or skip this and type or paste your letter below. It stays on your device.</span>
+        <span className="font-medium text-fg">Upload a PDF, Word or text file to edit</span>
+        <span className="text-xs text-fg/50">Or skip this and type or paste your text below. It stays on your device.</span>
         <input
           type="file"
           accept=".pdf,.docx,.txt,application/pdf"
@@ -117,11 +132,35 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
           }}
         />
       </label>
-      {busy && <p className="text-sm text-fg/60">Opening your letter…</p>}
+      {busy && <p className="text-sm text-fg/60">Opening your file…</p>}
+
+      {/* Letter, plain text or code. Picked from the text, but the student can always choose. */}
+      <div>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+          <span className="text-fg/60">Layout</span>
+          <div role="radiogroup" aria-label="Layout of the PDF" className="flex gap-1 rounded-lg bg-fg/5 p-1">
+            {MODES.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                role="radio"
+                aria-checked={mode === m.id}
+                onClick={() => setChosenMode(m.id)}
+                className={`rounded-md px-3 py-1.5 transition-colors ${mode === m.id ? "bg-fg/10 text-fg ring-1 ring-fg/15" : "text-fg/55 hover:text-fg"}`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <p className="mt-1.5 text-xs text-fg/45">
+          {MODES.find((m) => m.id === mode)?.hint} {chosenMode === null && text.trim() ? "Picked for you from your text." : ""}
+        </p>
+      </div>
 
       <div>
         <label htmlFor="own-letter" className="mb-1.5 block text-sm font-medium text-fg/80">
-          Your letter
+          Your text
         </label>
         <textarea
           id="own-letter"
@@ -133,13 +172,24 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
           placeholder={PLACEHOLDER}
           className="w-full resize-y rounded-lg border border-fg/12 bg-fg/[0.03] px-3.5 py-3 text-[15px] leading-relaxed text-fg placeholder:text-fg/30 focus:border-brand-400/70 focus:outline-none"
         />
-        <p className="mt-1.5 text-xs text-fg/45">
-          Write it all here: your address and the date first, then the person you are writing to, “Dear…”, and the closing. Your address is optional. A heading on its own line under “Dear…”, like “My request for financial assistance”, is made bold and underlined. Your signature is placed right under “Yours faithfully” or “Yours sincerely”.
-        </p>
+        {mode === "letter" && (
+          <p className="mt-1.5 text-xs text-fg/45">
+            Everything is optional: your address, the date and the person’s address. A heading on its own line under “Dear…”, like “My request for financial assistance”, is made bold and underlined. Your signature goes right under “Yours faithfully” or “Yours sincerely”.
+          </p>
+        )}
       </div>
 
+      {/* Other text only gets a signature if the student asks for one */}
+      {mode !== "letter" && signature && (
+        <label className="flex items-center gap-2 text-sm text-fg/75">
+          <input type="checkbox" checked={addSignature} onChange={(e) => setAddSignature(e.target.checked)} className="size-4 accent-brand-500" />
+          Add my signature at the end
+        </label>
+      )}
+
+      {(mode === "letter" || (addSignature && signature)) && (
       <div className="flex flex-wrap items-center gap-3 text-sm">
-        <span className="text-fg/60">Align my address and date, closing, signature and name to the</span>
+        <span className="text-fg/60">{mode === "letter" ? "Align my address and date, closing, signature and name to the" : "Put my signature on the"}</span>
         <div role="radiogroup" aria-label="Signature side" className="flex gap-1 rounded-lg bg-fg/5 p-1">
           {(["left", "right"] as const).map((side) => (
             <button
@@ -156,16 +206,17 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
         </div>
         {!signature && <span className="text-xs text-fg/45">Add your signature in step 1 to see it here.</span>}
       </div>
+      )}
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       {pages.length > 0 && (
-        <div className="space-y-3" aria-label="Preview of your letter">
-          <p className="text-center text-xs text-fg/50">Tap any line of the letter to edit it.</p>
+        <div className="space-y-3" aria-label="Preview of your PDF">
+          <p className="text-center text-xs text-fg/50">Tap any line to edit it.</p>
           {pages.map((p, i) => (
             <div key={i} className="relative mx-auto max-w-[640px] overflow-hidden rounded-lg bg-white">
               {/* eslint-disable-next-line @next/next/no-img-element -- a local page preview, nothing to optimise */}
-              <img src={p.src} alt={`Page ${i + 1} of your letter`} className="block w-full" draggable={false} />
+              <img src={p.src} alt={`Page ${i + 1} of your PDF`} className="block w-full" draggable={false} />
               {/* An invisible button over each line. Positions are fractions of the page, so they fit any screen. */}
               {regions
                 .filter((r) => r.page === i)
@@ -173,7 +224,7 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
                   <button
                     key={`${r.page}-${r.line}`}
                     type="button"
-                    aria-label="Edit this part of the letter"
+                    aria-label="Edit this part"
                     onClick={() => editLine(r.line)}
                     style={{ left: `${r.x * 100}%`, top: `${r.y * 100}%`, width: `${r.w * 100}%`, height: `${r.h * 100}%` }}
                     className={`absolute cursor-text rounded-sm outline-1 outline-offset-0 transition-colors hover:bg-slate-900/10 hover:outline hover:outline-slate-500 ${
@@ -192,7 +243,7 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
         disabled={!bytes}
         className="flex w-full items-center justify-center rounded-md bg-brand-600 py-3 text-[15px] font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_22px_rgb(124_128_255/0.5)] hover:bg-brand-500 disabled:opacity-40 disabled:shadow-none sm:w-auto sm:px-8"
       >
-        Download letter as PDF
+        Download as PDF
       </button>
       <p className="text-xs text-fg/45">The signs “₵” and some other symbols can’t be printed, so the cedi sign is written as GHS.</p>
     </div>
