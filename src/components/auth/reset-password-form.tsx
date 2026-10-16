@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { getSupabase } from "@/lib/supabase";
+import { PasswordInput } from "./password-input";
 import { useUser } from "./use-user";
 
 /**
@@ -49,14 +50,7 @@ export function ResetPasswordForm() {
     <form onSubmit={submit} className="space-y-5">
       <label className="block text-sm font-medium text-fg/80">
         New password
-        <input
-          type="password"
-          autoComplete="new-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="At least 8 characters"
-          className="mt-1.5 w-full rounded-lg border border-fg/12 bg-fg/[0.03] px-3.5 py-3 text-[15px] text-fg placeholder:text-fg/35 focus:border-brand-400/70 focus:outline-none"
-        />
+        <PasswordInput value={password} onChange={setPassword} autoComplete="new-password" />
       </label>
       {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
       <button

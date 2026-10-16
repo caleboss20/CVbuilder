@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { authConfigured, getSupabase } from "@/lib/supabase";
+import { PasswordInput } from "./password-input";
 import { useUser } from "./use-user";
 
 const inputClass =
@@ -119,16 +120,7 @@ export function AuthForm({
 
       <label className="block text-sm font-medium text-fg/80">
         Password
-        <input
-          type="password"
-          autoComplete={signup ? "new-password" : "current-password"}
-          required
-          minLength={8}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="At least 8 characters"
-          className={inputClass}
-        />
+        <PasswordInput value={password} onChange={setPassword} autoComplete={signup ? "new-password" : "current-password"} />
       </label>
 
       {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
