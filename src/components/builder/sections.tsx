@@ -11,6 +11,7 @@ import {
   type BuilderCv,
 } from "@/lib/builder";
 import { AddButton, Field, ItemCard, LinesField, PhotoInput, TagInput, TextArea } from "./fields";
+import { buildSummaryStarter, summaryGoals } from "@/lib/summary-starter";
 import { BulletCoach } from "./bullet-coach";
 import { VoiceInput } from "./voice-input";
 
@@ -93,6 +94,28 @@ export function SummaryStep({ cv, update, hints }: StepProps) {
     <div className="space-y-5">
       <StepIntro title="Professional summary">Two or three sentences that sum up who you are and what you want.</StepIntro>
       <VoiceInput kind="summary" onAdd={([summary]) => summary && update({ summary })} />
+
+      {/* Only while the box is empty, so it can never overwrite something the student wrote */}
+      {!cv.summary.trim() && (
+        <div className="rounded-xl border border-fg/10 bg-fg/[0.03] p-4">
+          <p className="text-sm font-medium text-fg">Need a start? What are you looking for?</p>
+          <p className="mt-0.5 text-xs text-fg/50">We’ll draft a summary from your course, school and skills. You can edit every word.</p>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {summaryGoals.map((g) => (
+              <li key={g.id}>
+                <button
+                  type="button"
+                  onClick={() => update({ summary: buildSummaryStarter(cv, g) })}
+                  className="rounded-full border border-brand-400/40 bg-brand-500/10 px-3.5 py-2 text-sm text-fg/90 transition-colors hover:bg-brand-500/25"
+                >
+                  {g.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <TextArea
         label="Summary"
         rows={5}
