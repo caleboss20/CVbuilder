@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cvExamples } from "@/lib/cv-examples";
-import { siteConfig } from "@/lib/site";
+import { siteConfig, whatsappLink } from "@/lib/site";
 import { Logo } from "@/components/ui/logo";
 import { ButtonLink } from "@/components/ui/button";
 
@@ -37,6 +37,8 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
     title: "Support",
     links: [
       { label: "About", href: "/about" },
+      // Only when a WhatsApp number is configured
+      ...(whatsappLink() ? [{ label: "WhatsApp support", href: whatsappLink() as string }] : []),
       { label: "FAQ", href: "/#faq" },
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms of Service", href: "/terms" },

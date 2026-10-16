@@ -15,6 +15,12 @@ export const siteConfig = {
     "ATS-friendly CV",
     "CV templates",
   ],
+  /**
+   * WhatsApp support number, digits only, with the country code (for Ghana: 233 then the
+   * number without its leading 0, e.g. 233241234567). Set NEXT_PUBLIC_WHATSAPP in the
+   * environment. While it is empty, no WhatsApp button or link is shown anywhere.
+   */
+  whatsapp: (process.env.NEXT_PUBLIC_WHATSAPP ?? "").replace(/\D/g, ""),
   nav: [
     { label: "Home", href: "/" },
     { label: "Features", href: "/#features" },
@@ -25,3 +31,8 @@ export const siteConfig = {
     { label: "FAQ", href: "/#faq" },
   ],
 } as const;
+
+/** A wa.me chat link with a first message filled in, or null when no number is configured. */
+export function whatsappLink(message = "Hi CV11, I need help with my CV."): string | null {
+  return siteConfig.whatsapp ? `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(message)}` : null;
+}

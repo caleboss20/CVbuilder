@@ -10,6 +10,7 @@ import { industries, OTHER_INDUSTRY } from "@/lib/industries";
 import { CHECKER_HANDOFF_KEY } from "@/lib/cv-import";
 import { CvFileError, readCvFile } from "@/lib/read-cv-file";
 import { CheckIcon } from "@/components/ui/check-icon";
+import { ScoreCard } from "./score-card";
 
 /*
  * CV checker page. Everything happens in the browser: the file is read here, scored
@@ -402,6 +403,9 @@ function ReportView({ report, onImprove }: { report: CvReport; onImprove?: () =>
           </ul>
         </div>
       )}
+
+      {/* keyed by score: a new score remounts the card, so an old picture is never shown */}
+      <ScoreCard key={report.score} report={report} />
 
       <div className="rounded-2xl border border-brand-400/30 bg-brand-500/[0.08] p-5 sm:p-6">
         <p className="font-medium text-fg">Ready to fix it?</p>
