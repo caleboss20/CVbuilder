@@ -345,10 +345,11 @@ function StackHeader({ cfg, doc, role, photo }: { cfg: StackConfig } & TemplateP
             {role}
           </p>
         )}
-        {/* Contact items in three columns, with their icons in the accent colour */}
-        <div className="mt-3 grid grid-cols-3 gap-x-4 gap-y-1 text-[12.5px] font-semibold text-slate-700">
+        {/* Contact items spread across the page, with their icons in the accent colour. Each one stays
+            whole: when the line is too narrow, an item moves to the next line instead of breaking. */}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[12.5px] font-semibold text-slate-700">
           {doc.contact.map((c) => (
-            <span key={c} className="inline-flex items-center gap-1.5 break-all">
+            <span key={c} className="inline-flex items-center gap-1.5">
               <span style={{ color: A(cfg.accent) }}>
                 <ContactIcon kind={contactKind(c)} />
               </span>
@@ -399,7 +400,7 @@ function stackSections(cfg: StackConfig, doc: CvDoc): ReactNode[] {
   // A label-column layout puts the section name on the left and its content beside it
   const section = (key: string, title: string, body: ReactNode) =>
     cfg.labelColumn ? (
-      <section key={key} className="grid grid-cols-[130px_1fr] gap-x-6 border-t border-slate-300 pt-4 first:border-t-0 first:pt-0">
+      <section key={key} className="grid grid-cols-[130px_1fr] gap-x-6 border-t border-slate-400 pt-4 first:border-t-0 first:pt-0">
         <SectionHeading kind={heading} accent={accent} title={title} />
         <div>{body}</div>
       </section>
