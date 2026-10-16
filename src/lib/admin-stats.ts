@@ -1,5 +1,3 @@
-import { getSupabase } from "@/lib/supabase";
-
 /** One day of the chart. */
 export type DailyPoint = { day: string; people: number; cvs_started: number; cvs_finished: number };
 
@@ -28,22 +26,42 @@ export type AdminStats = {
 /** Why loading failed, so the page can say the right thing. */
 export type AdminError = "not-signed-in" | "not-admin" | "not-set-up" | "failed";
 
-/** Loads the numbers. Only people on the admin list get them: the database checks that, not the page. */
-export async function fetchAdminStats(days: number): Promise<{ stats: AdminStats } | { error: AdminError; detail?: string }> {
-  const supabase = getSupabase();
-  if (!supabase) return { error: "not-set-up" };
+/**
+ * Loads the numbers. Only people on the admin list get them: the database checks that, not the page.
+ *
+ * It calls the database directly with the access token of the session the page already has, instead
+ * of asking the Supabase client to look the session up again, which is what made some log-ins look
+ * like they had not worked.
+ */
+export async function fetchAdminStats(days: number, accessToken: string | undefined): Promise<{ stats: AdminStats } | { error: AdminError; detail?: string }> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) return { error: "not-set-up" };
+  if (!accessToken) return { error: "not-signed-in" };
 
-  const { data: session } = await supabase.auth.getSession();
-  if (!session.session) return { error: "not-signed-in" };
-
-  const { data, error } = await supabase.rpc("admin_stats", { days });
-  if (error) {
-    // 42501 with our own message: the database checked and this account is not on the admin list
-    if (error.code === "42501" && error.message === "not allowed") return { error: "not-admin" };
-    // The function does not exist until supabase/schema.sql has been run
-    if (error.code === "PGRST202" || error.code === "42883") return { error: "not-set-up", detail: error.message };
-    // Anything else (for example "permission denied for function"): keep the reason so it can be fixed
-    return { error: "failed", detail: `${error.code ?? "error"}: ${error.message}` };
+  let response: Response;
+  try {
+    response = await fetch(`${url}/rest/v1/rpc/admin_stats`, {
+      method: "POST",
+      headers: { apikey: key, Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ days }),
+    });
+  } catch {
+    return { error: "failed", detail: "Could not reach the server" };
   }
-  return { stats: data as AdminStats };
+
+  if (response.ok) return { stats: (await response.json()) as AdminStats };
+
+  const body = (await response.json().catch(() => ({}))) as { code?: string; message?: string };
+  const code = body.code ?? String(response.status);
+  const message = body.message ?? response.statusText;
+
+  // Our own refusal: the database checked, and this account is not on the admin list
+  if (code === "42501" && message === "not allowed") return { error: "not-admin" };
+  // The function does not exist until supabase/schema.sql has been run
+  if (code === "PGRST202" || code === "42883") return { error: "not-set-up", detail: message };
+  // The session itself was refused (expired or invalid)
+  if (response.status === 401) return { error: "not-signed-in", detail: `${code}: ${message}` };
+  // Anything else: keep the reason so it can be fixed
+  return { error: "failed", detail: `${code}: ${message}` };
 }

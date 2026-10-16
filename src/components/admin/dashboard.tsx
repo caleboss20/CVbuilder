@@ -42,7 +42,8 @@ const cardClass = "rounded-lg border border-afg/10 bg-acard";
 
 /** A private page for the site owner: how many people use CV11 and what they do. */
 export function AdminDashboard() {
-  const { user, loading: userLoading } = useUser();
+  const { user, session, loading: userLoading } = useUser();
+  const token = session?.access_token;
   const [days, setDays] = useState<number>(30);
   const [series, setSeries] = useState<(typeof SERIES)[number]["key"]>("people");
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -51,24 +52,27 @@ export function AdminDashboard() {
   const [detail, setDetail] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const load = useCallback(async (period: number) => {
-    setBusy(true);
-    const result = await fetchAdminStats(period);
-    if ("stats" in result) {
-      setStats(result.stats);
-      setError(null);
-      setDetail("");
-    } else {
-      setError(result.error);
-      setDetail(result.detail ?? "");
-    }
-    setBusy(false);
-  }, []);
+  const load = useCallback(
+    async (period: number) => {
+      setBusy(true);
+      const result = await fetchAdminStats(period, token);
+      if ("stats" in result) {
+        setStats(result.stats);
+        setError(null);
+        setDetail("");
+      } else {
+        setError(result.error);
+        setDetail(result.detail ?? "");
+      }
+      setBusy(false);
+    },
+    [token],
+  );
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch the numbers once signed in, and again when the period changes
-    if (user) void load(days);
-  }, [user, days, load]);
+    if (token) void load(days);
+  }, [token, days, load]);
 
   let body: React.ReactNode;
   if (!authConfigured) body = <Notice title="Accounts are not switched on">Add the Supabase values first, then come back.</Notice>;
@@ -82,7 +86,13 @@ export function AdminDashboard() {
         <AuthForm mode="login" after="/admin" allowSignup={false} neutral />
       </div>
     );
-  else if (error === "not-signed-in") body = <Notice title="We could not confirm your login">You are logged in as {user.email}, but the server did not accept the session. Press Refresh, or log out and log in again.</Notice>;
+  else if (error === "not-signed-in")
+    body = (
+      <Notice title="We could not confirm your login">
+        You are logged in as {user.email}, but the server did not accept the session. Press Refresh, or log out and log in again.
+        {detail && <span className="mt-3 block break-words font-mono text-xs text-afg/40">{detail}</span>}
+      </Notice>
+    );
   else if (error === "not-admin") body = <Notice title="This account is not an admin">You are logged in as {user.email}. Add that email to the admin list in Supabase (see supabase/schema.sql).</Notice>;
   else if (error === "not-set-up")
     body = (
