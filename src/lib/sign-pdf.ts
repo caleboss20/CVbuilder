@@ -282,15 +282,20 @@ export function findTopBlock(lines: string[]): { block: number[]; date: number }
 
   let i = 0;
   while (i < salutation && !lines[i].trim()) i++;
-  const block: number[] = [];
-  while (i < salutation && lines[i].trim() && block.length < 7) block.push(i++);
-  if (!block.length) return null;
+  const first: number[] = [];
+  while (i < salutation && lines[i].trim() && first.length < 7) first.push(i++);
 
-  // A line that is only a date is part of the top block too, wherever it sits above "Dear…"
+  // The first paragraph is only the sender's address if it reads like one. A single name line, such as
+  // the person being written to, stays where it is, because many letters have no addresses at all.
+  const looksLikeAddress =
+    first.length >= 3 || first.some((n) => /\d|@|\b(box|street|road|avenue|lane|close|estate|hall|hostel|p\.?\s?o\.?)\b/i.test(lines[n]));
+  const block = looksLikeAddress ? first : [];
+
+  // A line that is only a date goes at the top right too, wherever it sits above "Dear…"
   const date = lines.findIndex((l, n) => n >= i && n < salutation && DATE_LINE.test(l.trim()));
-  // A date inside the first paragraph is already in the block
   const dateOutside = date >= 0 && !block.includes(date) ? date : -1;
-  return { block, date: dateOutside };
+
+  return block.length || dateOutside >= 0 ? { block, date: dateOutside } : null;
 }
 
 /**
@@ -370,7 +375,8 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
       y -= LEADING;
     }
     if (dateRow) {
-      y -= LEADING * 0.5;
+      // A small gap after an address, but none when the date is the only thing at the top
+      if (rows.length) y -= LEADING * 0.5;
       page.drawText(dateRow, { x, y: y - SIZE, size: SIZE, font, color: ink });
       y -= LEADING;
     }
