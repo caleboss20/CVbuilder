@@ -1,0 +1,250 @@
+"use client";
+
+import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
+import { useUser } from "@/components/auth/use-user";
+import { Logo } from "@/components/ui/logo";
+import { fetchAdminStats, type AdminError, type AdminStats, type DailyPoint } from "@/lib/admin-stats";
+import { authConfigured } from "@/lib/supabase";
+import { AreaChart, shortDate } from "./area-chart";
+
+const RANGES = [
+  { days: 7, label: "7 days" },
+  { days: 30, label: "30 days" },
+  { days: 90, label: "90 days" },
+] as const;
+
+/** The three numbers the main chart can show, each with its own colour. */
+const SERIES: { key: "people" | "cvs_started" | "cvs_finished"; label: string; color: string }[] = [
+  { key: "people", label: "People", color: "#7c80ff" },
+  { key: "cvs_started", label: "CVs started", color: "#38bdf8" },
+  { key: "cvs_finished", label: "CVs finished", color: "#34d399" },
+];
+
+const n = (v: number) => v.toLocaleString("en-GB");
+
+/** Up or down compared with the period before. Shows nothing useful when there was no data before. */
+function Delta({ now, before }: { now: number; before: number }) {
+  if (before === 0) return <span className="text-xs text-white/35">{now > 0 ? "New" : "No change"}</span>;
+  const pct = Math.round(((now - before) / before) * 100);
+  if (pct === 0) return <span className="text-xs text-white/35">No change</span>;
+  const up = pct > 0;
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs font-medium ${up ? "bg-emerald-500/15 text-emerald-300" : "bg-red-500/15 text-red-300"}`}>
+      {up ? "▲" : "▼"} {Math.abs(pct)}%
+    </span>
+  );
+}
+
+const cardClass = "rounded-lg border border-white/10 bg-[#0a0a0a]";
+
+/** A private page for the site owner: how many people use CV11 and what they do. */
+export function AdminDashboard() {
+  const { user, loading: userLoading } = useUser();
+  const [days, setDays] = useState<number>(30);
+  const [series, setSeries] = useState<(typeof SERIES)[number]["key"]>("people");
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [error, setError] = useState<AdminError | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const load = useCallback(async (period: number) => {
+    setBusy(true);
+    const result = await fetchAdminStats(period);
+    if ("stats" in result) {
+      setStats(result.stats);
+      setError(null);
+    } else {
+      setError(result.error);
+    }
+    setBusy(false);
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch the numbers once signed in, and again when the period changes
+    if (user) void load(days);
+  }, [user, days, load]);
+
+  let body: React.ReactNode;
+  if (!authConfigured) body = <Notice title="Accounts are not switched on">Add the Supabase values first, then come back.</Notice>;
+  else if (userLoading || (user && !stats && !error)) body = <Skeleton />;
+  else if (!user || error === "not-signed-in")
+    body = (
+      <Notice title="Log in to see the numbers">
+        <Link href="/login" className="text-[#7c80ff] underline">
+          Log in
+        </Link>{" "}
+        with the email on the admin list.
+      </Notice>
+    );
+  else if (error === "not-admin") body = <Notice title="This account is not an admin">You are logged in as {user.email}. Add that email to the admin list in Supabase (see supabase/schema.sql).</Notice>;
+  else if (error === "not-set-up") body = <Notice title="The dashboard is not set up yet">Run supabase/schema.sql in the Supabase SQL Editor, then refresh this page.</Notice>;
+  else if (error === "failed" && !stats) body = <Notice title="Could not load the numbers">Check your internet and press Refresh.</Notice>;
+  else if (stats) body = <Panels stats={stats} series={series} onSeries={setSeries} />;
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <header className="sticky top-0 z-20 border-b border-white/10 bg-black/90 backdrop-blur">
+        <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
+          <Logo />
+          <span className="text-white/25" aria-hidden="true">
+            /
+          </span>
+          <span className="text-sm font-medium">Analytics</span>
+          <div className="ml-auto flex items-center gap-2">
+            <div role="radiogroup" aria-label="Period" className="flex rounded-md border border-white/10 p-0.5 text-xs">
+              {RANGES.map((r) => (
+                <button
+                  key={r.days}
+                  type="button"
+                  role="radio"
+                  aria-checked={days === r.days}
+                  onClick={() => setDays(r.days)}
+                  className={`rounded px-2.5 py-1.5 transition-colors ${days === r.days ? "bg-white/10 text-white" : "text-white/50 hover:text-white"}`}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => load(days)}
+              disabled={busy || !user}
+              className="rounded-md border border-white/10 px-2.5 py-1.5 text-xs text-white/70 hover:text-white disabled:opacity-40"
+            >
+              {busy ? "Loading…" : "Refresh"}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-6xl space-y-4 px-4 py-6 sm:px-6">{body}</main>
+    </div>
+  );
+}
+
+/** The numbers, once they have loaded. */
+export function Panels({ stats, series, onSeries }: { stats: AdminStats; series: (typeof SERIES)[number]["key"]; onSeries: (k: (typeof SERIES)[number]["key"]) => void }) {
+  const current = SERIES.find((s) => s.key === series) ?? SERIES[0];
+  const points = stats.daily.map((d: DailyPoint) => ({ label: shortDate(d.day), value: d[series] }));
+  const finishRate = stats.funnel.started ? Math.round((stats.funnel.finished / stats.funnel.started) * 100) : 0;
+  const topTemplate = Math.max(1, ...stats.templates.map((t) => t.count));
+
+  const activity: [string, number][] = [
+    ["Active devices", stats.totals.active_devices],
+    ["Letters downloaded", stats.totals.letters],
+    ["Letters signed", stats.totals.letters_signed],
+    ["WhatsApp shares", stats.totals.shares],
+    ["Backups saved", stats.totals.backups],
+    ["Accounts (all time)", stats.accounts],
+  ];
+
+  return (
+    <>
+      {/* The headline numbers double as the chart's tabs, like Vercel's analytics */}
+      <section className={cardClass} aria-label="Overview">
+        <div role="tablist" className="grid grid-cols-3 border-b border-white/10">
+          {SERIES.map((s) => (
+            <button
+              key={s.key}
+              type="button"
+              role="tab"
+              aria-selected={series === s.key}
+              onClick={() => onSeries(s.key)}
+              className={`border-b-2 px-3 py-4 text-left transition-colors sm:px-5 ${series === s.key ? "border-white bg-white/[0.03]" : "border-transparent hover:bg-white/[0.02]"}`}
+            >
+              <span className="flex items-center gap-2 text-xs text-white/55">
+                <span className="size-2 rounded-full" style={{ background: s.color }} />
+                {s.label}
+              </span>
+              <span className="mt-2 block text-2xl font-semibold tabular-nums sm:text-3xl">{n(stats.totals[s.key])}</span>
+              <span className="mt-1.5 block">
+                <Delta now={stats.totals[s.key]} before={stats.previous[s.key]} />
+              </span>
+            </button>
+          ))}
+        </div>
+        <div className="p-3 sm:p-5">
+          <p className="mb-2 text-xs text-white/45">
+            {current.label} per day, last {stats.days} days
+          </p>
+          <AreaChart points={points} color={current.color} />
+        </div>
+      </section>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <section className={`${cardClass} p-5`} aria-label="Templates">
+          <h2 className="text-sm font-medium">Templates people finish with</h2>
+          <ul className="mt-4 space-y-3">
+            {stats.templates.length === 0 && <li className="text-sm text-white/40">No downloads in this period yet.</li>}
+            {stats.templates.map((t) => (
+              <li key={t.name} className="relative flex items-center justify-between overflow-hidden rounded-md px-3 py-2 text-sm">
+                <span aria-hidden="true" className="absolute inset-y-0 left-0 rounded-md bg-[#7c80ff]/15" style={{ width: `${(t.count / topTemplate) * 100}%` }} />
+                <span className="relative truncate">{t.name}</span>
+                <span className="relative ml-3 tabular-nums text-white/70">{n(t.count)}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className={`${cardClass} p-5`} aria-label="Finish rate">
+          <h2 className="text-sm font-medium">Do people finish their CV?</h2>
+          <p className="mt-4 text-4xl font-semibold tabular-nums">{finishRate}%</p>
+          <p className="mt-1 text-xs text-white/45">
+            {n(stats.funnel.finished)} of {n(stats.funnel.started)} devices that started a CV downloaded it.
+          </p>
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+            <div className="h-full rounded-full bg-emerald-400" style={{ width: `${finishRate}%` }} />
+          </div>
+          <dl className="mt-6 grid grid-cols-3 gap-3 border-t border-white/10 pt-4 text-xs">
+            {(
+              [
+                ["People, all time", stats.all_time.people],
+                ["Started, all time", stats.all_time.cvs_started],
+                ["Finished, all time", stats.all_time.cvs_finished],
+              ] as const
+            ).map(([label, value]) => (
+              <div key={label}>
+                <dt className="text-white/45">{label}</dt>
+                <dd className="mt-1 text-lg font-semibold tabular-nums">{n(value)}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      </div>
+
+      <section className={`${cardClass} p-5`} aria-label="More activity">
+        <h2 className="text-sm font-medium">More activity, last {stats.days} days</h2>
+        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
+          {activity.map(([label, value]) => (
+            <div key={label} className="border-t border-white/10 pt-3">
+              <dt className="text-xs text-white/45">{label}</dt>
+              <dd className="mt-1 text-xl font-semibold tabular-nums">{n(value)}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </>
+  );
+}
+
+function Notice({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className={`${cardClass} mx-auto mt-16 max-w-md p-6 text-center`}>
+      <h1 className="text-base font-medium">{title}</h1>
+      <p className="mt-2 text-sm leading-relaxed text-white/55">{children}</p>
+    </div>
+  );
+}
+
+/** Grey placeholders in the same shape as the real panels, while the numbers load. */
+function Skeleton() {
+  return (
+    <div className="animate-pulse space-y-4" aria-label="Loading">
+      <div className={`${cardClass} h-80`} />
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className={`${cardClass} h-56`} />
+        <div className={`${cardClass} h-56`} />
+      </div>
+    </div>
+  );
+}
