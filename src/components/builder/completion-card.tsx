@@ -49,6 +49,7 @@ export function CompletionCard({ data, onClose }: { data: Completion; onClose: (
           <p className="mt-1.5 text-sm text-fg/55">
             Your PDF has been prepared. Here’s a summary of this CV.
           </p>
+          
 
           <dl className="mt-6 grid grid-cols-3 divide-x divide-fg/10 rounded-xl border border-fg/10 bg-fg/[0.03]">
             {stats.map((s) => (
@@ -71,6 +72,12 @@ export function CompletionCard({ data, onClose }: { data: Completion; onClose: (
               className="flex w-full items-center justify-center rounded-md bg-brand-600 py-2.5 text-sm font-medium text-white ring-1 ring-brand-300/60 hover:bg-brand-500"
             >
               Write a matching cover letter
+            </Link>
+            <Link
+              href="/tracker"
+              className="flex w-full items-center justify-center rounded-md py-2.5 text-sm font-medium text-fg ring-1 ring-fg/15 hover:bg-fg/5"
+            >
+              Track your applications
             </Link>
             <a
               href={`https://wa.me/?text=${share}`}

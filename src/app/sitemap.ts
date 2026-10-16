@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteConfig.url}/templates`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${siteConfig.url}/cv-examples`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${siteConfig.url}/cv-checker`, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${siteConfig.url}/tracker`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteConfig.url}/blog`, changeFrequency: "monthly", priority: 0.7 },
     ...guides.map((g) => ({ url: `${siteConfig.url}/blog/${g.slug}`, changeFrequency: "monthly" as const, priority: 0.7 })),
     { url: `${siteConfig.url}/about`, changeFrequency: "yearly", priority: 0.4 },

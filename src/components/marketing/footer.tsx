@@ -22,6 +22,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "CV Examples", href: "/cv-examples" },
       { label: "CV Checker", href: "/cv-checker" },
       { label: "Cover Letter Builder", href: "/cover-letter" },
+      { label: "Application Tracker", href: "/tracker" },
       { label: "How to Write a CV", href: "/blog/how-to-write-a-cv" },
       { label: "CV Help", href: "/blog" },
     ],
