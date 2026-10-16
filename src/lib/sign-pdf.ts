@@ -329,6 +329,21 @@ export function detectTextMode(text: string): LetterMode {
   return hasLetterParts ? "letter" : "plain";
 }
 
+/** How a title looks: where it sits, and whether it is underlined, bold or in capitals. */
+export type TitleStyle = { align: "left" | "center" | "right"; underline: boolean; bold: boolean; caps: boolean };
+
+/** Everything that shapes the PDF besides the text itself. */
+export type BuildOptions = {
+  /** The signature as a PNG data URL, or "" for none. */
+  signature: string;
+  /** Which side the sign-off (and, in a letter, the sender's address) sits on. */
+  align: "left" | "right";
+  mode: LetterMode;
+  /** A title the student typed separately. Empty for none. */
+  title: string;
+  titleStyle: TitleStyle;
+};
+
 /** A tappable area of the preview: where one line of the typed text appears on a page, as fractions of the page. */
 export type LetterRegion = { page: number; line: number; x: number; y: number; w: number; h: number };
 
@@ -345,7 +360,8 @@ export type BuiltLetter = { bytes: Uint8Array; regions: LetterRegion[] };
  *    signature and the typed name. The signature gets a fixed-size space directly under the closing line.
  *  - With no closing line found, the signature goes at the end.
  */
-export async function buildLetterPdf(text: string, signaturePng: string, align: "left" | "right", mode: LetterMode = "letter"): Promise<BuiltLetter> {
+export async function buildLetterPdf(text: string, options: BuildOptions): Promise<BuiltLetter> {
+  const { signature: signaturePng, align, mode, title, titleStyle } = options;
   const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
@@ -437,7 +453,7 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
   const lines = printable(text).split("\n");
   const isLetter = mode === "letter";
   const signoff = isLetter ? findSignoff(lines) : null;
-  const titleIndex = isLetter ? findTitleLine(lines, signoff ? signoff.closing : lines.length) : -1;
+  const titleIndex = isLetter && !title.trim() ? findTitleLine(lines, signoff ? signoff.closing : lines.length) : -1;
   const inSignoff = new Set(signoff?.block ?? []);
   // With right alignment the sender's address and the date form a block at the top right
   const top = isLetter && align === "right" ? findTopBlock(lines) : null;
@@ -486,22 +502,33 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
     });
   };
 
-  /** Draws the heading: bold, underlined, centred, in capitals. */
-  const drawTitle = (title: string, lineIndex: number) => {
-    const size = 12;
-    const rows = wrap(title.trim().toUpperCase(), bold, size);
+  /**
+   * Draws a title in the student's chosen style: left, centre or right, with or without underline,
+   * bold and capitals. `lineIndex` is the line of text it came from, or -1 for the separate title box.
+   */
+  const drawTitle = (heading: string, lineIndex: number, size: number) => {
+    const face = titleStyle.bold ? bold : font;
+    const rows = wrap(titleStyle.caps ? heading.trim().toUpperCase() : heading.trim(), face, size);
     y -= 4;
     for (const row of rows) {
       if (y - size < MARGIN) nextPage();
-      const w = bold.widthOfTextAtSize(row, size);
-      const x = (PAGE_W - w) / 2;
+      const w = face.widthOfTextAtSize(row, size);
+      const x = titleStyle.align === "center" ? (PAGE_W - w) / 2 : titleStyle.align === "right" ? PAGE_W - MARGIN - w : MARGIN;
       mark(lineIndex, x, w, y, LEADING + 1);
-      page.drawText(row, { x, y: y - size, size, font: bold, color: ink });
-      page.drawLine({ start: { x, y: y - size - 2 }, end: { x: x + w, y: y - size - 2 }, thickness: 0.8, color: ink });
-      y -= LEADING + 1;
+      page.drawText(row, { x, y: y - size, size, font: face, color: ink });
+      if (titleStyle.underline) {
+        page.drawLine({ start: { x, y: y - size - 2 }, end: { x: x + w, y: y - size - 2 }, thickness: 0.8, color: ink });
+      }
+      y -= LEADING + (size > 13 ? 4 : 1);
     }
     y -= 4;
   };
+
+  // A title typed in its own box. In a letter it goes under "Dear…", elsewhere at the very top.
+  const boxTitle = title.trim();
+  const titleSize = isLetter ? 12.5 : 16;
+  const salutationIndex = isLetter ? lines.findIndex((l) => SALUTATION.test(l.trim())) : -1;
+  if (boxTitle && salutationIndex < 0) drawTitle(boxTitle, -1, titleSize);
 
   let signoffDrawn = false;
   let topDrawn = false;
@@ -528,7 +555,7 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
       continue;
     }
     if (i === titleIndex) {
-      drawTitle(line, i);
+      drawTitle(line, i, titleSize);
       continue;
     }
     const rowFont = code ? mono : font;
@@ -538,6 +565,7 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
       page.drawText(row, { x: MARGIN, y: y - SIZE, size: SIZE, font: rowFont, color: ink });
       y -= LEADING;
     }
+    if (boxTitle && i === salutationIndex) drawTitle(boxTitle, -1, titleSize);
   }
 
   // No closing line to sign under: put the signature at the end instead

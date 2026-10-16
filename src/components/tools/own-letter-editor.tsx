@@ -28,6 +28,14 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
   // null means "let the app decide from the text"; a student's own choice always wins
   const [chosenMode, setChosenMode] = useState<LetterMode | null>(null);
   const [addSignature, setAddSignature] = useState(false);
+  // An optional title, with where it sits and how it looks
+  const [title, setTitle] = useState("");
+  const [titleAlign, setTitleAlign] = useState<"left" | "center" | "right">("center");
+  const [underline, setUnderline] = useState(true);
+  const [boldTitle, setBoldTitle] = useState(true);
+  // null means "follow the layout": capitals for a letter's heading, as typed for anything else
+  const [capsChoice, setCapsChoice] = useState<boolean | null>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
   const [pages, setPages] = useState<PreviewPage[]>([]);
   const [bytes, setBytes] = useState<Uint8Array | null>(null);
   // Where each line of the text sits on the preview, so a tap on the preview can find its line
@@ -44,10 +52,11 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
   const mode = chosenMode ?? detectedMode;
   // A letter is signed by default. Other text only gets the signature if the student asks for it.
   const signatureForPdf = mode === "letter" || addSignature ? signature : "";
+  const caps = capsChoice ?? mode === "letter";
 
   // Rebuild the preview a moment after the student stops typing
   useEffect(() => {
-    if (!text.trim()) {
+    if (!text.trim() && !title.trim()) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- an empty letter has no preview
       setPages([]);
       setBytes(null);
@@ -57,7 +66,13 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
     const id = ++run.current;
     const timer = setTimeout(async () => {
       try {
-        const built = await buildLetterPdf(text, signatureForPdf, align, mode);
+        const built = await buildLetterPdf(text, {
+          signature: signatureForPdf,
+          align,
+          mode,
+          title,
+          titleStyle: { align: titleAlign, underline, bold: boldTitle, caps },
+        });
         const rendered = await renderPages(built.bytes);
         // A newer edit may have started while this one was building: ignore the stale result
         if (id !== run.current) return;
@@ -70,7 +85,7 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
       }
     }, 400);
     return () => clearTimeout(timer);
-  }, [text, signatureForPdf, align, mode]);
+  }, [text, title, titleAlign, underline, boldTitle, caps, signatureForPdf, align, mode]);
 
   async function openFile(file: File | undefined) {
     if (!file) return;
@@ -92,6 +107,12 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
 
   /** Jumps to a line of the letter in the text box and selects it, ready to be changed. */
   function editLine(line: number) {
+    // -1 is the separate title, which lives in its own box above the text
+    if (line < 0) {
+      titleRef.current?.focus();
+      titleRef.current?.select();
+      return;
+    }
     const box = textRef.current;
     if (!box) return;
     const rows = text.replace(/\r/g, "").split("\n");
@@ -155,6 +176,58 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
         </div>
         <p className="mt-1.5 text-xs text-fg/45">
           {MODES.find((m) => m.id === mode)?.hint} {chosenMode === null && text.trim() ? "Picked for you from your text." : ""}
+        </p>
+      </div>
+
+      {/* An optional title for any kind of text, with its position and style */}
+      <div>
+        <label htmlFor="own-title" className="mb-1.5 block text-sm font-medium text-fg/80">
+          Title (optional)
+        </label>
+        <input
+          id="own-title"
+          ref={titleRef}
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={120}
+          placeholder="For example: Database Systems, Assignment 2"
+          className="w-full rounded-lg border border-fg/12 bg-fg/[0.03] px-3.5 py-3 text-[15px] text-fg placeholder:text-fg/30 focus:border-brand-400/70 focus:outline-none"
+        />
+        {(title.trim() || mode === "letter") && (
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2.5 text-sm">
+            <div role="radiogroup" aria-label="Title position" className="flex gap-1 rounded-lg bg-fg/5 p-1">
+              {(["left", "center", "right"] as const).map((side) => (
+                <button
+                  key={side}
+                  type="button"
+                  role="radio"
+                  aria-checked={titleAlign === side}
+                  onClick={() => setTitleAlign(side)}
+                  className={`rounded-md px-3 py-1.5 capitalize transition-colors ${titleAlign === side ? "bg-fg/10 text-fg ring-1 ring-fg/15" : "text-fg/55 hover:text-fg"}`}
+                >
+                  {side === "center" ? "Centre" : side}
+                </button>
+              ))}
+            </div>
+            {(
+              [
+                ["Underline", underline, setUnderline],
+                ["Bold", boldTitle, setBoldTitle],
+                ["Capitals", caps, (v: boolean) => setCapsChoice(v)],
+              ] as const
+            ).map(([label, on, set]) => (
+              <label key={label} className="flex items-center gap-2 text-fg/75">
+                <input type="checkbox" checked={on} onChange={(e) => set(e.target.checked)} className="size-4 accent-brand-500" />
+                {label}
+              </label>
+            ))}
+          </div>
+        )}
+        <p className="mt-1.5 text-xs text-fg/45">
+          {mode === "letter"
+            ? "In a letter the title goes under “Dear…”. If you leave this empty, a short line you put there yourself is made into the title."
+            : "The title goes at the top of the page."}
         </p>
       </div>
 
