@@ -35,6 +35,7 @@ import {
 import { CvTypePicker, TypeGuide } from "./type-guide";
 import type { CvType } from "@/lib/cv-type";
 import type { ImportResult } from "@/lib/cv-import";
+import { templateAdviceFor, type TemplateAdvice } from "@/lib/template-advice";
 import { ConfirmDialog } from "./confirm-dialog";
 import { ImportBanner } from "./import-card";
 import { StartScreen } from "./start-screen";
@@ -609,6 +610,7 @@ export function Builder() {
           role={pickerRole}
           photo={pickerPhoto}
           showingSample={showingPickerSample}
+          advice={templateAdviceFor(cv.courseSlug, cv.courseName)}
           onPick={(template) => {
             update({ template });
             setPickerOpen(false);
@@ -696,10 +698,13 @@ function TemplatePicker({
   role,
   photo,
   showingSample,
+  advice,
   onPick,
   onClose,
 }: {
   cv: BuilderCv;
+  /** Suggested templates for the student's course, if they picked one. */
+  advice: TemplateAdvice | null;
   /** True while the thumbnails show sample text because the CV has no name yet. */
   showingSample: boolean;
   /** What the thumbnails show: the student's CV, or the course sample while it is still empty. */
@@ -710,6 +715,9 @@ function TemplatePicker({
   onClose: () => void;
 }) {
   const accentStyle = cvStyle(cv, cvStrength(cv).score);
+  // Suggested designs lead the list; the rest keep their usual order
+  const suggested = advice?.ids ?? [];
+  const ordered = [...templates].sort((a, b) => Number(suggested.includes(b.id)) - Number(suggested.includes(a.id)));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -730,9 +738,14 @@ function TemplatePicker({
           Close
         </button>
       </div>
-      <AtsExplainer className="mx-4 mt-4 sm:mx-6" />
+      {advice && (
+        <p className="mx-4 mt-4 rounded-lg border border-brand-400/30 bg-brand-500/[0.08] px-4 py-3 text-sm text-fg/75 sm:mx-6">
+          <span className="font-medium text-fg">Recommended for {advice.field}.</span> {advice.reason}
+        </p>
+      )}
+      <AtsExplainer className="mx-4 mt-3 sm:mx-6" />
       <ul className="grid flex-1 grid-cols-2 gap-5 overflow-y-auto p-4 sm:grid-cols-3 sm:p-6 lg:grid-cols-4 xl:grid-cols-5">
-        {templates.map((t) => (
+        {ordered.map((t) => (
           <li key={t.id}>
             <button type="button" onClick={() => onPick(t.id)} className="group w-full text-left">
               <div
@@ -752,6 +765,9 @@ function TemplatePicker({
                 {cv.template === t.id && <span className="text-xs text-brand-300">Selected</span>}
               </p>
               <p className="mt-0.5 flex flex-wrap gap-1.5 text-[11px]">
+                {suggested.includes(t.id) && (
+                  <span className="rounded bg-brand-500/25 px-1.5 py-0.5 font-medium text-brand-300">Recommended</span>
+                )}
                 {t.tags.includes("ats") && (
                   <span title="One column, plain headings, no photo" className="rounded bg-emerald-500/15 px-1.5 py-0.5 font-medium text-emerald-300">
                     ATS-safe
