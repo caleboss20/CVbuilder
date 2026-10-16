@@ -5,6 +5,7 @@ import { SIGNATURE_KEY, SignaturePad } from "@/components/builder/signature-pad"
 import { renderPages, stampSignature, toPdfBytes, type Placement, type PreviewPage } from "@/lib/sign-pdf";
 import { trackEvent } from "@/lib/track";
 import { ShareNudge } from "@/components/ui/share-nudge";
+import { OwnLetterEditor } from "./own-letter-editor";
 
 const DEFAULT_WIDTH = 0.22;
 const MIN_WIDTH = 0.1;
@@ -50,6 +51,8 @@ export function SignLetter() {
   const [placement, setPlacement] = useState<Placement>({ x: MARGIN, y: 0.78, width: DEFAULT_WIDTH });
   // Whether we found the closing line and placed the signature under it ourselves
   const [found, setFound] = useState(false);
+  // "edit": write or change the text, then sign it. "as-is": sign a finished file without changing it.
+  const [tab, setTab] = useState<"edit" | "as-is">("edit");
   // Set after a signed letter is downloaded, to offer sharing CV11 with a friend
   const [signed, setSigned] = useState(false);
   const [busy, setBusy] = useState<"" | "reading" | "saving">("");
@@ -178,26 +181,56 @@ export function SignLetter() {
         <h2 className="flex items-center gap-3 text-lg font-medium text-fg">
           <span className={step}>2</span> Your letter
         </h2>
-        <label className="mt-4 flex h-32 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-fg/25 bg-fg/[0.03] px-4 text-center text-sm text-fg/65 hover:text-fg">
-          <span className="font-medium text-fg">{file ? "Choose a different letter" : "Choose your letter"}</span>
-          <span className="text-xs text-fg/50">A PDF, or a clear photo of the printed letter. It stays on your device.</span>
-          <input
-            type="file"
-            accept="application/pdf,.pdf,image/*"
-            className="sr-only"
-            onChange={(e) => {
-              void openLetter(e.target.files?.[0]);
-              e.target.value = "";
-            }}
-          />
-        </label>
-        {busy === "reading" && <p className="mt-3 text-sm text-fg/60">Opening your letter…</p>}
-        {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
-        <p className="mt-2 text-xs text-fg/45">Written it in Word? Choose Save as PDF first, then upload it here.</p>
+
+        {/* Two ways in: edit the words (a PDF or Word file, or typed from scratch), or leave a finished file untouched */}
+        <div role="radiogroup" aria-label="How to add your letter" className="mt-4 grid grid-cols-2 gap-1 rounded-lg bg-fg/5 p-1 text-sm">
+          {(
+            [
+              ["edit", "Write or edit the text"],
+              ["as-is", "Keep my file as it is"],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={tab === id}
+              onClick={() => setTab(id)}
+              className={`rounded-md px-3 py-2 transition-colors ${tab === id ? "bg-fg/10 text-fg ring-1 ring-fg/15" : "text-fg/55 hover:text-fg"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {tab === "edit" ? (
+          <div className="mt-5">
+            <OwnLetterEditor signature={signature} />
+          </div>
+        ) : (
+          <>
+            <label className="mt-5 flex h-32 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-fg/25 bg-fg/[0.03] px-4 text-center text-sm text-fg/65 hover:text-fg">
+              <span className="font-medium text-fg">{file ? "Choose a different letter" : "Choose your letter"}</span>
+              <span className="text-xs text-fg/50">A PDF, or a clear photo of the printed letter. It stays on your device.</span>
+              <input
+                type="file"
+                accept="application/pdf,.pdf,image/*"
+                className="sr-only"
+                onChange={(e) => {
+                  void openLetter(e.target.files?.[0]);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+            {busy === "reading" && <p className="mt-3 text-sm text-fg/60">Opening your letter…</p>}
+            {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+            <p className="mt-2 text-xs text-fg/45">Use this when your letter is finished and must stay exactly as it is, such as a stamped or scanned copy. Written it in Word? Save as PDF first.</p>
+          </>
+        )}
       </section>
 
-      {/* 3. Place it and download */}
-      {page && file && (
+      {/* 3. Place it and download (only for a file kept as it is; the editor places the signature itself) */}
+      {tab === "as-is" && page && file && (
         <section>
           <h2 className="flex items-center gap-3 text-lg font-medium text-fg">
             <span className={step}>3</span> Place your signature

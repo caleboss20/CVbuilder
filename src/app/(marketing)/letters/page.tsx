@@ -51,9 +51,11 @@ export default function LettersPage() {
           href="/sign-letter"
           className="group mt-4 flex flex-col gap-1 rounded-xl border border-brand-400/30 bg-brand-500/[0.08] p-5 transition-colors hover:border-brand-400/60 sm:p-6"
         >
-          <h2 className="text-lg font-medium text-fg">Already have a letter? Sign it</h2>
-          <p className="text-sm leading-relaxed text-fg/60">Upload your PDF or a photo of it, drag your signature into place, and download the signed copy.</p>
-          <span className="mt-2 text-sm text-brand-300 group-hover:text-fg">Sign a letter →</span>
+          <h2 className="text-lg font-medium text-fg">Have your own letter? Edit it and sign it</h2>
+          <p className="text-sm leading-relaxed text-fg/60">
+            Type a letter, or upload a PDF or Word file and change the words. Add your signature under “Yours faithfully” and download it. No forms to fill in.
+          </p>
+          <span className="mt-2 text-sm text-brand-300 group-hover:text-fg">Write or sign a letter →</span>
         </Link>
       </div>
     </div>

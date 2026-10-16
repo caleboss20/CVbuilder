@@ -14,8 +14,9 @@ const MAX_PDF_PAGES = 8;
 /** Thrown for problems the student can fix, with a message safe to show them. */
 export class CvFileError extends Error {}
 
-export async function readCvFile(file: File): Promise<string> {
-  if (file.size > MAX_BYTES) throw new CvFileError("That file is larger than 8 MB. Try a smaller copy of your CV.");
+/** `subject` is what the file is called in messages: "CV" for the CV importer, "letter" for the letter editor. */
+export async function readCvFile(file: File, subject = "CV"): Promise<string> {
+  if (file.size > MAX_BYTES) throw new CvFileError(`That file is larger than 8 MB. Try a smaller copy of your ${subject}.`);
 
   const name = file.name.toLowerCase();
   if (name.endsWith(".pdf")) return readPdf(file);
@@ -24,7 +25,7 @@ export async function readCvFile(file: File): Promise<string> {
   if (name.endsWith(".doc")) {
     throw new CvFileError("Old .doc files can't be read. Open it in Word, choose Save As, and pick .docx or PDF.");
   }
-  throw new CvFileError("Upload a PDF or Word (.docx) file, or paste your CV text instead.");
+  throw new CvFileError(`Upload a PDF or Word (.docx) file, or paste your ${subject} text instead.`);
 }
 
 async function readDocx(file: File): Promise<string> {

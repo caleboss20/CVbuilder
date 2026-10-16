@@ -22,7 +22,7 @@ export type ClosingSpot = {
 export type PreviewPage = { src: string; width: number; height: number; closing?: ClosingSpot };
 
 /** The words letters end with, just above the signature. */
-const CLOSING = /^(yours\s+(faithfully|sincerely|truly|respectfully)|sincerely|respectfully|regards|kind regards|best regards|warm regards|with thanks)\b/i;
+export const CLOSING = /^(yours\s+(faithfully|sincerely|truly|respectfully)|sincerely|respectfully|regards|kind regards|best regards|warm regards|with thanks)\b/i;
 
 const PREVIEW_WIDTH = 900;
 const MAX_PAGES = 20;
@@ -154,5 +154,139 @@ export async function stampSignature(
     width,
     height,
   });
+  return doc.save();
+}
+
+/* ------------------------------------------------------------------------------------------
+ * Writing or editing a letter's text, then turning it into a signed PDF
+ * ------------------------------------------------------------------------------------------ */
+
+/**
+ * Tidies text read from a PDF or Word file. A PDF gives one line per printed line, so lines that
+ * were only wrapped are joined back into paragraphs, and short lines (an address, "Dear Sir,")
+ * are kept as they are. A blank line is added after each rebuilt paragraph.
+ */
+export function reflowLetterText(raw: string): string {
+  const lines = raw.replace(/\r\n?/g, "\n").split("\n").map((l) => l.trim());
+  const out: string[] = [];
+  let buffer = "";
+  let parts = 0;
+
+  const flush = () => {
+    if (!buffer) return;
+    out.push(buffer);
+    // A paragraph that was rebuilt from several lines gets a blank line after it
+    if (parts > 1) out.push("");
+    buffer = "";
+    parts = 0;
+  };
+
+  for (const line of lines) {
+    if (!line) {
+      flush();
+      if (out.at(-1) !== "") out.push("");
+      continue;
+    }
+    buffer = buffer ? `${buffer} ${line}` : line;
+    parts += 1;
+    // A short line, or one that ends a sentence, ends the paragraph
+    if (line.length < 60 || /[.!?:;]$/.test(line)) flush();
+  }
+  flush();
+  return out.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+/**
+ * The standard PDF fonts can only print Western characters, so anything else becomes a "?".
+ * The Ghana cedi sign is common in letters, so it is written as "GHS" instead of disappearing.
+ */
+function printable(text: string): string {
+  return text
+    .replace(/\r/g, "")
+    .replace(/\t/g, "    ")
+    .replace(/GH₵/g, "GHS")
+    .replace(/₵/g, "GHS ")
+    .replace(/[^\n\u0020-\u007E\u00A0-\u00FF\u2018\u2019\u201C\u201D\u2013\u2014\u2022\u2026\u20AC]/g, "?");
+}
+
+/**
+ * Lays out a letter as a clean A4 PDF with real, selectable text. The signature goes straight under
+ * the closing line ("Yours faithfully,"), in a fixed-size space so the name below is never pushed far
+ * away. With no closing line found, it goes at the end. `align` puts it at the left or right margin.
+ */
+export async function buildLetterPdf(text: string, signaturePng: string, align: "left" | "right"): Promise<Uint8Array> {
+  const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+
+  const PAGE_W = 595.28;
+  const PAGE_H = 841.89;
+  const MARGIN = 64;
+  const SIZE = 11.5;
+  const LEADING = 16.5;
+  const textWidth = PAGE_W - MARGIN * 2;
+  const ink = rgb(0.07, 0.09, 0.15);
+
+  let page = doc.addPage([PAGE_W, PAGE_H]);
+  let y = PAGE_H - MARGIN;
+  const nextPage = () => {
+    page = doc.addPage([PAGE_W, PAGE_H]);
+    y = PAGE_H - MARGIN;
+  };
+
+  // The signature is fitted inside one fixed frame, whatever size it was made at
+  const png = signaturePng ? await doc.embedPng(dataUrlToBytes(signaturePng)) : null;
+  const FRAME_W = 150;
+  const FRAME_H = 50;
+  const scale = png ? Math.min(FRAME_W / png.width, FRAME_H / png.height) : 0;
+  const sigW = png ? png.width * scale : 0;
+  const sigH = png ? png.height * scale : 0;
+
+  /** Splits one paragraph into lines that fit the page width. */
+  const wrap = (paragraph: string): string[] => {
+    const words = paragraph.split(" ");
+    const lines: string[] = [];
+    let line = "";
+    for (const word of words) {
+      const test = line ? `${line} ${word}` : word;
+      if (line && font.widthOfTextAtSize(test, SIZE) > textWidth) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    }
+    lines.push(line);
+    return lines;
+  };
+
+  const placeSignature = () => {
+    if (!png) return;
+    if (y - sigH - 6 < MARGIN) nextPage();
+    page.drawImage(png, { x: align === "right" ? PAGE_W - MARGIN - sigW : MARGIN, y: y - sigH - 2, width: sigW, height: sigH });
+    y -= sigH + 8;
+  };
+
+  let signed = false;
+  for (const paragraph of printable(text).split("\n")) {
+    if (!paragraph.trim()) {
+      y -= LEADING * 0.7;
+      continue;
+    }
+    for (const line of wrap(paragraph)) {
+      if (y - SIZE < MARGIN) nextPage();
+      page.drawText(line, { x: MARGIN, y: y - SIZE, size: SIZE, font, color: ink });
+      y -= LEADING;
+    }
+    if (!signed && CLOSING.test(paragraph.trim())) {
+      placeSignature();
+      signed = true;
+    }
+  }
+  // No closing line to sign under: put the signature at the end instead
+  if (!signed) {
+    y -= 10;
+    placeSignature();
+  }
   return doc.save();
 }
