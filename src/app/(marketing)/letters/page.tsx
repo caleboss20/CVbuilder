@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/button";
-import { letterGuides, writerHref } from "@/lib/letter-guides";
+import { letterGuides } from "@/lib/letter-guides";
 
 export const metadata: Metadata = {
   title: "Free Letter Writer: Scholarship, University, Cover and Reference Letters",
@@ -41,9 +41,6 @@ export default function LettersPage() {
                 <h2 className="text-lg font-medium text-fg">{g.short}</h2>
                 <p className="mt-1.5 flex-1 text-sm leading-relaxed text-fg/60">{g.blurb}</p>
                 <span className="mt-4 text-sm text-brand-300 group-hover:text-fg">Read the guide →</span>
-              </Link>
-              <Link href={writerHref(g.kind)} className="mt-2 inline-block px-1 py-1 text-sm text-fg/55 hover:text-fg">
-                Write it now
               </Link>
             </li>
           ))}
