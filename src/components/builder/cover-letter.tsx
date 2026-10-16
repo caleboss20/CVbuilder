@@ -141,7 +141,7 @@ export function CoverLetterBuilder() {
                 disabled={!body.trim()}
                 className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)] hover:bg-brand-500 disabled:opacity-40"
               >
-                <span className="hidden sm:inline">Download </span>PDF
+                Download PDF
               </button>
             </div>
           </div>
@@ -342,6 +342,16 @@ export function CoverLetterBuilder() {
                     className="w-full resize-y rounded-lg border border-fg/12 bg-fg/[0.03] px-3.5 py-3 text-[15px] leading-relaxed text-fg focus:border-brand-400/70 focus:outline-none"
                   />
                   <p className="mt-1.5 text-xs text-fg/45">Read it out loud once. Make sure every sentence is true and sounds like you.</p>
+
+                  {/* Right where they finish editing, so nobody has to hunt for the download */}
+                  <button
+                    type="button"
+                    onClick={download}
+                    className="mt-5 flex w-full items-center justify-center rounded-md bg-brand-600 py-3 text-[15px] font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_22px_rgb(124_128_255/0.5)] hover:bg-brand-500"
+                  >
+                    Download letter as PDF
+                  </button>
+                  <p className="mt-2 text-center text-xs text-fg/45">Your signature, if you added one, is included.</p>
                 </div>
               )}
             </div>

@@ -6,8 +6,23 @@
 /** Where the signature sits on a page, as fractions (0 to 1) of the page, measured from the top left. */
 export type Placement = { x: number; y: number; width: number };
 
+/** Where a closing such as "Yours faithfully," sits on a page, as fractions of the page. */
+export type ClosingSpot = {
+  /** Left edge and baseline of the closing line. */
+  x: number;
+  y: number;
+  /** Width of the closing text, and its font height. */
+  w: number;
+  size: number;
+  /** Baseline of the next line below it (usually the typed name), if there is one. */
+  below?: number;
+};
+
 /** One page of the letter, ready to show on screen. */
-export type PreviewPage = { src: string; width: number; height: number };
+export type PreviewPage = { src: string; width: number; height: number; closing?: ClosingSpot };
+
+/** The words letters end with, just above the signature. */
+const CLOSING = /^(yours\s+(faithfully|sincerely|truly|respectfully)|sincerely|respectfully|regards|kind regards|best regards|warm regards|with thanks)\b/i;
 
 const PREVIEW_WIDTH = 900;
 const MAX_PAGES = 20;
@@ -88,7 +103,28 @@ export async function renderPages(bytes: Uint8Array): Promise<PreviewPage[]> {
     canvas.width = Math.round(viewport.width);
     canvas.height = Math.round(viewport.height);
     await page.render({ canvas, viewport, background: "#ffffff" }).promise;
-    pages.push({ src: canvas.toDataURL("image/jpeg", 0.85), width: canvas.width, height: canvas.height });
+
+    // Find the closing line, so the signature can start right where it belongs, on whichever
+    // side of the page the letter puts it. Photos and scans have no text, so they skip this.
+    let closing: ClosingSpot | undefined;
+    const text = await page.getTextContent();
+    // Every line of text, as a position on the page (fractions measured from the top left)
+    const lines = text.items.flatMap((item) => {
+      if (!("str" in item) || !item.str.trim()) return [];
+      const [vx, vy] = viewport.convertToViewportPoint(item.transform[4], item.transform[5]);
+      return [{ str: item.str.trim(), x: vx / viewport.width, y: vy / viewport.height, w: item.width / base.width, size: Math.hypot(item.transform[2], item.transform[3]) / base.height }];
+    });
+    for (const line of lines) {
+      // Keep the lowest match, since a letter can say "Regards" in the body too
+      if (CLOSING.test(line.str) && (!closing || line.y > closing.y)) closing = { x: line.x, y: line.y, w: line.w, size: line.size };
+    }
+    // The line right under it, lined up with it, is normally the typed name
+    if (closing) {
+      const here = closing;
+      const next = lines.filter((l) => l.y > here.y + here.size * 0.5 && Math.abs(l.x - here.x) < 0.15).sort((a, b) => a.y - b.y)[0];
+      closing = { ...here, below: next?.y };
+    }
+    pages.push({ src: canvas.toDataURL("image/jpeg", 0.85), width: canvas.width, height: canvas.height, closing });
   }
   return pages;
 }

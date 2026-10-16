@@ -5,12 +5,35 @@ import { SIGNATURE_KEY, SignaturePad } from "@/components/builder/signature-pad"
 import { renderPages, stampSignature, toPdfBytes, type Placement, type PreviewPage } from "@/lib/sign-pdf";
 import { trackEvent } from "@/lib/track";
 
-/** Where the signature starts: lower left, where most letters are signed. */
-const START: Placement = { x: 0.1, y: 0.78, width: 0.25 };
+const DEFAULT_WIDTH = 0.22;
 const MIN_WIDTH = 0.1;
 const MAX_WIDTH = 0.6;
+/** Letters usually keep a margin of about this much on each side. */
+const MARGIN = 0.08;
 
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
+
+/**
+ * Where the signature starts on a page. If we found "Yours faithfully," it goes just under it, lined
+ * up with it, so it follows letters that sign on the left or on the right. Otherwise it starts in
+ * the lower left, where most letters are signed.
+ */
+function startFor(page: PreviewPage | undefined, width: number, aspect: number): Placement {
+  const c = page?.closing;
+  if (!page || !c) return { x: MARGIN, y: 0.78, width };
+  const height = (aspect * width * page.width) / page.height;
+  const gap = c.below === undefined ? Infinity : c.below - c.size - c.y; // free space between the two lines
+
+  // Room between the closing line and the name: sit in the gap, lined up with them
+  if (gap >= height) return { x: clamp(c.x, 0, 1 - width), y: clamp(c.y + c.size * 0.2, 0, 0.95), width };
+
+  // Tight layout, with the name right under the closing: put the signature beside the two lines,
+  // on the open side (to their left when they sit on the right of the page, otherwise to their right)
+  const middle = c.below === undefined ? c.y : (c.y + c.below) / 2;
+  const onRight = c.x > 0.5;
+  const x = onRight ? c.x - width - 0.03 : c.x + Math.max(c.w, 0.2) + 0.03;
+  return { x: clamp(x, 0, 1 - width), y: clamp(middle - height / 2 - c.size * 0.3, 0, 0.95), width };
+}
 
 /**
  * For students who already have a letter and only need to sign it. They add their signature,
@@ -23,7 +46,9 @@ export function SignLetter() {
   const [file, setFile] = useState<{ name: string; bytes: Uint8Array } | null>(null);
   const [pages, setPages] = useState<PreviewPage[]>([]);
   const [pageIndex, setPageIndex] = useState(0);
-  const [placement, setPlacement] = useState<Placement>(START);
+  const [placement, setPlacement] = useState<Placement>({ x: MARGIN, y: 0.78, width: DEFAULT_WIDTH });
+  // Whether we found the closing line and placed the signature under it ourselves
+  const [found, setFound] = useState(false);
   const [busy, setBusy] = useState<"" | "reading" | "saving">("");
   const [error, setError] = useState("");
   const pageRef = useRef<HTMLDivElement>(null);
@@ -55,9 +80,12 @@ export function SignLetter() {
       if (!rendered.length) throw new Error("That file has no pages.");
       setFile({ name: chosen.name.replace(/\.[^.]+$/, ""), bytes });
       setPages(rendered);
-      // Letters are signed on the last page
-      setPageIndex(rendered.length - 1);
-      setPlacement(START);
+      // Sign on the page that has the closing line ("Yours faithfully"), or else the last page
+      const closingPage = rendered.findLastIndex((p) => p.closing);
+      const start = closingPage >= 0 ? closingPage : rendered.length - 1;
+      setPageIndex(start);
+      setPlacement(startFor(rendered[start], placement.width, aspect));
+      setFound(closingPage >= 0);
     } catch (e) {
       setError(e instanceof Error ? e.message : "We could not open that file. Is it a PDF or a clear photo?");
     } finally {
@@ -171,7 +199,11 @@ export function SignLetter() {
             <span className={step}>3</span> Place your signature
           </h2>
           <p className="mt-2 text-sm text-fg/60">
-            {signature ? "Drag the signature to where it belongs, then set its size." : "Add your signature in step 1, then drag it into place here."}
+            {!signature
+              ? "Add your signature in step 1, then drag it into place here."
+              : found
+                ? "We placed it next to your closing line. Drag it if it needs to move, or use Left, Centre and Right."
+                : "Drag the signature to where it belongs, then set its size."}
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm">
@@ -200,7 +232,30 @@ export function SignLetter() {
                 </button>
               </div>
             )}
-            <button type="button" onClick={() => setPlacement(START)} className="rounded-md px-3 py-1.5 text-fg/70 ring-1 ring-fg/15 hover:text-fg">
+            {/* Quick sides, for letters that sign on the left, in the middle or on the right */}
+            <div role="group" aria-label="Move the signature to a side" className="flex items-center gap-2 text-fg/70">
+              {(["Left", "Centre", "Right"] as const).map((label) => (
+                <button
+                  key={label}
+                  type="button"
+                  disabled={!signature}
+                  onClick={() =>
+                    setPlacement((p) => ({
+                      ...p,
+                      x: label === "Left" ? MARGIN : label === "Right" ? 1 - p.width - MARGIN : (1 - p.width) / 2,
+                    }))
+                  }
+                  className="rounded-md px-3 py-1.5 ring-1 ring-fg/15 hover:text-fg disabled:opacity-35"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setPlacement((p) => startFor(page, p.width, aspect))}
+              className="rounded-md px-3 py-1.5 text-fg/70 ring-1 ring-fg/15 hover:text-fg"
+            >
               Reset position
             </button>
           </div>

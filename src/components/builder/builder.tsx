@@ -393,7 +393,7 @@ export function Builder() {
               title="Editable Word file, for employers who ask for .docx"
               className="hidden rounded-md px-3 py-2 text-sm font-medium text-fg ring-1 ring-fg/15 hover:bg-fg/5 sm:block"
             >
-              Word
+              Download Word
             </button>
             <button
               type="button"
@@ -610,16 +610,16 @@ export function Builder() {
         <button
           type="button"
           onClick={downloadWord}
-          className="shrink-0 rounded-md px-4 py-3 text-sm font-medium text-fg ring-1 ring-fg/15"
+          className="flex-1 rounded-md py-3 text-sm font-medium text-fg ring-1 ring-fg/15"
         >
-          Word
+          Download Word
         </button>
         <button
           type="button"
           onClick={download}
           className="flex-1 rounded-md bg-brand-600 py-3 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)]"
         >
-          Download PDF · {strength.score}% strong
+          Download PDF
         </button>
       </div>
 
