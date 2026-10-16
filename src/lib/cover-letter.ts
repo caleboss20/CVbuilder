@@ -32,7 +32,15 @@ export type LetterInput = {
   helpWith: string[];
   /** The documents they are attaching, listed under the signature as "Enclosures:". */
   enclosures: string[];
+  /** The writer's postal address, one line per row. Falls back to the CV's location. */
+  senderAddress: string;
+  /** The recipient's address under their name and organisation, one line per row. */
+  recipientAddress: string;
+  /** "formal": the traditional layout used in Ghana. "cv": a letterhead that matches the CV. */
+  style: LetterStyle;
 };
+
+export type LetterStyle = "formal" | "cv";
 
 /** What each field means for a given kind of letter, so the form asks the right question. */
 type FieldText = { label: string; placeholder: string };
@@ -66,7 +74,7 @@ export const letterKinds: LetterKindConfig[] = [
     changes: "Presents you as ready to contribute from day one, and asks for a chance to discuss the role.",
     company: { label: "Company or organisation", placeholder: "GCB Bank" },
     role: { label: "Role", placeholder: "Customer Service Officer" },
-    manager: { label: "Hiring manager (optional)", placeholder: "Mrs. Akosua Mensah", hint: "Leave empty to use “Dear Hiring Manager”." },
+    manager: { label: "Hiring manager (optional)", placeholder: "Mrs. Akosua Mensah", hint: "Leave empty to use “Dear Sir/Madam”." },
     why: { label: "Why this job? (optional)", placeholder: "" },
     recipient: "Hiring Manager",
     subject: (r) => `APPLICATION FOR ${r || "THE ADVERTISED ROLE"}`,
@@ -77,7 +85,7 @@ export const letterKinds: LetterKindConfig[] = [
     changes: "Says you are eager to learn while contributing, and uses “internship” in the first line.",
     company: { label: "Company or organisation", placeholder: "GCB Bank" },
     role: { label: "Internship", placeholder: "Customer Service Intern" },
-    manager: { label: "Hiring manager (optional)", placeholder: "Mrs. Akosua Mensah", hint: "Leave empty to use “Dear Hiring Manager”." },
+    manager: { label: "Hiring manager (optional)", placeholder: "Mrs. Akosua Mensah", hint: "Leave empty to use “Dear Sir/Madam”." },
     why: { label: "Why this internship? (optional)", placeholder: "" },
     recipient: "Hiring Manager",
     subject: (r) => `APPLICATION FOR ${r || "THE ADVERTISED INTERNSHIP"}`,
@@ -88,7 +96,7 @@ export const letterKinds: LetterKindConfig[] = [
     changes: "Asks for a national service placement and says you are ready to serve and learn how the organisation works.",
     company: { label: "Organisation", placeholder: "Ghana Health Service" },
     role: { label: "Placement or unit (optional)", placeholder: "Finance Unit" },
-    manager: { label: "Contact person (optional)", placeholder: "Mr. Kojo Mensah", hint: "Leave empty to use “Dear Hiring Manager”." },
+    manager: { label: "Contact person (optional)", placeholder: "Mr. Kojo Mensah", hint: "Leave empty to use “Dear Sir/Madam”." },
     why: { label: "Why this organisation? (optional)", placeholder: "" },
     recipient: "Hiring Manager",
     subject: (r) => `APPLICATION FOR NATIONAL SERVICE${r ? `: ${r}` : ""}`,
@@ -99,7 +107,7 @@ export const letterKinds: LetterKindConfig[] = [
     changes: "Leads with your studies and results, says what the support would let you do, and thanks the committee.",
     company: { label: "Scholarship provider", placeholder: "Ghana Scholarships Secretariat" },
     role: { label: "Scholarship name", placeholder: "Mastercard Foundation Scholarship" },
-    manager: { label: "Committee or contact (optional)", placeholder: "The Selection Committee", hint: "Leave empty to use “Dear Scholarship Committee”." },
+    manager: { label: "Committee or contact (optional)", placeholder: "The Selection Committee", hint: "Leave empty to use “Dear Sir/Madam”." },
     why: { label: "What will you do with this scholarship? (optional)", placeholder: "" },
     // Names only, no eligibility or deadlines: those change, so students check the provider's own page
     quickPicks: [
@@ -163,7 +171,7 @@ export const letterKinds: LetterKindConfig[] = [
     changes: "Explains why you want the programme, what you have already done in the field, and what you hope to achieve.",
     company: { label: "University or institution", placeholder: "University of Ghana" },
     role: { label: "Programme", placeholder: "MPhil Economics" },
-    manager: { label: "Admissions contact (optional)", placeholder: "The Admissions Officer", hint: "Leave empty to use “Dear Admissions Officer”." },
+    manager: { label: "Admissions contact (optional)", placeholder: "The Admissions Officer", hint: "Leave empty to use “Dear Sir/Madam”." },
     why: { label: "Why this programme? (optional)", placeholder: "" },
     choices: [
       {
@@ -182,7 +190,7 @@ export const letterKinds: LetterKindConfig[] = [
     changes: "A polite request to a lecturer or supervisor to be your referee, with your CV attached and an easy way to say no.",
     company: { label: "Their institution (optional)", placeholder: "KNUST" },
     role: { label: "What you are applying for", placeholder: "a graduate trainee role at Ecobank" },
-    manager: { label: "Their name and title", placeholder: "Dr. Kwame Owusu", hint: "Leave empty to use “Dear Sir or Madam”." },
+    manager: { label: "Their name and title", placeholder: "Dr. Kwame Owusu", hint: "Leave empty to use “Dear Sir/Madam”." },
     why: { label: "How do they know you? (optional)", placeholder: "" },
     recipient: "Sir or Madam",
     subject: () => "REQUEST FOR A REFERENCE",
@@ -193,7 +201,7 @@ export const letterKinds: LetterKindConfig[] = [
     changes: "A short note that thanks the interviewer, mentions something you enjoyed discussing, and repeats your interest.",
     company: { label: "Company or organisation", placeholder: "GCB Bank" },
     role: { label: "Role you interviewed for", placeholder: "Customer Service Officer" },
-    manager: { label: "Interviewer (optional)", placeholder: "Mrs. Akosua Mensah", hint: "Leave empty to use “Dear Hiring Manager”." },
+    manager: { label: "Interviewer (optional)", placeholder: "Mrs. Akosua Mensah", hint: "Leave empty to use “Dear Sir/Madam”." },
     why: { label: "Something you enjoyed discussing (optional)", placeholder: "" },
     recipient: "Hiring Manager",
     subject: () => "THANK YOU FOR THE INTERVIEW",
@@ -204,7 +212,7 @@ export const letterKinds: LetterKindConfig[] = [
     changes: "A short, polite message that checks on your application and says you are still interested.",
     company: { label: "Company or organisation", placeholder: "GCB Bank" },
     role: { label: "Role you applied for", placeholder: "Customer Service Officer" },
-    manager: { label: "Contact person (optional)", placeholder: "Mrs. Akosua Mensah", hint: "Leave empty to use “Dear Hiring Manager”." },
+    manager: { label: "Contact person (optional)", placeholder: "Mrs. Akosua Mensah", hint: "Leave empty to use “Dear Sir/Madam”." },
     why: { label: "When did you apply? (optional)", placeholder: "" },
     recipient: "Hiring Manager",
     subject: (r) => `FOLLOW-UP ON MY APPLICATION${r ? ` FOR ${r}` : ""}`,

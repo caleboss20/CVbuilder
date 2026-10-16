@@ -8,7 +8,7 @@ import { CvPageFrame } from "@/components/cv/cv-page-frame";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
-import { Field } from "./fields";
+import { Field, TextArea } from "./fields";
 import { VoiceInput } from "./voice-input";
 
 const LETTER_KEY = "cv11-letter-v1";
@@ -39,7 +39,7 @@ type Saved = LetterInput & { body: string };
 
 export function CoverLetterBuilder() {
   const [cv, setCv] = useState<BuilderCv | null>(null);
-  const [input, setInput] = useState<LetterInput>({ kind: "job", company: "", role: "", manager: "", why: "", results: "", need: "", contribution: "", helpWith: [], enclosures: [] });
+  const [input, setInput] = useState<LetterInput>({ kind: "job", company: "", role: "", manager: "", why: "", results: "", need: "", contribution: "", helpWith: [], enclosures: [], senderAddress: "", recipientAddress: "", style: "formal" });
   const [body, setBody] = useState("");
   const [date, setDate] = useState("");
 
@@ -68,6 +68,9 @@ export function CoverLetterBuilder() {
         contribution: letter.contribution ?? "",
         helpWith: letter.helpWith ?? [],
         enclosures: letter.enclosures ?? [],
+        senderAddress: letter.senderAddress ?? "",
+        recipientAddress: letter.recipientAddress ?? "",
+        style: letter.style ?? "formal",
       });
       setBody(letter.body);
     }
@@ -143,6 +146,32 @@ export function CoverLetterBuilder() {
                 )}
               </div>
 
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+                <span className="text-fg/55">Layout</span>
+                <div role="radiogroup" aria-label="Letter layout" className="flex gap-1 rounded-lg bg-fg/5 p-1">
+                  {(
+                    [
+                      ["formal", "Formal letter"],
+                      ["cv", "Match my CV"],
+                    ] as const
+                  ).map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      role="radio"
+                      aria-checked={input.style === id}
+                      onClick={() => set({ style: id })}
+                      className={`rounded-md px-3 py-1.5 transition-colors ${
+                        input.style === id ? "bg-fg/10 text-fg ring-1 ring-fg/15" : "text-fg/55 hover:text-fg"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <span className="text-xs text-fg/45">Formal is the standard for scholarships and applications.</span>
+              </div>
+
               <div role="radiogroup" aria-label="Which letter do you need?" className="flex flex-wrap gap-2">
                 {letterKinds.map((k) => (
                   <button
@@ -210,6 +239,25 @@ export function CoverLetterBuilder() {
                   hint={x.hint}
                 />
               ))}
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <TextArea
+                  label="Your address (optional)"
+                  rows={2}
+                  value={input.senderAddress}
+                  onChange={(senderAddress) => set({ senderAddress })}
+                  placeholder={"P. O. Box KS 123\nKumasi"}
+                  hint="Shown at the top right. Empty uses your CV's location."
+                />
+                <TextArea
+                  label="Their address (optional)"
+                  rows={2}
+                  value={input.recipientAddress}
+                  onChange={(recipientAddress) => set({ recipientAddress })}
+                  placeholder={"P. O. Box 1234\nAccra"}
+                  hint="Shown under their name and organisation."
+                />
+              </div>
 
               {cfg.choices?.map((c) => (
                 <fieldset key={c.key}>
@@ -303,13 +351,93 @@ export function CoverLetterBuilder() {
   );
 }
 
-/** The letter itself, styled with the CV's accent colour as a letterhead. */
+/** Splits a typed address into clean lines. */
+const addressLines = (text: string) =>
+  text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+/**
+ * The letter itself, in one of two layouts. The default is the traditional formal letter used in
+ * Ghana: the writer's address and the date at the top right, the recipient's name, organisation and
+ * address on the left, then "Dear Sir/Madam", the heading in underlined capitals, the body, "Yours
+ * faithfully", the name and any enclosures. "Match my CV" keeps the coloured letterhead instead.
+ */
 function LetterPage({ cv, input, body, date }: { cv: BuilderCv; input: LetterInput; body: string; date: string }) {
   const cfg = kindConfig(input.kind);
   const accent = cv.accent ?? "#1e3a5f";
   const contact = useMemo(() => [cv.location, cv.phone, cv.email, ...cv.links].map((s) => s.trim()).filter(Boolean), [cv]);
   const paragraphs = body.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
   const name = cv.name.trim() || "Your Name";
+  const formal = input.style === "formal";
+
+  // A named person gets their name in the greeting. Otherwise Ghana's convention is "Sir/Madam".
+  const named = input.manager.trim();
+  const salutation = named || "Sir/Madam";
+  const closing = named ? "Yours sincerely," : "Yours faithfully,";
+
+  const senderLines = [...(addressLines(input.senderAddress).length ? addressLines(input.senderAddress) : [cv.location.trim()]), cv.phone.trim(), cv.email.trim()].filter(Boolean);
+  const recipientLines = [named || `The ${cfg.recipient}`, input.company.trim() || cfg.company.label.replace(/ \(optional\)/, ""), ...addressLines(input.recipientAddress)];
+  const subject = cfg.subject(input.role.trim().toUpperCase());
+
+  const bodyBlock = paragraphs.length ? (
+    <div className="mt-4 space-y-4 text-justify">
+      {paragraphs.map((p, i) => (
+        <p key={i}>{p}</p>
+      ))}
+    </div>
+  ) : (
+    <div className="mt-5 space-y-2.5" aria-hidden="true">
+      {[100, 96, 88, 100, 72, 0, 100, 92, 84].map((w, i) =>
+        w ? <span key={i} className="block h-2.5 rounded bg-slate-200" style={{ width: `${w}%` }} /> : <span key={i} className="block h-2" />,
+      )}
+    </div>
+  );
+
+  const enclosures =
+    cfg.choices?.some((c) => c.key === "enclosures") && input.enclosures.length > 0 ? (
+      <div className="mt-8 text-[13px]">
+        <p className="font-semibold text-slate-900">Enclosures:</p>
+        <ol className="mt-1 list-decimal space-y-0.5 pl-5">
+          {input.enclosures.map((e) => (
+            <li key={e}>{e}</li>
+          ))}
+        </ol>
+      </div>
+    ) : null;
+
+  if (formal) {
+    return (
+      <div className="flex-1 bg-white px-16 py-14 text-[14px] leading-[1.7] text-slate-800">
+        {/* The writer's address, then the date, at the top right */}
+        <div className="ml-auto w-fit text-right">
+          {senderLines.map((l) => (
+            <p key={l}>{l}</p>
+          ))}
+          <p className="mt-2">{date}</p>
+        </div>
+
+        {/* The recipient, on the left */}
+        <div className="mt-8">
+          {recipientLines.map((l, i) => (
+            <p key={`${i}-${l}`} className={i === 0 ? "font-semibold text-slate-900" : undefined}>
+              {l}
+            </p>
+          ))}
+        </div>
+
+        <p className="mt-6">Dear {salutation},</p>
+        <p className="mt-5 text-center font-bold uppercase text-slate-900 underline underline-offset-4">{subject}</p>
+
+        {bodyBlock}
+
+        <p className="mt-8">{closing}</p>
+        <p className="mt-12 font-bold uppercase text-slate-900">{name}</p>
+        {enclosures}
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 bg-white px-16 py-14 text-[14px] leading-[1.75] text-slate-700">
@@ -323,43 +451,21 @@ function LetterPage({ cv, input, body, date }: { cv: BuilderCv; input: LetterInp
 
       <div className="mt-8 space-y-1 text-[13.5px]">
         <p>{date}</p>
-        <p className="pt-3 font-semibold text-slate-900">{input.manager.trim() || `The ${cfg.recipient}`}</p>
-        <p>{input.company.trim() || cfg.company.label.replace(/ \(optional\)/, "")}</p>
+        {recipientLines.map((l, i) => (
+          <p key={`${i}-${l}`} className={i === 0 ? "pt-3 font-semibold text-slate-900" : undefined}>
+            {l}
+          </p>
+        ))}
       </div>
 
-      <p className="mt-6 font-semibold text-slate-900">
-        RE: {cfg.subject(input.role.trim().toUpperCase())}
-      </p>
-      <p className="mt-5">Dear {input.manager.trim() || cfg.recipient},</p>
+      <p className="mt-6 font-semibold text-slate-900">RE: {subject}</p>
+      <p className="mt-5">Dear {salutation},</p>
 
-      {paragraphs.length ? (
-        <div className="mt-4 space-y-4 text-justify">
-          {paragraphs.map((p, i) => (
-            <p key={i}>{p}</p>
-          ))}
-        </div>
-      ) : (
-        <div className="mt-5 space-y-2.5" aria-hidden="true">
-          {[100, 96, 88, 100, 72, 0, 100, 92, 84].map((w, i) =>
-            w ? <span key={i} className="block h-2.5 rounded bg-slate-200" style={{ width: `${w}%` }} /> : <span key={i} className="block h-2" />,
-          )}
-        </div>
-      )}
+      {bodyBlock}
 
-      <p className="mt-8">{input.manager.trim() ? "Yours sincerely," : "Yours faithfully,"}</p>
+      <p className="mt-8">{closing}</p>
       <p className="mt-10 font-semibold text-slate-900">{name}</p>
-
-      {/* Real letters list what is attached, under the signature */}
-      {cfg.choices?.some((c) => c.key === "enclosures") && input.enclosures.length > 0 && (
-        <div className="mt-8 text-[13px]">
-          <p className="font-semibold text-slate-900">Enclosures:</p>
-          <ol className="mt-1 list-decimal space-y-0.5 pl-5">
-            {input.enclosures.map((e) => (
-              <li key={e}>{e}</li>
-            ))}
-          </ol>
-        </div>
-      )}
+      {enclosures}
     </div>
   );
 }
