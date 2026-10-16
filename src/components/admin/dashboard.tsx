@@ -79,7 +79,7 @@ export function AdminDashboard() {
         <h1 className="text-base font-medium">Admin log in</h1>
         <p className="mb-5 mt-1.5 text-sm text-afg/55">Use the email that is on the admin list.</p>
         {/* Stays on this page after logging in, instead of going to the student account page */}
-        <AuthForm mode="login" after="/admin" />
+        <AuthForm mode="login" after="/admin" allowSignup={false} />
       </div>
     );
   else if (error === "not-signed-in") body = <Notice title="We could not confirm your login">You are logged in as {user.email}, but the server did not accept the session. Press Refresh, or log out and log in again.</Notice>;

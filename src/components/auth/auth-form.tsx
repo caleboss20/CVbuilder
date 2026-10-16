@@ -24,7 +24,17 @@ function friendly(message: string): string {
  * One form for both sign up and log in. Email and password only for now. Students who are
  * already signed in are sent straight to their account.
  */
-export function AuthForm({ mode, after = "/account" }: { mode: "login" | "signup"; after?: string }) {
+export function AuthForm({
+  mode,
+  after = "/account",
+  allowSignup = true,
+}: {
+  mode: "login" | "signup";
+  /** Where to go once signed in. */
+  after?: string;
+  /** False on private pages, such as the admin log-in, so they do not invite anyone to create an account. */
+  allowSignup?: boolean;
+}) {
   const router = useRouter();
   const { user, loading } = useUser();
   const [email, setEmail] = useState("");
@@ -142,12 +152,16 @@ export function AuthForm({ mode, after = "/account" }: { mode: "login" | "signup
           </p>
         ) : (
           <>
-            <p>
-              New here?{" "}
-              <Link href="/signup" className="text-brand-300 hover:text-fg">
-                Create an account
-              </Link>
-            </p>
+            {allowSignup ? (
+              <p>
+                New here?{" "}
+                <Link href="/signup" className="text-brand-300 hover:text-fg">
+                  Create an account
+                </Link>
+              </p>
+            ) : (
+              <span />
+            )}
             <button type="button" onClick={forgot} className="text-brand-300 hover:text-fg">
               Forgot password?
             </button>
