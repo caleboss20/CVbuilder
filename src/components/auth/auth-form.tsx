@@ -7,8 +7,28 @@ import { authConfigured, getSupabase } from "@/lib/supabase";
 import { PasswordInput } from "./password-input";
 import { useUser } from "./use-user";
 
-const inputClass =
-  "mt-1.5 w-full rounded-lg border border-fg/12 bg-fg/[0.03] px-3.5 py-3 text-[15px] text-fg placeholder:text-fg/35 focus:border-brand-400/70 focus:outline-none";
+/**
+ * The form's colours in two palettes: the site's own navy and purple, and a plain black and white
+ * one for the admin dashboard, so nothing on that page is blue.
+ */
+const TONES = {
+  site: {
+    input: "border-fg/12 bg-fg/[0.03] text-fg placeholder:text-fg/35 focus:border-brand-400/70",
+    label: "text-fg/80",
+    submit: "bg-brand-600 text-white ring-1 ring-brand-300/60 shadow-[0_0_22px_rgb(124_128_255/0.5)] hover:bg-brand-500 disabled:shadow-none",
+    muted: "text-fg/60",
+    link: "text-brand-300 hover:text-fg",
+    notice: "text-emerald-300",
+  },
+  neutral: {
+    input: "border-afg/15 bg-afg/[0.03] text-afg placeholder:text-afg/35 focus:border-afg/60",
+    label: "text-afg/80",
+    submit: "bg-afg text-abg hover:opacity-90",
+    muted: "text-afg/55",
+    link: "text-afg underline underline-offset-2 hover:opacity-80",
+    notice: "text-aup",
+  },
+} as const;
 
 /** Turns Supabase's technical errors into something a student can act on. */
 function friendly(message: string): string {
@@ -29,8 +49,11 @@ export function AuthForm({
   mode,
   after = "/account",
   allowSignup = true,
+  neutral = false,
 }: {
   mode: "login" | "signup";
+  /** Plain black and white colours instead of the site's, used on the admin page. */
+  neutral?: boolean;
   /** Where to go once signed in. */
   after?: string;
   /** False on private pages, such as the admin log-in, so they do not invite anyone to create an account. */
@@ -45,6 +68,8 @@ export function AuthForm({
   const [notice, setNotice] = useState("");
 
   const signup = mode === "signup";
+  const tone = neutral ? TONES.neutral : TONES.site;
+  const inputClass = `mt-1.5 w-full rounded-lg border px-3.5 py-3 text-[15px] focus:outline-none ${tone.input}`;
 
   useEffect(() => {
     if (user) router.replace(after);
@@ -104,7 +129,7 @@ export function AuthForm({
 
   return (
     <form onSubmit={submit} className="space-y-5" noValidate>
-      <label className="block text-sm font-medium text-fg/80">
+      <label className={`block text-sm font-medium ${tone.label}`}>
         Email
         <input
           type="email"
@@ -118,27 +143,27 @@ export function AuthForm({
         />
       </label>
 
-      <label className="block text-sm font-medium text-fg/80">
+      <label className={`block text-sm font-medium ${tone.label}`}>
         Password
-        <PasswordInput value={password} onChange={setPassword} autoComplete={signup ? "new-password" : "current-password"} />
+        <PasswordInput value={password} onChange={setPassword} autoComplete={signup ? "new-password" : "current-password"} neutral={neutral} />
       </label>
 
       {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
-      {notice && <p className="text-sm text-emerald-300" role="status">{notice}</p>}
+      {notice && <p className={`text-sm ${tone.notice}`} role="status">{notice}</p>}
 
       <button
         type="submit"
         disabled={busy || loading || !email.trim()}
-        className="flex h-12 w-full items-center justify-center rounded-md bg-brand-600 text-[15px] font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_22px_rgb(124_128_255/0.5)] hover:bg-brand-500 disabled:opacity-50 disabled:shadow-none"
+        className={`flex h-12 w-full items-center justify-center rounded-md text-[15px] font-medium disabled:opacity-50 ${tone.submit}`}
       >
         {busy ? "Please wait…" : signup ? "Create my account" : "Log in"}
       </button>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-fg/60">
+      <div className={`flex flex-wrap items-center justify-between gap-2 text-sm ${tone.muted}`}>
         {signup ? (
           <p>
             Already have an account?{" "}
-            <Link href="/login" className="text-brand-300 hover:text-fg">
+            <Link href="/login" className={tone.link}>
               Log in
             </Link>
           </p>
@@ -147,14 +172,14 @@ export function AuthForm({
             {allowSignup ? (
               <p>
                 New here?{" "}
-                <Link href="/signup" className="text-brand-300 hover:text-fg">
+                <Link href="/signup" className={tone.link}>
                   Create an account
                 </Link>
               </p>
             ) : (
               <span />
             )}
-            <button type="button" onClick={forgot} className="text-brand-300 hover:text-fg">
+            <button type="button" onClick={forgot} className={tone.link}>
               Forgot password?
             </button>
           </>

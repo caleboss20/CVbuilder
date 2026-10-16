@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 
-const inputClass =
-  "mt-1.5 w-full rounded-lg border border-fg/12 bg-fg/[0.03] py-3 pl-3.5 pr-12 text-[15px] text-fg placeholder:text-fg/35 focus:border-brand-400/70 focus:outline-none";
+const BASE = "mt-1.5 w-full rounded-lg border py-3 pl-3.5 pr-12 text-[15px] focus:outline-none";
+const SITE = "border-fg/12 bg-fg/[0.03] text-fg placeholder:text-fg/35 focus:border-brand-400/70";
+// Plain black and white, for the admin page
+const NEUTRAL = "border-afg/15 bg-afg/[0.03] text-afg placeholder:text-afg/35 focus:border-afg/60";
 
 /**
  * A password box with an eye button to show what was typed, so a mistyped password on a small
@@ -14,11 +16,13 @@ export function PasswordInput({
   onChange,
   autoComplete,
   placeholder = "At least 8 characters",
+  neutral = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   autoComplete: "current-password" | "new-password";
   placeholder?: string;
+  neutral?: boolean;
 }) {
   const [shown, setShown] = useState(false);
 
@@ -32,7 +36,7 @@ export function PasswordInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={inputClass}
+        className={`${BASE} ${neutral ? NEUTRAL : SITE}`}
       />
       <button
         type="button"
@@ -40,7 +44,7 @@ export function PasswordInput({
         aria-label={shown ? "Hide password" : "Show password"}
         aria-pressed={shown}
         // Sits inside the box, centred on the input itself (the label above it adds space)
-        className="absolute bottom-0 right-0 top-1.5 grid w-12 place-items-center text-fg/55 hover:text-fg"
+        className={`absolute bottom-0 right-0 top-1.5 grid w-12 place-items-center ${neutral ? "text-afg/55 hover:text-afg" : "text-fg/55 hover:text-fg"}`}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           {shown ? (

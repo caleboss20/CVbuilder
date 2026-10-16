@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { AuthForm } from "@/components/auth/auth-form";
 import { useUser } from "@/components/auth/use-user";
-import { Logo } from "@/components/ui/logo";
+import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { fetchAdminStats, type AdminError, type AdminStats, type DailyPoint } from "@/lib/admin-stats";
 import { authConfigured, getSupabase } from "@/lib/supabase";
@@ -79,7 +79,7 @@ export function AdminDashboard() {
         <h1 className="text-base font-medium">Admin log in</h1>
         <p className="mb-5 mt-1.5 text-sm text-afg/55">Use the email that is on the admin list.</p>
         {/* Stays on this page after logging in, instead of going to the student account page */}
-        <AuthForm mode="login" after="/admin" allowSignup={false} />
+        <AuthForm mode="login" after="/admin" allowSignup={false} neutral />
       </div>
     );
   else if (error === "not-signed-in") body = <Notice title="We could not confirm your login">You are logged in as {user.email}, but the server did not accept the session. Press Refresh, or log out and log in again.</Notice>;
@@ -104,7 +104,10 @@ export function AdminDashboard() {
     <div className="min-h-screen bg-abg text-afg">
       <header className="sticky top-0 z-20 border-b border-afg/10 bg-abg/90 backdrop-blur">
         <div className="mx-auto flex min-h-14 max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2 sm:px-6">
-          <Logo />
+          {/* Plain text instead of the coloured logo, to keep this page black and white */}
+          <Link href="/" className="text-base font-semibold tracking-tight">
+            CV11
+          </Link>
           <span className="text-afg/25" aria-hidden="true">
             /
           </span>
