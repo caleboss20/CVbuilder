@@ -41,12 +41,6 @@ export function Navbar() {
 
         <div className="hidden items-center gap-5 lg:flex">
           <ThemeToggle />
-          <Link
-            href="/login"
-            className="text-sm font-medium text-fg transition-colors hover:text-brand-300"
-          >
-            Log in
-          </Link>
           <ButtonLink href="/builder">Try for free</ButtonLink>
         </div>
 
@@ -100,9 +94,6 @@ export function Navbar() {
             ))}
           </ul>
           <div className="mt-3 flex gap-3 border-t border-fg/10 pt-4">
-            <ButtonLink href="/login" variant="ghost" className="flex-1">
-              Log in
-            </ButtonLink>
             <ButtonLink href="/builder" className="flex-1">
               Try for free
             </ButtonLink>

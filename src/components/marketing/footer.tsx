@@ -20,6 +20,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "CV Builder", href: "/builder" },
       { label: "CV Templates", href: "/templates" },
       { label: "CV Examples", href: "/cv-examples" },
+      { label: "CV Checker", href: "/cv-checker" },
       { label: "Cover Letter Builder", href: "/cover-letter" },
       { label: "How to Write a CV", href: "/blog/how-to-write-a-cv" },
       { label: "CV Help", href: "/blog" },
@@ -36,11 +37,9 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
     title: "Support",
     links: [
       { label: "About", href: "/about" },
-      { label: "Contact", href: "/contact" },
       { label: "FAQ", href: "/#faq" },
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms of Service", href: "/terms" },
-      { label: "Cookies", href: "/cookies" },
     ],
   },
 ];
