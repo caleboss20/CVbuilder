@@ -1,4 +1,5 @@
 import { track } from "@vercel/analytics";
+import { isOwnerDevice } from "@/lib/owner";
 
 /**
  * The few moments that tell us whether CV11 is working. Names are fixed here so the
@@ -14,6 +15,7 @@ export type TrackedEvent =
 /** Records an event. Analytics must never break the app, so any failure is ignored. */
 export function trackEvent(name: TrackedEvent, data?: Record<string, string | number>) {
   try {
+    if (isOwnerDevice()) return;
     track(name, data);
   } catch {
     /* ignore: analytics is optional */
