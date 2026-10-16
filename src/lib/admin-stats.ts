@@ -29,7 +29,7 @@ export type AdminStats = {
 export type AdminError = "not-signed-in" | "not-admin" | "not-set-up" | "failed";
 
 /** Loads the numbers. Only people on the admin list get them: the database checks that, not the page. */
-export async function fetchAdminStats(days: number): Promise<{ stats: AdminStats } | { error: AdminError }> {
+export async function fetchAdminStats(days: number): Promise<{ stats: AdminStats } | { error: AdminError; detail?: string }> {
   const supabase = getSupabase();
   if (!supabase) return { error: "not-set-up" };
 
@@ -38,11 +38,12 @@ export async function fetchAdminStats(days: number): Promise<{ stats: AdminStats
 
   const { data, error } = await supabase.rpc("admin_stats", { days });
   if (error) {
-    // 42501: the database said this account is not an admin
-    if (error.code === "42501") return { error: "not-admin" };
+    // 42501 with our own message: the database checked and this account is not on the admin list
+    if (error.code === "42501" && error.message === "not allowed") return { error: "not-admin" };
     // The function does not exist until supabase/schema.sql has been run
-    if (error.code === "PGRST202" || error.code === "42883") return { error: "not-set-up" };
-    return { error: "failed" };
+    if (error.code === "PGRST202" || error.code === "42883") return { error: "not-set-up", detail: error.message };
+    // Anything else (for example "permission denied for function"): keep the reason so it can be fixed
+    return { error: "failed", detail: `${error.code ?? "error"}: ${error.message}` };
   }
   return { stats: data as AdminStats };
 }

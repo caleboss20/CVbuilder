@@ -6,7 +6,7 @@ import { useUser } from "@/components/auth/use-user";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { fetchAdminStats, type AdminError, type AdminStats, type DailyPoint } from "@/lib/admin-stats";
-import { authConfigured } from "@/lib/supabase";
+import { authConfigured, getSupabase } from "@/lib/supabase";
 import { AreaChart, shortDate } from "./area-chart";
 
 const RANGES = [
@@ -47,6 +47,8 @@ export function AdminDashboard() {
   const [series, setSeries] = useState<(typeof SERIES)[number]["key"]>("people");
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [error, setError] = useState<AdminError | null>(null);
+  // The technical reason, shown so a failure can be fixed instead of guessed at
+  const [detail, setDetail] = useState("");
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async (period: number) => {
@@ -55,8 +57,10 @@ export function AdminDashboard() {
     if ("stats" in result) {
       setStats(result.stats);
       setError(null);
+      setDetail("");
     } else {
       setError(result.error);
+      setDetail(result.detail ?? "");
     }
     setBusy(false);
   }, []);
@@ -69,7 +73,7 @@ export function AdminDashboard() {
   let body: React.ReactNode;
   if (!authConfigured) body = <Notice title="Accounts are not switched on">Add the Supabase values first, then come back.</Notice>;
   else if (userLoading || (user && !stats && !error)) body = <Skeleton />;
-  else if (!user || error === "not-signed-in")
+  else if (!user)
     body = (
       <div className={`${cardClass} mx-auto mt-12 max-w-sm p-6`}>
         <h1 className="text-base font-medium">Admin log in</h1>
@@ -78,9 +82,22 @@ export function AdminDashboard() {
         <AuthForm mode="login" after="/admin" />
       </div>
     );
+  else if (error === "not-signed-in") body = <Notice title="We could not confirm your login">You are logged in as {user.email}, but the server did not accept the session. Press Refresh, or log out and log in again.</Notice>;
   else if (error === "not-admin") body = <Notice title="This account is not an admin">You are logged in as {user.email}. Add that email to the admin list in Supabase (see supabase/schema.sql).</Notice>;
-  else if (error === "not-set-up") body = <Notice title="The dashboard is not set up yet">Run supabase/schema.sql in the Supabase SQL Editor, then refresh this page.</Notice>;
-  else if (error === "failed" && !stats) body = <Notice title="Could not load the numbers">Check your internet and press Refresh.</Notice>;
+  else if (error === "not-set-up")
+    body = (
+      <Notice title="The dashboard is not set up yet">
+        Run supabase/schema.sql in the Supabase SQL Editor, then refresh this page.
+        {detail && <span className="mt-3 block break-words font-mono text-xs text-afg/40">{detail}</span>}
+      </Notice>
+    );
+  else if (error === "failed" && !stats)
+    body = (
+      <Notice title="Could not load the numbers">
+        Press Refresh. If it keeps happening, send this message to the developer:
+        <span className="mt-3 block break-words font-mono text-xs text-afg/50">{detail || "no details"}</span>
+      </Notice>
+    );
   else if (stats) body = <Panels stats={stats} series={series} onSeries={setSeries} />;
 
   return (
@@ -117,6 +134,17 @@ export function AdminDashboard() {
               {busy ? "Loading…" : "Refresh"}
             </button>
             <ThemeToggle neutral className="size-8" />
+            {/* Always show who is logged in, with a clear way out */}
+            {user && (
+              <button
+                type="button"
+                onClick={() => getSupabase()?.auth.signOut()}
+                title={user.email ?? undefined}
+                className="ml-auto rounded-md border border-afg/10 px-2.5 py-1.5 text-xs text-afg/70 hover:text-afg"
+              >
+                Log out
+              </button>
+            )}
           </div>
         </div>
       </header>
