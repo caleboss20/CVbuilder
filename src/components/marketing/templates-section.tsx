@@ -19,7 +19,7 @@ export function TemplatesSection() {
           />
         </div>
         <div className="mt-12">
-          <TemplateGallery layout="row" />
+          <TemplateGallery layout="row" curated />
         </div>
         <div className="mt-6 text-center">
           <Link href="/templates" className="text-sm font-medium text-brand-300 hover:text-fg">

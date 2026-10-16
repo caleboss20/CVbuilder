@@ -32,7 +32,7 @@ export const templates: TemplateInfo[] = [
   { id: "accent", name: "Accent Portrait", blurb: "Tall portrait, accent stripe and a skills footer.", tags: ["photo"], exampleSlug: "data-science" },
 
   // Plain, recruiter-style layouts. One column and no photo is the safest for applicant tracking systems.
-  { id: "ruledClassic", name: "Ruled Classic", blurb: "Centred name, heavy rules and employer-first entries. Reads like a proper CV.", tags: ["simple", "ats"], exampleSlug: "accounting" },
+  { id: "ruledClassic", name: "Ruled Classic", blurb: "Centred name, heavy rules and employer-first entries. Reads like a proper CV.", tags: ["simple", "ats"], exampleSlug: "medicine" },
   { id: "serifExecutive", name: "Serif Executive", blurb: "Serif name, a strong rule and skills grouped by type.", tags: ["simple", "ats"], exampleSlug: "business-administration" },
   { id: "serifNavy", name: "Serif Navy", blurb: "The serif layout in navy with one line for your areas of expertise.", tags: ["simple", "ats"], exampleSlug: "data-science" },
   { id: "greyBars", name: "Grey Bars", blurb: "Soft grey bars behind each heading and skills in three columns.", tags: ["simple", "ats"], exampleSlug: "banking" },
@@ -51,6 +51,29 @@ export const templates: TemplateInfo[] = [
   { id: "gridBand", name: "Grid Band", blurb: "Tinted header block with icons, ruled grid and a timeline.", tags: ["simple"], exampleSlug: "medical-laboratory-science" },
   { id: "gridSpaced", name: "Grid Spaced", blurb: "Widely spaced name and a ruled two-column grid.", tags: ["simple"], exampleSlug: "architecture" },
 ];
+
+/**
+ * The templates shown in the homepage's "Find your style" section. Photos are optional and not every
+ * employer wants one, so only a few photo designs are shown (seven), mixed in among the plain ATS-safe
+ * ones. The first card is the plain Ruled Classic design showing the Medicine CV, with no photo.
+ */
+const HOMEPAGE_FIRST = "ruledClassic";
+const HOMEPAGE_PHOTO_IDS: CvTemplateName[] = ["sage", "tealHeader", "softBars", "greyHeader", "cleanRule", "blueDiagonal", "navyPanel"];
+
+export function homepageTemplates(): TemplateInfo[] {
+  const byId = (id: CvTemplateName) => templates.find((t) => t.id === id);
+  const first = byId(HOMEPAGE_FIRST);
+  const photo = HOMEPAGE_PHOTO_IDS.flatMap((id) => byId(id) ?? []);
+  const plain = templates.filter((t) => t.tags.includes("ats") && t.id !== HOMEPAGE_FIRST && !HOMEPAGE_PHOTO_IDS.includes(t.id));
+
+  // Alternate photo and plain designs, so the first few cards already show some variety
+  const mixed: TemplateInfo[] = [];
+  for (let i = 0; i < Math.max(photo.length, plain.length); i++) {
+    if (photo[i]) mixed.push(photo[i]);
+    if (plain[i]) mixed.push(plain[i]);
+  }
+  return first ? [first, ...mixed] : mixed;
+}
 
 /** Two-column layouts, which some hiring software reads less reliably than one column. */
 const TWO_COLUMN = new Set<CvTemplateName>([

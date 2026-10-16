@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, type CSSProperties } from "react";
 import { getCvExample } from "@/lib/cv-examples";
-import { accentSwatches, templateFilters, templates, type TemplateTag } from "@/lib/templates";
+import { accentSwatches, homepageTemplates, templateFilters, templates, type TemplateTag } from "@/lib/templates";
 import { AtsExplainer } from "@/components/ui/ats-explainer";
 import { CvPageFrame } from "@/components/cv/cv-page-frame";
 import { CvTemplateView } from "@/components/cv/cv-templates";
@@ -13,11 +13,13 @@ import { CvTemplateView } from "@/components/cv/cv-templates";
  * colour picker. On phones it is a swipeable carousel; from the sm breakpoint
  * up it is a grid ("row" shows the first six on the homepage, "grid" shows all).
  */
-export function TemplateGallery({ layout = "grid" }: { layout?: "row" | "grid" }) {
+export function TemplateGallery({ layout = "grid", curated = false }: { layout?: "row" | "grid"; curated?: boolean }) {
   const [filter, setFilter] = useState<"all" | TemplateTag>("all");
   const [accent, setAccent] = useState<string | null>(null);
 
-  const shown = templates.filter((t) => filter === "all" || t.tags.includes(filter));
+  // On the homepage a short, mixed list is shown. The templates page lists every design.
+  const source = curated ? homepageTemplates() : templates;
+  const shown = source.filter((t) => filter === "all" || t.tags.includes(filter));
   const accentStyle = accent ? ({ "--cv-accent": accent } as CSSProperties) : undefined;
 
   const listRef = useRef<HTMLUListElement>(null);
