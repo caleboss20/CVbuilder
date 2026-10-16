@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { downloadBackup, hasBackupData, restoreBackup } from "@/lib/backup";
 import { trackEvent } from "@/lib/track";
+import { CloudSyncPanel } from "./cloud-sync-panel";
 import { ConfirmDialog } from "./confirm-dialog";
 
 /**
@@ -75,6 +76,8 @@ export function BackupCard({ restoreOnly = false }: { restoreOnly?: boolean }) {
       </div>
       {message && <p className="mt-2 text-xs text-emerald-300">{message}</p>}
       {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+
+      <CloudSyncPanel loadOnly={restoreOnly} />
 
       {pending && (
         <ConfirmDialog

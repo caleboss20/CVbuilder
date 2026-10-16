@@ -3,9 +3,10 @@ import { STORAGE_KEY as APPLICATIONS_KEY } from "@/lib/applications";
 import { SIGNATURE_KEY } from "@/components/builder/signature-pad";
 
 /**
- * Everything a student has made lives in their browser. A backup is one small file holding all
- * of it, so they can move to a new phone or recover after clearing their browser data.
- * Only the keys listed here are ever saved or restored.
+ * Everything a student has made lives in their browser. A backup is one small bundle holding all
+ * of it, so they can move to a new phone or recover after clearing their browser data. It is used
+ * for the downloadable backup file and for saving to a student's account. Only the keys listed
+ * here are ever saved or restored.
  */
 const BACKUP_KEYS = [
   BUILDER_STORAGE_KEY, // the CV
@@ -15,11 +16,14 @@ const BACKUP_KEYS = [
   "cv11-nss-checklist-v1", // the national service checklist
 ] as const;
 
+/** The saved data, keyed by browser storage key. */
+export type BackupData = Record<string, string>;
+
 type BackupFile = {
   app: "cv11";
   version: 1;
   createdAt: string;
-  data: Record<string, string>;
+  data: BackupData;
 };
 
 /** True when there is a CV in this browser worth backing up. */
@@ -31,18 +35,24 @@ export function hasBackupData(): boolean {
   }
 }
 
-/** Downloads a backup file of everything saved in this browser. Returns false if there was nothing to save. */
-export function downloadBackup(): boolean {
-  const data: Record<string, string> = {};
+/** Gathers everything saved in this browser, or null when there is nothing to save. */
+export function collectBackup(): BackupData | null {
+  const data: BackupData = {};
   try {
     for (const key of BACKUP_KEYS) {
       const value = localStorage.getItem(key);
       if (value !== null) data[key] = value;
     }
   } catch {
-    return false;
+    return null;
   }
-  if (!Object.keys(data).length) return false;
+  return Object.keys(data).length ? data : null;
+}
+
+/** Downloads a backup file of everything saved in this browser. Returns false if there was nothing to save. */
+export function downloadBackup(): boolean {
+  const data = collectBackup();
+  if (!data) return false;
 
   const file: BackupFile = { app: "cv11", version: 1, createdAt: new Date().toISOString(), data };
   const url = URL.createObjectURL(new Blob([JSON.stringify(file)], { type: "application/json" }));
@@ -55,25 +65,16 @@ export function downloadBackup(): boolean {
 }
 
 /**
- * Restores a backup file, replacing what is saved in this browser. Throws an Error with a plain
- * message if the file is not a CV11 backup, and writes nothing in that case.
+ * Writes backed-up data into this browser, replacing what is saved. Throws an Error with a plain
+ * message if the data is not a usable CV11 backup, and writes nothing in that case.
  */
-export async function restoreBackup(file: File): Promise<void> {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(await file.text());
-  } catch {
-    throw new Error("That file is not a CV11 backup.");
-  }
+export function applyBackup(data: unknown): void {
+  if (typeof data !== "object" || data === null) throw new Error("That is not a CV11 backup.");
+  const source = data as Record<string, unknown>;
 
-  const backup = parsed as Partial<BackupFile>;
-  if (backup?.app !== "cv11" || typeof backup.data !== "object" || backup.data === null) {
-    throw new Error("That file is not a CV11 backup.");
-  }
-
-  // Check everything first, so a bad file never leaves half a backup behind
+  // Check everything first, so bad data never leaves half a backup behind
   const entries = BACKUP_KEYS.flatMap((key) => {
-    const value = backup.data?.[key];
+    const value = source[key];
     return typeof value === "string" ? [[key, value] as const] : [];
   });
   const cv = entries.find(([key]) => key === BUILDER_STORAGE_KEY);
@@ -89,4 +90,16 @@ export async function restoreBackup(file: File): Promise<void> {
   } catch {
     throw new Error("This browser would not let us save the backup. Check that private browsing is off.");
   }
+}
+
+/** Restores a downloaded backup file. Throws an Error with a plain message if it cannot be used. */
+export async function restoreBackup(file: File): Promise<void> {
+  let parsed: Partial<BackupFile> | null;
+  try {
+    parsed = JSON.parse(await file.text());
+  } catch {
+    throw new Error("That file is not a CV11 backup.");
+  }
+  if (parsed?.app !== "cv11") throw new Error("That file is not a CV11 backup.");
+  applyBackup(parsed.data);
 }
