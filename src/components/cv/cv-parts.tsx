@@ -72,6 +72,9 @@ export function extraLists(doc: CvDoc, skip: string[] = []) {
   return [
     { title: "Languages", items: doc.languages ?? [] },
     { title: "Certifications", items: doc.certifications ?? [] },
+    { title: "Research", items: doc.research ?? [] },
+    { title: "Publications", items: doc.publications ?? [] },
+    { title: "Presentations", items: doc.presentations ?? [] },
     { title: "Awards", items: doc.awards ?? [] },
     { title: "Interests", items: doc.interests ?? [] },
   ].filter((s) => s.items.length > 0 && !skip.includes(s.title));

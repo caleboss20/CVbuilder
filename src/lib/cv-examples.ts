@@ -1,6 +1,7 @@
 import { cvExtras } from "./cv-example-extras";
 import { cvMore } from "./cv-example-more";
 import { courseExamples } from "./cv-example-courses";
+import type { CvType } from "./cv-type";
 
 export type CvIcon =
   | "health"
@@ -40,6 +41,12 @@ export type CvDoc = {
   awards?: string[];
   interests?: string[];
   references?: { name: string; role: string; phone: string }[];
+  /** Academic CVs only. Each entry is one line, like a citation. */
+  research?: string[];
+  publications?: string[];
+  presentations?: string[];
+  /** Which kind of CV this is. The newer templates use it to order their sections. */
+  type?: CvType;
 };
 
 export type CvTemplateName =

@@ -1,4 +1,5 @@
 import { exampleForCourse } from "./course-match";
+import type { CvType } from "./cv-type";
 import { getCvExample, type CvDoc, type CvExample, type CvTemplateName } from "./cv-examples";
 
 export const BUILDER_STORAGE_KEY = "cv11-builder-v1";
@@ -30,6 +31,12 @@ export type BuilderCv = {
   awards: string[];
   interests: string[];
   references: Referee[];
+  /** Which kind of CV this is (standard, graduate, skills-based or academic). */
+  cvType: CvType;
+  /** Academic CVs: one line per item, like a citation or a talk title. */
+  research: string[];
+  publications: string[];
+  presentations: string[];
   /**
    * Slug of the course the student picked at the start. Used only to show that
    * course's example as dimmed placeholder text and as the sample preview. It
@@ -77,6 +84,10 @@ export function blankCv(template: CvTemplateName = "ats"): BuilderCv {
     awards: [],
     interests: [],
     references: [],
+    cvType: "standard",
+    research: [],
+    publications: [],
+    presentations: [],
   };
 }
 
@@ -128,6 +139,10 @@ export function cvFromExample(e: CvExample, template?: CvTemplateName): BuilderC
     awards: [...(e.cv.awards ?? [])],
     interests: [...(e.cv.interests ?? [])],
     references: (e.cv.references ?? []).map((x) => ({ id: uid(), ...x })),
+    cvType: "standard",
+    research: [],
+    publications: [],
+    presentations: [],
   };
 }
 
@@ -157,6 +172,10 @@ export function toDoc(cv: BuilderCv): CvDoc {
     references: cv.references
       .filter((r) => r.name.trim())
       .map((r) => ({ name: clean(r.name), role: clean(r.role), phone: clean(r.phone) })),
+    research: nonEmpty(cv.research),
+    publications: nonEmpty(cv.publications),
+    presentations: nonEmpty(cv.presentations),
+    type: cv.cvType,
   };
 }
 

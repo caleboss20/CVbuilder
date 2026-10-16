@@ -22,6 +22,15 @@ const perks = [
   { label: "Free PDF, no watermark", d: "M7 3h7l5 5v13H7zM14 3v5h5" },
 ];
 
+type StartMode = "template" | "blank" | "upload";
+
+/** The three ways to start. Short, concrete and equal, so the choice takes a second. */
+const startOptions: { id: StartMode; title: string; hint: string; icon: string }[] = [
+  { id: "template", title: "Use a template", hint: "Pick your course. We fill it with examples.", icon: "M4 4h16v16H4zM4 9h16M9 9v11" },
+  { id: "blank", title: "Start blank", hint: "A clean page with every section ready.", icon: "M12 5v14M5 12h14" },
+  { id: "upload", title: "Upload my CV", hint: "Already have one? We fill the builder for you.", icon: "M12 16V4m0 0-4 4m4-4 4 4M4 16v4h16v-4" },
+];
+
 /** First screen of the builder: start from a course example (with live preview) or blank. */
 export function StartScreen({
   template,
@@ -43,6 +52,8 @@ export function StartScreen({
   /** True when the student came from an "Import my CV" button. */
   highlightImport?: boolean;
 }) {
+  /** Which of the three ways to start is open. The "Import my CV" button opens upload directly. */
+  const [mode, setMode] = useState<StartMode>(highlightImport ? "upload" : "template");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(cvExamples[0].slug);
 
@@ -94,7 +105,7 @@ export function StartScreen({
             <span className="bg-linear-to-b from-fg to-fg/60 bg-clip-text text-transparent">Let’s build your CV</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-fg/60 sm:text-lg">
-            Pick your course and get example wording for your field as you write, or begin with a clean page. Either way you’ll be done in minutes.
+            Choose how you want to start. Whichever you pick, you’ll be done in minutes.
           </p>
           <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             {perks.map((p) => (
@@ -110,23 +121,52 @@ export function StartScreen({
           </ul>
         </div>
 
-        <div className="mt-12 grid gap-6 lg:mt-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-10">
-          {/* Choices */}
+        <div
+          className={`mt-10 grid gap-6 lg:mt-14 lg:gap-10 ${
+            mode === "template" ? "lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]" : "mx-auto max-w-2xl"
+          }`}
+        >
           <div className="min-w-0 space-y-5">
-            {/* From the "Import my CV" button, this comes first so it is the obvious next step */}
-            {highlightImport && <ImportCard template={template} highlight onImport={onImport} />}
+            {/* Three clear choices, so nobody has to work out what to do */}
+            <div role="radiogroup" aria-label="How do you want to start?" className="grid gap-3 sm:grid-cols-3">
+              {startOptions.map((o) => {
+                const active = mode === o.id;
+                return (
+                  <button
+                    key={o.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    onClick={() => setMode(o.id)}
+                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all sm:flex-col sm:gap-2.5 ${
+                      active
+                        ? "border-brand-400/70 bg-brand-500/15 shadow-[0_0_30px_-10px_rgb(124_128_255/0.8)]"
+                        : "border-fg/10 bg-fg/[0.03] hover:border-fg/25"
+                    }`}
+                  >
+                    <span className={`grid size-9 shrink-0 place-items-center rounded-lg ${active ? "bg-brand-500/25 text-brand-300" : "bg-fg/10 text-fg/70"}`}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d={o.icon} />
+                      </svg>
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block font-medium text-fg">{o.title}</span>
+                      <span className="mt-0.5 block text-sm text-fg/55">{o.hint}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
 
+            {mode === "template" && (
             <section
               aria-labelledby="from-course"
               className="relative overflow-hidden rounded-2xl border border-brand-400/30 bg-linear-to-b from-brand-600/20 via-ink-900/60 to-ink-900/40 p-5 shadow-[0_0_60px_-25px_rgb(124_128_255/0.6)] sm:p-7"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 id="from-course" className="text-lg font-medium text-fg sm:text-xl">
-                  Start from my course
+                  Pick your course
                 </h2>
-                <span className="rounded-full bg-brand-500/20 px-2.5 py-0.5 text-xs font-medium text-brand-300 ring-1 ring-brand-400/40">
-                  Fastest · Recommended
-                </span>
               </div>
               <p className="mt-1.5 text-sm text-fg/60">Pick your course and check the preview. Examples show in grey as you fill in your own details.</p>
 
@@ -213,27 +253,28 @@ export function StartScreen({
                 <span aria-hidden="true">→</span>
               </button>
             </section>
+            )}
 
-            {!highlightImport && <ImportCard template={template} onImport={onImport} />}
+            {mode === "blank" && (
+              <section aria-label="Start with a blank CV" className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-5 sm:p-6">
+                <h2 className="text-lg font-medium text-fg">A clean page, every section ready</h2>
+                <p className="mt-1.5 text-sm text-fg/60">Fill in one step at a time. Tips show at each step, and the preview updates as you type.</p>
+                <button
+                  type="button"
+                  onClick={onBlank}
+                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-brand-600 py-3 text-[15px] font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_22px_rgb(124_128_255/0.5)] transition-colors hover:bg-brand-500"
+                >
+                  Start a blank CV
+                  <span aria-hidden="true">→</span>
+                </button>
+              </section>
+            )}
 
-            <button
-              type="button"
-              onClick={onBlank}
-              className="group flex w-full items-center gap-4 rounded-2xl border border-fg/10 bg-fg/[0.03] p-5 text-left transition-all hover:border-fg/25 hover:bg-fg/[0.05] sm:p-6"
-            >
-              <span className="grid size-12 shrink-0 place-items-center rounded-xl border border-dashed border-fg/25 text-xl text-fg/70 group-hover:border-brand-400/60 group-hover:text-brand-300">
-                +
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-medium text-fg">Start with a blank CV</span>
-                <span className="mt-0.5 block text-sm text-fg/55">Every section ready, with tips at each step.</span>
-              </span>
-              <span className="text-fg/40 transition-transform group-hover:translate-x-1 group-hover:text-fg" aria-hidden="true">
-                →
-              </span>
-            </button>
+            {mode === "upload" && <ImportCard template={template} highlight={highlightImport} onImport={onImport} />}
           </div>
 
+          {mode === "template" && (
+            <>
           {/* Live preview of the chosen course */}
           <div className="min-w-0">
             <div className="lg:sticky lg:top-8">
@@ -262,6 +303,8 @@ export function StartScreen({
               <p className="mt-6 text-center text-xs text-fg/45">You can change the template and colour any time in the builder.</p>
             </div>
           </div>
+            </>
+          )}
         </div>
       </main>
     </div>

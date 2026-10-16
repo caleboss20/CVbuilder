@@ -33,6 +33,9 @@ export function cvToText(doc: CvDoc, role = ""): string {
   if (doc.skills.length) out.push("", "SKILLS", doc.skills.join(", "));
   if (doc.languages?.length) out.push("", "LANGUAGES", doc.languages.join(", "));
   if (doc.certifications?.length) out.push("", "CERTIFICATIONS", ...doc.certifications.map((c) => `• ${c}`));
+  if (doc.research?.length) out.push("", "RESEARCH", ...doc.research.map((r) => `• ${r}`));
+  if (doc.publications?.length) out.push("", "PUBLICATIONS", ...doc.publications.map((p) => `• ${p}`));
+  if (doc.presentations?.length) out.push("", "PRESENTATIONS", ...doc.presentations.map((p) => `• ${p}`));
   if (doc.awards?.length) out.push("", "AWARDS", ...doc.awards.map((a) => `• ${a}`));
   if (doc.interests?.length) out.push("", "INTERESTS", doc.interests.join(", "));
 

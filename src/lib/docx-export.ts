@@ -110,6 +110,9 @@ export async function downloadDocx(doc: CvDoc, role: string, accent: string | nu
   const extras: [string, string[] | undefined][] = [
     ["Languages", doc.languages],
     ["Certifications", doc.certifications],
+    ["Research", doc.research],
+    ["Publications", doc.publications],
+    ["Presentations", doc.presentations],
     ["Awards", doc.awards],
     ["Interests", doc.interests],
   ];
