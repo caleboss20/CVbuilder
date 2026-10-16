@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { authConfigured, getSupabase } from "@/lib/supabase";
+import { authConfigured } from "@/lib/auth-config";
+import { getSupabase } from "@/lib/supabase";
 import { useUser } from "./use-user";
 
 /** What a signed-in student sees: who they are, their plan, and a way to sign out. */
 export function AccountPanel() {
-  const { user, loading } = useUser();
+  const { user, loading } = useUser({ eager: true });
 
   if (!authConfigured) return <p className="text-sm text-fg/70">Accounts are not switched on yet.</p>;
   if (loading) return <p className="text-sm text-fg/55">Loading…</p>;

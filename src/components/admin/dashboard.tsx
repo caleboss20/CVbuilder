@@ -6,7 +6,8 @@ import { useUser } from "@/components/auth/use-user";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { fetchAdminStats, type AdminError, type AdminStats, type DailyPoint } from "@/lib/admin-stats";
-import { authConfigured, getSupabase } from "@/lib/supabase";
+import { authConfigured } from "@/lib/auth-config";
+import { getSupabase } from "@/lib/supabase";
 import { AreaChart, shortDate } from "./area-chart";
 
 const RANGES = [
@@ -42,7 +43,7 @@ const cardClass = "rounded-lg border border-afg/10 bg-acard";
 
 /** A private page for the site owner: how many people use CV11 and what they do. */
 export function AdminDashboard() {
-  const { user, session, loading: userLoading } = useUser();
+  const { user, session, loading: userLoading } = useUser({ eager: true });
   const token = session?.access_token;
   const [days, setDays] = useState<number>(30);
   const [series, setSeries] = useState<(typeof SERIES)[number]["key"]>("people");

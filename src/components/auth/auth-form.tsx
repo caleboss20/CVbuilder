@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { authConfigured, getSupabase } from "@/lib/supabase";
+import { authConfigured } from "@/lib/auth-config";
+import { getSupabase } from "@/lib/supabase";
 import { PasswordInput } from "./password-input";
 import { useUser } from "./use-user";
 
@@ -62,7 +63,7 @@ export function AuthForm({
   allowSignup?: boolean;
 }) {
   const router = useRouter();
-  const { user, loading } = useUser();
+  const { user, loading } = useUser({ eager: true });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);

@@ -1,5 +1,5 @@
 import { shouldSkipCounting } from "@/lib/owner";
-import { authConfigured, getSupabase } from "@/lib/supabase";
+import { authConfigured } from "@/lib/auth-config";
 
 /**
  * Our own anonymous counter, so we can read real totals (people, CVs started, CVs finished)
@@ -27,14 +27,16 @@ export function recordEvent(name: string, props?: Record<string, string | number
   if (!authConfigured || shouldSkipCounting()) return;
   const { id } = deviceId();
   if (!id) return;
-  // Fire and forget: counting must never slow down or break the student's page
-  void getSupabase()
-    ?.from("events")
-    .insert({ name, device: id, props: props ?? {} })
-    .then(
-      () => undefined,
-      () => undefined,
-    );
+  // One small request straight to the database, so counting never downloads the Supabase library.
+  // Fire and forget: counting must never slow down or break the student's page.
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+  void fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/events`, {
+    method: "POST",
+    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify({ name, device: id, props: props ?? {} }),
+    // Lets the request finish even if the student leaves the page right after, such as a download
+    keepalive: true,
+  }).catch(() => undefined);
 }
 
 /** Counts a brand-new device once, the first time it opens the site. This is our "people" number. */

@@ -1,5 +1,5 @@
 import { collectBackup, applyBackup } from "@/lib/backup";
-import { getSupabase } from "@/lib/supabase";
+import { loadSupabase } from "@/lib/auth-config";
 
 /** What we know about a student's saved copy, without downloading it. */
 export type CloudInfo = { updatedAt: string } | null;
@@ -17,7 +17,7 @@ function explain(error: { code?: string; message?: string }): Error {
 
 /** The signed-in student's id, or an error asking them to log in. */
 async function currentUserId(): Promise<string> {
-  const supabase = getSupabase();
+  const supabase = await loadSupabase();
   const { data } = (await supabase?.auth.getUser()) ?? { data: { user: null } };
   if (!data.user) throw new Error("Please log in first.");
   return data.user.id;
@@ -25,7 +25,7 @@ async function currentUserId(): Promise<string> {
 
 /** When the student last saved to their account, or null if they never have. */
 export async function getCloudInfo(): Promise<CloudInfo> {
-  const supabase = getSupabase();
+  const supabase = await loadSupabase();
   if (!supabase) return null;
   const userId = await currentUserId();
   const { data, error } = await supabase.from(TABLE).select("updated_at").eq("user_id", userId).maybeSingle();
@@ -35,7 +35,7 @@ export async function getCloudInfo(): Promise<CloudInfo> {
 
 /** Saves everything in this browser to the student's account, replacing their last saved copy. */
 export async function saveToCloud(): Promise<void> {
-  const supabase = getSupabase();
+  const supabase = await loadSupabase();
   const data = collectBackup();
   if (!supabase) throw new Error("Accounts are not switched on yet.");
   if (!data) throw new Error("There is nothing to save yet. Start your CV first.");
@@ -47,7 +47,7 @@ export async function saveToCloud(): Promise<void> {
 
 /** Replaces what is saved in this browser with the student's account copy. */
 export async function loadFromCloud(): Promise<void> {
-  const supabase = getSupabase();
+  const supabase = await loadSupabase();
   if (!supabase) throw new Error("Accounts are not switched on yet.");
 
   const userId = await currentUserId();

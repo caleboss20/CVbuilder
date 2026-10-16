@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useUser } from "@/components/auth/use-user";
 import { getCloudInfo, loadFromCloud, saveToCloud, type CloudInfo } from "@/lib/cloud-sync";
 import { hasBackupData } from "@/lib/backup";
-import { authConfigured } from "@/lib/supabase";
+import { authConfigured } from "@/lib/auth-config";
 import { ConfirmDialog } from "./confirm-dialog";
 
 const buttonClass = "rounded-md px-3 py-2 text-sm font-medium text-fg ring-1 ring-fg/15 hover:bg-fg/5 disabled:opacity-40";

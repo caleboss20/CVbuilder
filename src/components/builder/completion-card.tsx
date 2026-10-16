@@ -6,7 +6,7 @@ import { siteConfig } from "@/lib/site";
 import { CheckIcon } from "@/components/ui/check-icon";
 import { trackEvent } from "@/lib/track";
 import { downloadBackup } from "@/lib/backup";
-import { authConfigured } from "@/lib/supabase";
+import { authConfigured } from "@/lib/auth-config";
 import { useUser } from "@/components/auth/use-user";
 import { formatDuration } from "./build-timer";
 

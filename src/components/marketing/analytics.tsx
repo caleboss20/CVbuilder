@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useUser } from "@/components/auth/use-user";
 import { recordFirstVisit } from "@/lib/events";
 import { OWNER_KEY, shouldSkipCounting } from "@/lib/owner";
-import { getSupabase } from "@/lib/supabase";
+import { loadSupabase } from "@/lib/auth-config";
 
 /** Remembers which account we already asked "are you the admin?", so that is only asked once per device. */
 const CHECKED_KEY = "cv11-admin-checked";
@@ -34,15 +34,15 @@ export function SiteAnalytics() {
       return;
     }
     // The database answers this, using the admin list, so it cannot be faked from the browser
-    void getSupabase()
-      ?.rpc("is_admin")
-      .then(({ data }) => {
+    void loadSupabase().then((supabase) =>
+      supabase?.rpc("is_admin").then(({ data }) => {
         if (data === true) {
           try {
             localStorage.setItem(OWNER_KEY, "1");
           } catch {}
         }
-      });
+      }),
+    );
   }, [user]);
 
   return <Analytics beforeSend={(event) => (shouldSkipCounting() ? null : event)} />;

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { authConfigured } from "@/lib/supabase";
+import { authConfigured } from "@/lib/auth-config";
 import { useUser } from "./use-user";
 
 /**

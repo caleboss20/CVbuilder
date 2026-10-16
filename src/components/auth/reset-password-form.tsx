@@ -11,7 +11,7 @@ import { useUser } from "./use-user";
  * with the link, so they only need to type a new password.
  */
 export function ResetPasswordForm() {
-  const { user, loading } = useUser();
+  const { user, loading } = useUser({ eager: true });
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
