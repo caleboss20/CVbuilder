@@ -41,6 +41,10 @@ export function VoiceInput({ kind, onAdd }: { kind: RefineKind; onAdd: (lines: s
           <MicIcon />
         </span>
         {speech.supported ? "Say it, we’ll write it" : "Describe it, we’ll write it"}
+        {/* Speech recognition is the browser's own, and it can mishear accents and names */}
+        {speech.supported && (
+          <span className="rounded bg-fg/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-fg/60">Beta</span>
+        )}
       </button>
     );
   }
@@ -87,6 +91,12 @@ export function VoiceInput({ kind, onAdd }: { kind: RefineKind; onAdd: (lines: s
             className="mt-3 w-full resize-y rounded-lg border border-fg/12 bg-ink-950/60 px-3 py-2.5 text-sm leading-relaxed text-fg placeholder:text-fg/35 focus:border-brand-400/70 focus:outline-none"
           />
           {speech.error && <p className="mt-2 text-xs text-amber-300">{speech.error}</p>}
+          {speech.supported && (
+            <p className="mt-2 text-xs text-fg/50">
+              Voice typing is still in beta and can mishear names, places and accents. Read the text above and fix any
+              mistakes before you continue. You can type or edit it yourself at any time.
+            </p>
+          )}
 
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
             <button
