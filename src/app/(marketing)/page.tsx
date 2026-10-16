@@ -4,6 +4,7 @@ import { Faq } from "@/components/marketing/faq";
 import { FinalCta } from "@/components/marketing/final-cta";
 import { Hero } from "@/components/marketing/hero";
 import { HowItWorks } from "@/components/marketing/how-it-works";
+import { JobHuntTools } from "@/components/marketing/job-hunt-tools";
 import { Problems } from "@/components/marketing/problems";
 import { TemplatesSection } from "@/components/marketing/templates-section";
 import { Testimonials } from "@/components/marketing/testimonials";
@@ -33,6 +34,7 @@ export default function HomePage() {
       <Problems />
       <AiDemo />
       <HowItWorks />
+      <JobHuntTools />
       <TemplatesSection />
       <CvExamplesMarquee />
       <Testimonials />
