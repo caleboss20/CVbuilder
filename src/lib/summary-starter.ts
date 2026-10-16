@@ -19,7 +19,7 @@ export const summaryGoals: SummaryGoal[] = [
 const first = (s: string) => s.split(",")[0].trim();
 
 /** "Nursing Student" -> "nursing student" for use mid-sentence. All-caps words (KNUST, BSc, IT) stay as written. */
-const lowerWords = (s: string) =>
+export const lowerWords = (s: string) =>
   s
     .split(/\s+/)
     .map((w) => (/^[A-Z]{2,}$/.test(w) || /[a-z][A-Z]/.test(w) ? w : w.toLowerCase()))

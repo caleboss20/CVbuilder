@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { BUILDER_STORAGE_KEY, blankCv, type BuilderCv } from "@/lib/builder";
-import { draftLetter, letterKinds, type LetterInput } from "@/lib/cover-letter";
+import { draftLetter, kindConfig, letterKinds, type LetterInput } from "@/lib/cover-letter";
 import { CvPageFrame } from "@/components/cv/cv-page-frame";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -73,6 +73,7 @@ export function CoverLetterBuilder() {
     } catch {}
   }, [cv, input, body]);
 
+  const cfg = kindConfig(input.kind);
   const set = (patch: Partial<LetterInput>) => setInput((i) => ({ ...i, ...patch }));
   const hasCv = !!cv && (cv.name.trim() || cv.experience.some((j) => j.title.trim()));
 
@@ -83,7 +84,7 @@ export function CoverLetterBuilder() {
 
   function download() {
     const prev = document.title;
-    document.title = `${(cv?.name || "My").trim().replace(/\s+/g, "_")}_Cover_Letter`;
+    document.title = `${(cv?.name || "My").trim().replace(/\s+/g, "_")}_Letter`;
     window.print();
     document.title = prev;
   }
@@ -115,12 +116,12 @@ export function CoverLetterBuilder() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-          <section aria-label="Write your cover letter" className="min-w-0">
+          <section aria-label="Write your letter" className="min-w-0">
             <div className="mx-auto max-w-2xl space-y-5 px-4 pb-20 pt-8 sm:px-6">
               <div>
-                <h1 className="text-2xl font-medium text-fg sm:text-3xl">Your cover letter</h1>
+                <h1 className="text-2xl font-medium text-fg sm:text-3xl">Your letter</h1>
                 <p className="mt-1.5 text-sm text-fg/55">
-                  Tell us about the job. We’ll write a first draft from your CV that matches its design, and you can change every word.
+                  Choose the letter you need and add a few details. We’ll write a first draft from your CV that matches its design, and you can change every word.
                 </p>
                 {!hasCv && (
                   <p className="mt-3 rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-fg/80">
@@ -129,7 +130,7 @@ export function CoverLetterBuilder() {
                 )}
               </div>
 
-              <div role="radiogroup" aria-label="What are you applying for?" className="flex flex-wrap gap-2">
+              <div role="radiogroup" aria-label="Which letter do you need?" className="flex flex-wrap gap-2">
                 {letterKinds.map((k) => (
                   <button
                     key={k.id}
@@ -149,23 +150,23 @@ export function CoverLetterBuilder() {
               {/* Say what the choice does, so nobody has to guess */}
               <p className="-mt-2 text-sm text-fg/55">
                 <span className="text-fg/75">What this changes: </span>
-                {letterKinds.find((k) => k.id === input.kind)?.changes}
+                {cfg.changes}
               </p>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Company or organisation" value={input.company} onChange={(company) => set({ company })} placeholder="GCB Bank" />
-                <Field label="Role" value={input.role} onChange={(role) => set({ role })} placeholder="Customer Service Intern" />
+                <Field label={cfg.company.label} value={input.company} onChange={(company) => set({ company })} placeholder={cfg.company.placeholder} />
+                <Field label={cfg.role.label} value={input.role} onChange={(role) => set({ role })} placeholder={cfg.role.placeholder} />
                 <Field
-                  label="Hiring manager (optional)"
+                  label={cfg.manager.label}
                   value={input.manager}
                   onChange={(manager) => set({ manager })}
-                  placeholder="Mrs. Akosua Mensah"
-                  hint="Leave empty to use “Dear Hiring Manager”."
+                  placeholder={cfg.manager.placeholder}
+                  hint={cfg.manager.hint}
                 />
               </div>
 
               <div>
-                <p className="mb-1.5 text-sm font-medium text-fg/80">Why this job? (optional)</p>
+                <p className="mb-1.5 text-sm font-medium text-fg/80">{cfg.why.label}</p>
                 {input.why ? (
                   <div className="rounded-lg border border-fg/12 bg-fg/[0.03] p-3 text-sm text-fg/80">
                     {input.why}
@@ -230,6 +231,7 @@ export function CoverLetterBuilder() {
 
 /** The letter itself, styled with the CV's accent colour as a letterhead. */
 function LetterPage({ cv, input, body, date }: { cv: BuilderCv; input: LetterInput; body: string; date: string }) {
+  const cfg = kindConfig(input.kind);
   const accent = cv.accent ?? "#1e3a5f";
   const contact = useMemo(() => [cv.location, cv.phone, cv.email, ...cv.links].map((s) => s.trim()).filter(Boolean), [cv]);
   const paragraphs = body.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
@@ -247,14 +249,14 @@ function LetterPage({ cv, input, body, date }: { cv: BuilderCv; input: LetterInp
 
       <div className="mt-8 space-y-1 text-[13.5px]">
         <p>{date}</p>
-        <p className="pt-3 font-semibold text-slate-900">{input.manager.trim() || "The Hiring Manager"}</p>
-        <p>{input.company.trim() || "Company name"}</p>
+        <p className="pt-3 font-semibold text-slate-900">{input.manager.trim() || `The ${cfg.recipient}`}</p>
+        <p>{input.company.trim() || cfg.company.label.replace(/ \(optional\)/, "")}</p>
       </div>
 
       <p className="mt-6 font-semibold text-slate-900">
-        RE: APPLICATION FOR {(input.role.trim() || "THE ADVERTISED ROLE").toUpperCase()}
+        RE: {cfg.subject(input.role.trim().toUpperCase())}
       </p>
-      <p className="mt-5">Dear {input.manager.trim() || "Hiring Manager"},</p>
+      <p className="mt-5">Dear {input.manager.trim() || cfg.recipient},</p>
 
       {paragraphs.length ? (
         <div className="mt-4 space-y-4 text-justify">

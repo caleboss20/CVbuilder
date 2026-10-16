@@ -21,7 +21,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
       { label: "CV Templates", href: "/templates" },
       { label: "CV Examples", href: "/cv-examples" },
       { label: "CV Checker", href: "/cv-checker" },
-      { label: "Cover Letter Builder", href: "/cover-letter" },
+      { label: "Cover & Scholarship Letters", href: "/letters" },
       { label: "Application Tracker", href: "/tracker" },
       { label: "National Service Checklist", href: "/national-service" },
       { label: "Interview Preparation", href: "/interview-prep" },

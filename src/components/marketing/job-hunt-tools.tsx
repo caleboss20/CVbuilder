@@ -27,9 +27,9 @@ const tools: { title: string; text: string; href: string; icon: string }[] = [
     icon: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM8 12.5l3 3 5-6",
   },
   {
-    title: "Cover letter",
-    text: "A first draft for a job, internship or NSS.",
-    href: "/cover-letter",
+    title: "Letters",
+    text: "Scholarship, university, cover and reference letters.",
+    href: "/letters",
     icon: "M3 6h18v12H3zM3 6l9 7 9-7",
   },
   {

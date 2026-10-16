@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { cvExamples } from "@/lib/cv-examples";
 import { guides } from "@/lib/guides";
+import { letterGuides } from "@/lib/letter-guides";
 import { fieldPrep } from "@/lib/interview-prep";
 import { siteConfig } from "@/lib/site";
 
@@ -10,6 +11,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteConfig.url}/templates`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${siteConfig.url}/cv-examples`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${siteConfig.url}/cv-checker`, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${siteConfig.url}/letters`, changeFrequency: "monthly", priority: 0.8 },
+    ...letterGuides.map((g) => ({ url: `${siteConfig.url}/letters/${g.slug}`, changeFrequency: "monthly" as const, priority: 0.7 })),
     { url: `${siteConfig.url}/tracker`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteConfig.url}/national-service`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteConfig.url}/interview-prep`, changeFrequency: "monthly", priority: 0.7 },
