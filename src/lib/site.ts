@@ -31,6 +31,23 @@ export const siteConfig = {
   ],
 } as const;
 
+/** What a student can share, each with its own friendly message. */
+export type ShareKind = "cv" | "letter" | "sign";
+
+const SHARE_MESSAGES: Record<ShareKind, string> = {
+  cv: "I just made my CV for free on CV11, a CV builder for students in Ghana.",
+  letter: "I just wrote my application letter on CV11. It is free for students in Ghana.",
+  sign: "I signed my letter as a PDF on CV11, no printing or scanning. It is free.",
+};
+
+/**
+ * A WhatsApp link that lets the student pick who to send it to. The ?ref=whatsapp on the address
+ * lets analytics count how many new visitors arrive from shared links.
+ */
+export function whatsappShareLink(kind: ShareKind): string {
+  return `https://wa.me/?text=${encodeURIComponent(`${SHARE_MESSAGES[kind]} ${siteConfig.url}/?ref=whatsapp`)}`;
+}
+
 /** A wa.me chat link with a first message filled in, or null when no number is configured. */
 export function whatsappLink(message = "Hi CV11, I need help with my CV."): string | null {
   return siteConfig.whatsapp ? `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(message)}` : null;

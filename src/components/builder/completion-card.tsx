@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { siteConfig } from "@/lib/site";
 import { CheckIcon } from "@/components/ui/check-icon";
 import { trackEvent } from "@/lib/track";
+import { downloadBackup } from "@/lib/backup";
 import { formatDuration } from "./build-timer";
 
 export type Completion = {
@@ -85,7 +86,7 @@ export function CompletionCard({ data, onClose }: { data: Completion; onClose: (
               href={`https://wa.me/?text=${share}`}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => trackEvent("share_whatsapp")}
+              onClick={() => trackEvent("share_whatsapp", { from: "cv" })}
               className="flex w-full items-center justify-center gap-2 rounded-md py-2.5 text-sm font-medium text-fg ring-1 ring-fg/15 hover:bg-fg/5"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="text-[#25D366]">
@@ -93,6 +94,13 @@ export function CompletionCard({ data, onClose }: { data: Completion; onClose: (
               </svg>
               Share on WhatsApp
             </a>
+            <button
+              type="button"
+              onClick={() => downloadBackup() && trackEvent("cv_backup_saved")}
+              className="w-full py-2 text-sm text-fg/55 hover:text-fg"
+            >
+              Save a backup file of my CV
+            </button>
             <button type="button" onClick={onClose} className="w-full py-2 text-sm text-fg/55 hover:text-fg">
               Back to editing
             </button>

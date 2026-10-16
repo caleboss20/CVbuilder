@@ -43,6 +43,8 @@ import { JobMatchPanel } from "./job-match-panel";
 import { BuildTimer, readBest, saveBest } from "./build-timer";
 import { CompletionCard, type Completion } from "./completion-card";
 import { trackEvent } from "@/lib/track";
+import { BackupCard } from "./backup-card";
+import { ShareNudge } from "@/components/ui/share-nudge";
 import Link from "next/link";
 
 const stepDefs = {
@@ -79,6 +81,7 @@ export function Builder() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [matchOpen, setMatchOpen] = useState(false);
   const [completion, setCompletion] = useState<Completion | null>(null);
+  const [shareNudge, setShareNudge] = useState(false);
   const timeRef = useRef(0);
   const persistTime = useCallback((ms: number) => setCv((c) => (c.timeSpent === ms ? c : { ...c, timeSpent: ms })), []);
   const [saved, setSaved] = useState(true);
@@ -255,6 +258,7 @@ export function Builder() {
   async function downloadWord() {
     const { downloadDocx } = await import("@/lib/docx-export");
     await downloadDocx(doc, cv.role.trim(), cv.accent, `${(cv.name || "My").trim().replace(/\s+/g, "_")}_CV`);
+    setShareNudge(true);
   }
 
   function download() {
@@ -272,6 +276,9 @@ export function Builder() {
       trackEvent("cv_downloaded", { template: templateName, type: cv.cvType, minutes: Math.round(ms / 60000) });
       update({ finishedAt: Date.now(), timeSpent: ms });
       setCompletion({ ms, score: strength.score, template: templateName, best, newBest: best !== null && ms < best });
+    } else {
+      // Later downloads skip the summary, but still offer to share
+      setShareNudge(true);
     }
   }
 
@@ -575,6 +582,7 @@ export function Builder() {
                 setMobileView("edit");
               }
             }} />
+            <BackupCard />
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs text-fg/45">
                 Live preview · A4
@@ -622,6 +630,13 @@ export function Builder() {
           Download PDF
         </button>
       </div>
+
+      {/* After a repeat download or a Word download: a small, closable invitation to share */}
+      {shareNudge && !completion && (
+        <div className="fixed inset-x-3 bottom-20 z-40 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[26rem] print:hidden">
+          <ShareNudge kind="cv" onDismiss={() => setShareNudge(false)} className="bg-ink-900 shadow-[0_20px_50px_-15px_rgb(0_0_0/0.6)]" />
+        </div>
+      )}
 
       {completion && <CompletionCard data={completion} onClose={() => setCompletion(null)} />}
       {matchOpen && <JobMatchPanel cv={cv} update={update} onClose={() => setMatchOpen(false)} />}

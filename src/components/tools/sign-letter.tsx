@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { SIGNATURE_KEY, SignaturePad } from "@/components/builder/signature-pad";
 import { renderPages, stampSignature, toPdfBytes, type Placement, type PreviewPage } from "@/lib/sign-pdf";
 import { trackEvent } from "@/lib/track";
+import { ShareNudge } from "@/components/ui/share-nudge";
 
 const DEFAULT_WIDTH = 0.22;
 const MIN_WIDTH = 0.1;
@@ -49,6 +50,8 @@ export function SignLetter() {
   const [placement, setPlacement] = useState<Placement>({ x: MARGIN, y: 0.78, width: DEFAULT_WIDTH });
   // Whether we found the closing line and placed the signature under it ourselves
   const [found, setFound] = useState(false);
+  // Set after a signed letter is downloaded, to offer sharing CV11 with a friend
+  const [signed, setSigned] = useState(false);
   const [busy, setBusy] = useState<"" | "reading" | "saving">("");
   const [error, setError] = useState("");
   const pageRef = useRef<HTMLDivElement>(null);
@@ -148,6 +151,7 @@ export function SignLetter() {
       link.click();
       setTimeout(() => URL.revokeObjectURL(url), 2000);
       trackEvent("letter_signed");
+      setSigned(true);
     } catch {
       setError("We could not save the signed letter. If the PDF is locked, print it to a new PDF first and try again.");
     } finally {
@@ -300,6 +304,7 @@ export function SignLetter() {
             {busy === "saving" ? "Saving…" : "Download signed letter"}
           </button>
           <p className="mt-2 text-xs text-fg/45">The rest of your letter is left exactly as it was.</p>
+          {signed && <ShareNudge kind="sign" className="mt-5" />}
         </section>
       )}
     </div>

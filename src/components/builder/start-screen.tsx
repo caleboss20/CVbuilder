@@ -13,6 +13,7 @@ import { Logo } from "@/components/ui/logo";
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import type { ImportResult } from "@/lib/cv-import";
+import { BackupCard } from "./backup-card";
 import { ImportCard } from "./import-card";
 import { PortalGlow } from "./portal-glow";
 import { SkyBackground } from "./sky-background";
@@ -298,7 +299,13 @@ export function StartScreen({
               </section>
             )}
 
-            {mode === "upload" && <ImportCard template={template} highlight={highlightImport} onImport={onImport} />}
+            {mode === "upload" && (
+              <>
+                <ImportCard template={template} highlight={highlightImport} onImport={onImport} />
+                {/* A student returning on a new phone restores their CV here */}
+                <BackupCard restoreOnly />
+              </>
+            )}
           </div>
 
           {mode === "template" && (

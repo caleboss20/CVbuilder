@@ -10,6 +10,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
 import { Field, TextArea } from "./fields";
 import { trackEvent } from "@/lib/track";
+import { ShareNudge } from "@/components/ui/share-nudge";
 import { VoiceInput } from "./voice-input";
 import { SIGNATURE_KEY, SignaturePad } from "./signature-pad";
 
@@ -46,6 +47,8 @@ export function CoverLetterBuilder() {
   const [date, setDate] = useState("");
   // Kept under its own key so one signature serves every letter. Saved when it changes, never on load.
   const [signature, setSignature] = useState("");
+  // Once a letter has been downloaded, offer to share CV11 with a friend
+  const [downloaded, setDownloaded] = useState(false);
 
   function changeSignature(dataUrl: string) {
     setSignature(dataUrl);
@@ -119,6 +122,7 @@ export function CoverLetterBuilder() {
     window.print();
     document.title = prev;
     trackEvent("letter_downloaded", { kind: input.kind });
+    setDownloaded(true);
   }
 
   if (!cv) return <div className="grid min-h-screen place-items-center text-sm text-fg/50">Loading…</div>;
@@ -352,6 +356,7 @@ export function CoverLetterBuilder() {
                     Download letter as PDF
                   </button>
                   <p className="mt-2 text-center text-xs text-fg/45">Your signature, if you added one, is included.</p>
+                  {downloaded && <ShareNudge kind="letter" className="mt-4" />}
                 </div>
               )}
             </div>
