@@ -23,13 +23,11 @@ export const siteConfig = {
    */
   whatsapp: (process.env.NEXT_PUBLIC_WHATSAPP ?? "233256599734").replace(/\D/g, ""),
   nav: [
-    { label: "Features", href: "/#features" },
     { label: "Templates", href: "/templates" },
     { label: "CV examples", href: "/cv-examples" },
     { label: "CV checker", href: "/cv-checker" },
     { label: "Letters", href: "/letters" },
-    { label: "How it works", href: "/#how-it-works" },
-    { label: "FAQ", href: "/#faq" },
+    { label: "Guides", href: "/blog" },
   ],
 } as const;
 
