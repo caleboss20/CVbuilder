@@ -415,12 +415,16 @@ function LetterPage({ cv, input, body, date, signature }: { cv: BuilderCv; input
     </div>
   );
 
-  // The signature sits between "Yours faithfully," and the typed name. With none, leave room to sign by hand.
-  const signed = signature ? (
-    // eslint-disable-next-line @next/next/no-img-element -- a small local data URL, nothing to optimise
-    <img src={signature} alt="" className="mb-1 mt-3 h-14 w-auto max-w-[220px] object-contain object-left" />
-  ) : (
-    <div className="h-14" aria-hidden="true" />
+  // The signature sits in one fixed frame between "Yours faithfully," and the typed name. Whatever
+  // size it was drawn at, it is scaled to fit that frame, so the spacing never changes. With none,
+  // the same frame is left empty so the letter can be signed by hand.
+  const signed = (
+    <div className="mb-1 mt-2 flex h-14 w-[220px] items-end">
+      {signature && (
+        // eslint-disable-next-line @next/next/no-img-element -- a small local data URL, nothing to optimise
+        <img src={signature} alt="" className="max-h-full max-w-full object-contain object-left-bottom" />
+      )}
+    </div>
   );
 
   const enclosures =
