@@ -59,6 +59,9 @@ export function CoverLetterBuilder() {
       setInput({ kind: letter.kind, company: letter.company, role: letter.role, manager: letter.manager, why: letter.why });
       setBody(letter.body);
     }
+    // A link such as /cover-letter?kind=service opens the letter already set to that category
+    const kind = new URLSearchParams(window.location.search).get("kind");
+    if (kind === "job" || kind === "internship" || kind === "service") setInput((i) => ({ ...i, kind }));
     setDate(new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }));
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
