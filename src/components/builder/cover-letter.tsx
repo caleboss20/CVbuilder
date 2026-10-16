@@ -136,16 +136,18 @@ export function CoverLetterBuilder() {
             <span className="hidden text-sm text-fg/50 sm:inline">Cover letter</span>
             <div className="ml-auto flex items-center gap-2">
               <ThemeToggle className="hidden sm:grid" />
-              <Link href="/builder" className="rounded-md px-3 py-2 text-sm text-fg/70 ring-1 ring-fg/15 hover:text-fg">
+              <Link href="/builder" className="whitespace-nowrap rounded-md px-3 py-2 text-sm text-fg/70 ring-1 ring-fg/15 hover:text-fg">
                 ← My CV
               </Link>
               <button
                 type="button"
                 onClick={download}
                 disabled={!body.trim()}
-                className="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)] hover:bg-brand-500 disabled:opacity-40"
+                className="whitespace-nowrap rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)] hover:bg-brand-500 disabled:opacity-40"
               >
-                Download PDF
+                {/* The full name does not fit beside the logo on a small phone, so it is shortened there */}
+                <span className="sm:hidden">Download</span>
+                <span className="hidden sm:inline">Download PDF</span>
               </button>
             </div>
           </div>
@@ -225,7 +227,7 @@ export function CoverLetterBuilder() {
                         <button
                           type="button"
                           onClick={() => set({ company: q.company, role: q.role })}
-                          className="rounded-full border border-fg/12 bg-fg/[0.04] px-3.5 py-2 text-sm text-fg/80 transition-colors hover:border-brand-400/50 hover:text-fg"
+                          className="rounded-md border border-fg/12 bg-fg/[0.04] px-3.5 py-2 text-sm text-fg/80 transition-colors hover:border-brand-400/50 hover:text-fg"
                         >
                           {q.label}
                         </button>
@@ -293,7 +295,7 @@ export function CoverLetterBuilder() {
                             role="checkbox"
                             aria-checked={on}
                             onClick={() => set({ [c.key]: on ? input[c.key].filter((o) => o !== option) : [...input[c.key], option] })}
-                            className={`rounded-full border px-3.5 py-2 text-sm transition-colors ${
+                            className={`rounded-md border px-3.5 py-2 text-sm transition-colors ${
                               on ? "border-brand-400/60 bg-brand-500/15 text-fg" : "border-fg/12 bg-fg/[0.04] text-fg/70 hover:text-fg"
                             }`}
                           >

@@ -80,7 +80,7 @@ export default async function FieldPrepPage({ params }: PageProps<"/interview-pr
               <li key={f.id}>
                 <Link
                   href={`/interview-prep/${f.id}`}
-                  className="inline-block rounded-full bg-fg/[0.06] px-3.5 py-2 text-sm text-fg/70 hover:text-fg"
+                  className="inline-block rounded-md bg-fg/[0.06] px-3.5 py-2 text-sm text-fg/70 hover:text-fg"
                 >
                   {f.title}
                 </Link>

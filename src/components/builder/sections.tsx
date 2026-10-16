@@ -106,7 +106,7 @@ export function SummaryStep({ cv, update, hints }: StepProps) {
                 <button
                   type="button"
                   onClick={() => update({ summary: buildSummaryStarter(cv, g) })}
-                  className="rounded-full border border-brand-400/40 bg-brand-500/10 px-3.5 py-2 text-sm text-fg/90 transition-colors hover:bg-brand-500/25"
+                  className="rounded-md border border-brand-400/40 bg-brand-500/10 px-3.5 py-2 text-sm text-fg/90 transition-colors hover:bg-brand-500/25"
                 >
                   {g.label}
                 </button>

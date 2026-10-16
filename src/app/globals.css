@@ -71,6 +71,15 @@
 }
 
 @theme {
+  /*
+   * Boxier corners, like Vercel's: the rounded-lg / -xl / -2xl / -3xl classes used by cards, inputs and
+   * panels all come out smaller. The CV templates do not use these sizes, so their designs are unchanged.
+   */
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.5rem;
+  --radius-3xl: 0.75rem;
+
   --color-brand-400: #7c80ff;
   --color-brand-500: #5a5ef5;
   --color-brand-600: #4044d8;
@@ -161,4 +170,15 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+/*
+ * Headings use Vercel's weight and spacing: semibold with tight letter-spacing. This sits outside the
+ * layers on purpose, so it wins over the per-heading size classes without touching each page. The CV
+ * templates draw their own section headings with h3 and p, so they are not affected.
+ */
+h1,
+h2 {
+  font-weight: 600;
+  letter-spacing: -0.03em;
 }

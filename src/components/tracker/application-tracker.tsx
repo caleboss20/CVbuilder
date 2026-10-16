@@ -81,7 +81,7 @@ export function ApplicationTracker() {
               role="tab"
               aria-selected={filter === s.id}
               onClick={() => setFilter(s.id as "all" | ApplicationStatus)}
-              className={`rounded-full px-3.5 py-2 text-sm transition-colors sm:py-1.5 ${
+              className={`rounded-md px-3.5 py-2 text-sm transition-colors sm:py-1.5 ${
                 filter === s.id ? "bg-fg/10 text-fg ring-1 ring-fg/20" : "text-fg/55 hover:text-fg"
               }`}
             >
@@ -197,7 +197,7 @@ function ApplicationCard({
           <select
             value={app.status}
             onChange={(e) => onStatus(e.target.value as ApplicationStatus)}
-            className={`appearance-none rounded-full px-3.5 py-1.5 text-sm font-medium focus:outline-2 focus:outline-brand-400 ${tone}`}
+            className={`appearance-none rounded-md px-3.5 py-1.5 text-sm font-medium focus:outline-2 focus:outline-brand-400 ${tone}`}
           >
             {statuses.map((s) => (
               <option key={s.id} value={s.id} className="bg-ink-900 text-fg">

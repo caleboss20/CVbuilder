@@ -38,7 +38,7 @@ export function BulletCoach({ text, onChange }: { text: string; onChange: (next:
               <button
                 type="button"
                 onClick={() => onChange(startWith(verb, text))}
-                className="rounded-full border border-brand-400/40 bg-brand-500/10 px-2.5 py-1 text-fg/85 transition-colors hover:bg-brand-500/25"
+                className="rounded-md border border-brand-400/40 bg-brand-500/10 px-2.5 py-1 text-fg/85 transition-colors hover:bg-brand-500/25"
               >
                 {verb}…
               </button>
