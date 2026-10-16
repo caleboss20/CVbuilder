@@ -24,10 +24,17 @@ export function Testimonials() {
         <SectionHeading
           id="testimonials-heading"
           eyebrow="Student stories"
+          // "Loved by" is a claim, so it only appears once real students' words are shown beneath it
           title={
-            <>
-              Loved by students <em>across Ghana</em>
-            </>
+            visible.length > 0 ? (
+              <>
+                Loved by students <em>across Ghana</em>
+              </>
+            ) : (
+              <>
+                Built for students <em>across Ghana</em>
+              </>
+            )
           }
           description={
             visible.length > 0
