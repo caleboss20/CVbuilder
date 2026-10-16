@@ -20,6 +20,151 @@ const contact = (name: string, city: string, extra: string[] = []) => [
 
 export const courseExamples: CvExample[] = [
   {
+    slug: "information-technology",
+    course: "Information Technology",
+    icon: "code",
+    row: 1,
+    role: "Information Technology Student",
+    template: "dateColumn",
+    intro: "An IT CV that shows the systems you have supported, the networks you have set up and the tools you can use, with real examples.",
+    tips: [
+      "Name the systems and tools you used: Windows, Linux, Cisco Packet Tracer, helpdesk software, SQL.",
+      "Say how many users or tickets you handled. Numbers make support work concrete.",
+      "Add certificates you hold or are working towards, like Google IT Support, CompTIA A+ or Cisco CCNA, and say which are in progress.",
+    ],
+    cv: {
+      name: "Nana Adjei",
+      contact: contact("Nana Adjei", "Accra", ["github.com/nanaadjei"]),
+      summary:
+        "Final-year BSc Information Technology student at the Ghana Communication Technology University with hands-on helpdesk and networking experience. Patient with users, careful with documentation and keen to start as an IT support or network technician.",
+      experience: [
+        {
+          title: "IT Support Intern",
+          place: "Vodafone Ghana, Accra",
+          date: "Jun – Aug 2025",
+          bullets: [
+            "Resolved 15 to 20 helpdesk tickets a week on hardware, software and email problems.",
+            "Set up laptops and user accounts for 40 new staff, and installed the software each team needed.",
+            "Wrote a short fix guide for the ten most common faults, which the team now uses.",
+          ],
+        },
+        {
+          title: "Network Lab Assistant",
+          place: "Department of Information Technology, GCTU",
+          date: "2024 – 2025",
+          bullets: [
+            "Helped 50 students configure routers and switches in Cisco Packet Tracer labs.",
+            "Kept the lab computers updated and reported hardware faults to the technician.",
+          ],
+        },
+      ],
+      education: [
+        { degree: "BSc Information Technology", school: "Ghana Communication Technology University, Accra", date: "2022 – 2026" },
+        { degree: "WASSCE (General Science)", school: "Achimota School, Accra", date: "2018 – 2021" },
+      ],
+      skills: [
+        "Support: troubleshooting, helpdesk tickets, Windows and Linux administration",
+        "Networking: TCP/IP, DNS, DHCP, VLANs, Cisco Packet Tracer, basic firewall setup",
+        "Web and data: HTML, CSS, JavaScript, SQL, Python basics",
+      ],
+      languages: ["English (Fluent)", "Twi (Native)", "Ga (Conversational)"],
+      certifications: ["Google IT Support Professional Certificate", "Cisco CCNA: Introduction to Networks (in progress)"],
+      projects: [
+        {
+          name: "School Results Portal",
+          detail: "Built a PHP and MySQL portal where about 400 students check their results, replacing paper notice boards.",
+        },
+        {
+          name: "Campus Wi-Fi Survey",
+          detail: "Mapped weak Wi-Fi spots in three hostels and gave the IT office a short report with fixes.",
+        },
+      ],
+      awards: ["Best Final-Year Project, Department of Information Technology 2025"],
+      interests: ["Open-source projects", "Tech meetups in Accra", "Football"],
+      references: [
+        { name: "Mr. Kojo Antwi", role: "IT Support Lead, Vodafone Ghana", phone: "020 000 0000" },
+        { name: "Dr. Mary Ofori", role: "Senior Lecturer, GCTU Department of IT", phone: "020 000 0000" },
+      ],
+    },
+  },
+  {
+    slug: "medicine",
+    course: "Medicine",
+    icon: "health",
+    row: 0,
+    role: "Medical Student (MBChB)",
+    template: "ruledClassic",
+    intro: "A medical student CV that shows your clinical rotations, the skills you can do safely, and your community and research work.",
+    tips: [
+      "List every clinical rotation with the hospital, unit and dates: medicine, surgery, paediatrics, obstetrics and gynaecology.",
+      "Name procedures you have done under supervision, such as cannulation, suturing or ECG recording. Do not claim what you have only watched.",
+      "Add research, audits, outreach and any electives. Say what you did and the result in one line each.",
+    ],
+    cv: {
+      name: "Adwoa Frimpong",
+      contact: contact("Adwoa Frimpong", "Kumasi"),
+      summary:
+        "Final-year MBChB student at the KNUST School of Medical Sciences with clinical clerkships in medicine, surgery, paediatrics and obstetrics at Komfo Anokye Teaching Hospital. Careful with histories, clear in case presentations and committed to community health. Looking for a house officer (housemanship) placement.",
+      experience: [
+        {
+          title: "Clinical Clerkship Student",
+          place: "Komfo Anokye Teaching Hospital, Kumasi",
+          date: "Jan 2025 – present",
+          bullets: [
+            "Take histories and examine patients on ward rounds, then present each case to the consultant team.",
+            "Write clear clerking notes and follow up laboratory and imaging results for the patients I clerk.",
+            "Assist with minor procedures under supervision, including cannulation, suturing and urinary catheterisation.",
+          ],
+        },
+        {
+          title: "Community Health Outreach Volunteer",
+          place: "KNUST Medical Students’ Association, Kumasi",
+          date: "2022 – present",
+          bullets: [
+            "Screened residents for blood pressure, blood sugar and BMI at monthly community outreaches, and referred high-risk patients to the nearest clinic.",
+            "Gave short health talks on hypertension and diabetes in English and Twi.",
+          ],
+        },
+        {
+          title: "Research Assistant",
+          place: "Department of Community Health, KNUST",
+          date: "Jun – Aug 2024",
+          bullets: [
+            "Collected and entered survey data on hypertension awareness in two Kumasi communities.",
+            "Helped prepare tables and a short summary for the supervising lecturer.",
+          ],
+        },
+      ],
+      education: [
+        { degree: "MBChB (Bachelor of Medicine and Bachelor of Surgery)", school: "KNUST School of Medical Sciences, Kumasi", date: "2020 – 2026" },
+        { degree: "WASSCE (General Science)", school: "Wesley Girls’ High School, Cape Coast", date: "2016 – 2019" },
+      ],
+      skills: [
+        "Clinical: history taking, physical examination, case presentation, clerking notes",
+        "Procedures (supervised): cannulation, suturing, urinary catheterisation, ECG recording",
+        "Research and computer: SPSS, MS Office, reference managers, data entry",
+      ],
+      languages: ["English (Fluent)", "Twi (Native)", "Fante (Fluent)"],
+      certifications: ["Basic Life Support (BLS), Ghana Red Cross", "Good Clinical Practice (GCP), online course"],
+      projects: [
+        {
+          name: "Ward Handover Audit",
+          detail: "Reviewed 60 patient handovers on a medical ward and proposed a one-page checklist that the team now uses.",
+        },
+        {
+          name: "Hypertension Awareness Survey",
+          detail: "Co-authored a short report on how well residents in two communities know their blood pressure status.",
+        },
+      ],
+      awards: ["Dean’s List, Level 400", "Best Case Presentation, Surgery Rotation 2025"],
+      interests: ["Community health outreach", "Debating", "Football"],
+      references: [
+        { name: "Prof. Kwame Asare", role: "Consultant Physician and Lecturer, KNUST School of Medical Sciences", phone: "020 000 0000" },
+        { name: "Dr. Efua Danquah", role: "Senior Registrar, Komfo Anokye Teaching Hospital", phone: "020 000 0000" },
+      ],
+    },
+  },
+  {
     slug: "electrical-engineering",
     course: "Electrical and Electronics Engineering",
     icon: "gear",

@@ -1,3 +1,4 @@
+import type { PDFFont } from "pdf-lib";
 /**
  * Everything the "Sign a letter" tool does with files, kept apart from the screen so each
  * step is easy to read. It all runs in the browser: the letter is never uploaded anywhere.
@@ -196,11 +197,32 @@ export function reflowLetterText(raw: string): string {
   return out.join("\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
+/** Characters the built-in PDF fonts can print. Anything else needs a full font. */
+const BUILT_IN_FONT_CHARS = /[^\n\u0020-\u007E\u00A0-\u00FF\u2018\u2019\u201C\u201D\u2013\u2014\u2022\u2026\u20AC]/;
+
+/** The full fonts, fetched once and kept for later letters. They live in /public/fonts. */
+const fontFiles = new Map<string, Promise<ArrayBuffer>>();
+function loadFontFile(name: string): Promise<ArrayBuffer> {
+  let file = fontFiles.get(name);
+  if (!file) {
+    file = fetch(`/fonts/${name}`).then((r) => {
+      if (!r.ok) throw new Error(`Could not load the font ${name}`);
+      return r.arrayBuffer();
+    });
+    // If it failed, forget it so the next try asks again
+    file.catch(() => fontFiles.delete(name));
+    fontFiles.set(name, file);
+  }
+  return file;
+}
+
 /**
- * The standard PDF fonts can only print Western characters, so anything else becomes a "?".
- * The Ghana cedi sign is common in letters, so it is written as "GHS" instead of disappearing.
+ * Replaces characters that a font cannot draw. The built-in fonts only print Western characters, so
+ * anything else becomes a "?", and the Ghana cedi sign is written as "GHS" instead of disappearing.
+ * With a full font (`unicode`), nothing is replaced.
  */
-function printable(text: string): string {
+function printable(text: string, unicode = false): string {
+  if (unicode) return text.replace(/\r/g, "").replace(/\t/g, "    ");
   return text
     .replace(/\r/g, "")
     .replace(/\t/g, "    ")
@@ -364,9 +386,30 @@ export async function buildLetterPdf(text: string, options: BuildOptions): Promi
   const { signature: signaturePng, align, mode, title, titleStyle } = options;
   const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
   const doc = await PDFDocument.create();
-  const font = await doc.embedFont(StandardFonts.Helvetica);
-  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
-  const mono = await doc.embedFont(StandardFonts.Courier);
+  // The built-in fonts are tiny and instant. A full font is only fetched when the text has a character
+  // they cannot print, such as the cedi sign or an accented Ghanaian letter.
+  const unicode = BUILT_IN_FONT_CHARS.test(`${text}${title}`);
+  let font: PDFFont;
+  let bold: PDFFont;
+  let mono: PDFFont;
+  if (unicode) {
+    const { default: fontkit } = await import("@pdf-lib/fontkit");
+    doc.registerFontkit(fontkit);
+    // Only the faces this letter needs are fetched, and only the characters it uses are embedded
+    const needBold = mode === "letter" || titleStyle.bold;
+    const [regular, strong, fixed] = await Promise.all([
+      loadFontFile("DejaVuSans.ttf"),
+      needBold ? loadFontFile("DejaVuSans-Bold.ttf") : Promise.resolve(null),
+      mode === "code" ? loadFontFile("DejaVuSansMono.ttf") : Promise.resolve(null),
+    ]);
+    font = await doc.embedFont(regular, { subset: true });
+    bold = strong ? await doc.embedFont(strong, { subset: true }) : font;
+    mono = fixed ? await doc.embedFont(fixed, { subset: true }) : font;
+  } else {
+    font = await doc.embedFont(StandardFonts.Helvetica);
+    bold = await doc.embedFont(StandardFonts.HelveticaBold);
+    mono = await doc.embedFont(StandardFonts.Courier);
+  }
 
   const PAGE_W = 595.28;
   const PAGE_H = 841.89;
@@ -450,7 +493,7 @@ export async function buildLetterPdf(text: string, options: BuildOptions): Promi
     return rows;
   };
 
-  const lines = printable(text).split("\n");
+  const lines = printable(text, unicode).split("\n");
   const isLetter = mode === "letter";
   const signoff = isLetter ? findSignoff(lines) : null;
   const titleIndex = isLetter && !title.trim() ? findTitleLine(lines, signoff ? signoff.closing : lines.length) : -1;
@@ -517,7 +560,9 @@ export async function buildLetterPdf(text: string, options: BuildOptions): Promi
       mark(lineIndex, x, w, y, LEADING + 1);
       page.drawText(row, { x, y: y - size, size, font: face, color: ink });
       if (titleStyle.underline) {
-        page.drawLine({ start: { x, y: y - size - 2 }, end: { x: x + w, y: y - size - 2 }, thickness: 0.8, color: ink });
+        // Letters like g, y and p hang below the line the text sits on, so the underline goes under their tails
+        const lineY = y - size - Math.max(3, size * 0.26);
+        page.drawLine({ start: { x, y: lineY }, end: { x: x + w, y: lineY }, thickness: 0.8, color: ink });
       }
       // Each row of a title takes room for its own size, so a large title never touches the text below
       y -= Math.max(LEADING + 1, size * 1.3 + 4);

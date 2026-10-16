@@ -343,7 +343,6 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
       >
         Download as PDF
       </button>
-      <p className="text-xs text-fg/45">The signs “₵” and some other symbols can’t be printed, so the cedi sign is written as GHS.</p>
     </div>
   );
 }

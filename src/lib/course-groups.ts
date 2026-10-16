@@ -23,6 +23,7 @@ export const courseGroups: CourseGroup[] = [
 
 /** Which group each example course belongs to, by slug. */
 const groupBySlug: Record<string, string> = {
+  medicine: "health",
   nursing: "health",
   midwifery: "health",
   pharmacy: "health",
@@ -35,6 +36,7 @@ const groupBySlug: Record<string, string> = {
   architecture: "engineering",
 
   "computer-science": "computing",
+  "information-technology": "computing",
   "data-science": "computing",
 
   accounting: "business",

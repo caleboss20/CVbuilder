@@ -853,7 +853,10 @@ function withExtras(e: BaseExample): BaseExample {
   };
 }
 
-export const cvExamples: CvExample[] = [
+/** Courses shown first in every list, in this order, because many students ask for them by name. */
+const FEATURED = ["medicine", "information-technology"];
+
+const allExamples: CvExample[] = [
   ...baseExamples.map((e) => ({
     ...withExtras(e),
     ...(looks[e.slug] ?? { role: `${e.course} Student`, template: "ats" as const }),
@@ -861,6 +864,13 @@ export const cvExamples: CvExample[] = [
   // Extra courses are written out in full, with their own role and template
   ...courseExamples,
 ];
+
+// A stable sort, so everything that is not featured keeps its usual order
+const rank = (slug: string) => {
+  const i = FEATURED.indexOf(slug);
+  return i < 0 ? FEATURED.length : i;
+};
+export const cvExamples: CvExample[] = [...allExamples].sort((a, b) => rank(a.slug) - rank(b.slug));
 
 export function getCvExample(slug: string) {
   return cvExamples.find((e) => e.slug === slug);
