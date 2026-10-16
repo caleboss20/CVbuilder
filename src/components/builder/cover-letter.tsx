@@ -163,6 +163,28 @@ export function CoverLetterBuilder() {
                 {cfg.changes}
               </p>
 
+              {cfg.quickPicks && (
+                <div>
+                  <p className="mb-2 text-sm font-medium text-fg/80">Common scholarships and bursaries</p>
+                  <ul className="flex flex-wrap gap-2">
+                    {cfg.quickPicks.map((q) => (
+                      <li key={q.label}>
+                        <button
+                          type="button"
+                          onClick={() => set({ company: q.company, role: q.role })}
+                          className="rounded-full border border-fg/12 bg-fg/[0.04] px-3.5 py-2 text-sm text-fg/80 transition-colors hover:border-brand-400/50 hover:text-fg"
+                        >
+                          {q.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-xs text-fg/45">
+                    Tap one to fill it in, or type your own below. Always check the provider’s own page for the current requirements and deadline.
+                  </p>
+                </div>
+              )}
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label={cfg.company.label} value={input.company} onChange={(company) => set({ company })} placeholder={cfg.company.placeholder} />
                 <Field label={cfg.role.label} value={input.role} onChange={(role) => set({ role })} placeholder={cfg.role.placeholder} />

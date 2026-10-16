@@ -40,6 +40,8 @@ export type LetterKindConfig = {
   role: FieldText;
   manager: FieldText & { hint: string };
   why: FieldText;
+  /** Ready-made choices that fill in the organisation and the role/scholarship name in one tap. */
+  quickPicks?: { label: string; company: string; role: string }[];
   /** Extra questions this letter type asks, beyond the four standard ones. */
   extras?: { key: "results" | "need"; label: string; placeholder: string; hint: string }[];
   /** "Dear ___" when no name is given, and the first address line. */
@@ -91,6 +93,17 @@ export const letterKinds: LetterKindConfig[] = [
     role: { label: "Scholarship name", placeholder: "Mastercard Foundation Scholarship" },
     manager: { label: "Committee or contact (optional)", placeholder: "The Selection Committee", hint: "Leave empty to use “Dear Scholarship Committee”." },
     why: { label: "What will you do with this scholarship? (optional)", placeholder: "" },
+    // Names only, no eligibility or deadlines: those change, so students check the provider's own page
+    quickPicks: [
+      { label: "KNUST Bursary", company: "KNUST Directorate of Student Affairs (DoSA)", role: "KNUST Bursary" },
+      { label: "SRC Ketewa Biara Nsua (KBN)", company: "KNUST Students' Representative Council", role: "Ketewa Biara Nsua (KBN) Bursary" },
+      { label: "Mastercard Foundation", company: "Mastercard Foundation", role: "Mastercard Foundation Scholars Program" },
+      { label: "GETFund", company: "Ghana Education Trust Fund (GETFund)", role: "GETFund Scholarship" },
+      { label: "TEST for Ghana", company: "TEST for Ghana", role: "TEST for Ghana Scholarship" },
+      { label: "Hulede Foundation", company: "Hulede Foundation", role: "Hulede Foundation Scholarship" },
+      { label: "Educational Pathways International", company: "Educational Pathways International", role: "Educational Pathways International (EPI) Scholarship" },
+      { label: "Vodafone Ghana", company: "Vodafone Ghana", role: "Vodafone Ghana Scholarship" },
+    ],
     extras: [
       {
         key: "results",
