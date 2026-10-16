@@ -1,5 +1,5 @@
 import { track } from "@vercel/analytics";
-import { isOwnerDevice } from "@/lib/owner";
+import { shouldSkipCounting } from "@/lib/owner";
 import { recordEvent } from "@/lib/events";
 
 /**
@@ -17,7 +17,7 @@ export type TrackedEvent =
 /** Records an event. Analytics must never break the app, so any failure is ignored. */
 export function trackEvent(name: TrackedEvent, data?: Record<string, string | number>) {
   try {
-    if (isOwnerDevice()) return;
+    if (shouldSkipCounting()) return;
     track(name, data);
     // Our own counter, which keeps real totals we can read at any time
     recordEvent(name, data);

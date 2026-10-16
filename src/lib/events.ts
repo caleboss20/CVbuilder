@@ -1,4 +1,4 @@
-import { isOwnerDevice } from "@/lib/owner";
+import { shouldSkipCounting } from "@/lib/owner";
 import { authConfigured, getSupabase } from "@/lib/supabase";
 
 /**
@@ -24,7 +24,7 @@ function deviceId(): { id: string; isNew: boolean } {
 
 /** Sends one event to our counter. Quiet on failure, and skipped on the owner's own devices. */
 export function recordEvent(name: string, props?: Record<string, string | number>) {
-  if (!authConfigured || isOwnerDevice()) return;
+  if (!authConfigured || shouldSkipCounting()) return;
   const { id } = deviceId();
   if (!id) return;
   // Fire and forget: counting must never slow down or break the student's page
@@ -39,6 +39,6 @@ export function recordEvent(name: string, props?: Record<string, string | number
 
 /** Counts a brand-new device once, the first time it opens the site. This is our "people" number. */
 export function recordFirstVisit() {
-  if (!authConfigured || isOwnerDevice()) return;
+  if (!authConfigured || shouldSkipCounting()) return;
   if (deviceId().isNew) recordEvent("first_visit");
 }
