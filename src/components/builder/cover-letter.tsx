@@ -133,7 +133,8 @@ export function CoverLetterBuilder() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
           <section aria-label="Write your letter" className="min-w-0">
-            <div className="mx-auto max-w-2xl space-y-5 px-4 pb-20 pt-8 sm:px-6">
+            {/* Generous side padding keeps the form clear of the screen edge on every width */}
+            <div className="mx-auto max-w-2xl space-y-7 px-6 pb-24 pt-10 sm:px-10 lg:px-12">
               <div>
                 <h1 className="text-2xl font-medium text-fg sm:text-3xl">Your letter</h1>
                 <p className="mt-1.5 text-sm text-fg/55">
@@ -172,7 +173,7 @@ export function CoverLetterBuilder() {
                 <span className="text-xs text-fg/45">Formal is the standard for scholarships and applications.</span>
               </div>
 
-              <div role="radiogroup" aria-label="Which letter do you need?" className="flex flex-wrap gap-2">
+              <div role="radiogroup" aria-label="Which letter do you need?" className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
                 {letterKinds.map((k) => (
                   <button
                     key={k.id}
@@ -180,7 +181,7 @@ export function CoverLetterBuilder() {
                     role="radio"
                     aria-checked={input.kind === k.id}
                     onClick={() => set({ kind: k.id })}
-                    className={`rounded-md px-3.5 py-2 text-sm transition-colors ${
+                    className={`rounded-md px-3 py-2.5 text-center text-sm transition-colors ${
                       input.kind === k.id ? "bg-brand-500/15 text-fg ring-1 ring-brand-400/50" : "text-fg/60 ring-1 ring-fg/12 hover:text-fg"
                     }`}
                   >
@@ -190,7 +191,7 @@ export function CoverLetterBuilder() {
               </div>
 
               {/* Say what the choice does, so nobody has to guess */}
-              <p className="-mt-2 text-sm text-fg/55">
+              <p className="-mt-3 text-sm leading-relaxed text-fg/55">
                 <span className="text-fg/75">What this changes: </span>
                 {cfg.changes}
               </p>
