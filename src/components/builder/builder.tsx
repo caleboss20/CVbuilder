@@ -34,7 +34,7 @@ import {
 } from "./sections";
 import { CvTypePicker, TypeGuide } from "./type-guide";
 import type { CvType } from "@/lib/cv-type";
-import type { ImportResult } from "@/lib/cv-import";
+import { CHECKER_HANDOFF_KEY, importCv, type ImportResult } from "@/lib/cv-import";
 import { templateAdviceFor, type TemplateAdvice } from "@/lib/template-advice";
 import { ConfirmDialog } from "./confirm-dialog";
 import { ImportBanner } from "./import-card";
@@ -93,6 +93,8 @@ export function Builder() {
   const [hasSaved, setHasSaved] = useState(false);
   /** A brand-new CV waiting for the student to choose its type in the guide. */
   const [pending, setPending] = useState<BuilderCv | null>(null);
+  /** A CV handed over by the CV checker, waiting to be opened in the editor. */
+  const [incoming, setIncoming] = useState<ImportResult | null>(null);
   /** A pending "are you sure?" pop-up. Nothing destructive happens until the student confirms. */
   const [confirm, setConfirm] = useState<{
     title: string;
@@ -110,6 +112,16 @@ export function Builder() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- read once from the URL after mount
     setRequested(picked);
     setImportMode(wantsImport);
+    // The checker leaves the CV's text in sessionStorage and sends the student here
+    if (params.get("fromChecker") === "1") {
+      try {
+        const handedOver = sessionStorage.getItem(CHECKER_HANDOFF_KEY);
+        sessionStorage.removeItem(CHECKER_HANDOFF_KEY);
+        if (handedOver) setIncoming(importCv(handedOver));
+      } catch {
+        // Blocked storage: the student can upload the CV here instead
+      }
+    }
     let stored: BuilderCv | null = null;
     try {
       const raw = localStorage.getItem(BUILDER_STORAGE_KEY);
@@ -194,6 +206,15 @@ export function Builder() {
       onConfirm: start,
     });
   }
+
+  useEffect(() => {
+    if (!incoming || status === "loading") return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hand-over from the checker, then cleared
+    begin(incoming.cv, incoming);
+    setIncoming(null);
+    // begin() is recreated every render; this must only run when a CV arrives
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [incoming, status]);
 
   /** Opens the editor on `next`, from step one. A template chosen on the homepage always wins. */
   function openEditor(next: BuilderCv, imported?: ImportResult) {

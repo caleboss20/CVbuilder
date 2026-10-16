@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BUILDER_STORAGE_KEY, blankCv, toDoc } from "@/lib/builder";
 import { analyseCv, hasEnoughText, type Check, type CvReport } from "@/lib/cv-check";
 import { cvToText } from "@/lib/cv-text";
 import { industries, OTHER_INDUSTRY } from "@/lib/industries";
+import { CHECKER_HANDOFF_KEY } from "@/lib/cv-import";
 import { CvFileError, readCvFile } from "@/lib/read-cv-file";
 import { CheckIcon } from "@/components/ui/check-icon";
 
@@ -22,6 +24,7 @@ const FIELD =
   "w-full rounded-lg border border-fg/12 bg-ink-950/60 px-3.5 py-3 text-sm leading-relaxed text-fg placeholder:text-fg/35 focus:border-brand-400/70 focus:outline-none";
 
 export function CvChecker() {
+  const router = useRouter();
   const [source, setSource] = useState<Source>("upload");
   const [cvText, setCvText] = useState("");
   const [fileName, setFileName] = useState("");
@@ -88,6 +91,16 @@ export function CvChecker() {
     setReport(analyseCv({ cvText, advert, industryId, otherIndustry, cvType }));
     // On phones the results are below the form, so bring them into view
     requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }
+
+  /** Hands this CV to the builder, which imports it so the student can fix it with live advice. */
+  function improve() {
+    try {
+      sessionStorage.setItem(CHECKER_HANDOFF_KEY, cvText);
+    } catch {
+      // Blocked storage: the builder just opens without the CV, and they can upload it there
+    }
+    router.push("/builder?fromChecker=1");
   }
 
   return (
@@ -277,7 +290,7 @@ export function CvChecker() {
 
       {/* ---------------- Results ---------------- */}
       <section ref={resultsRef} aria-label="Your CV score" aria-live="polite" className="min-w-0 scroll-mt-24">
-        {report ? <ReportView report={report} /> : <EmptyState />}
+        {report ? <ReportView report={report} onImprove={source === "builder" ? undefined : improve} /> : <EmptyState />}
       </section>
     </div>
   );
@@ -316,7 +329,7 @@ const TONE = {
   weak: { ring: "stroke-amber-400", text: "text-amber-300" },
 } as const;
 
-function ReportView({ report }: { report: CvReport }) {
+function ReportView({ report, onImprove }: { report: CvReport; onImprove?: () => void }) {
   const tone = TONE[report.band.tone];
   const fixes = report.checks.filter((c) => c.status !== "good");
   const good = report.checks.filter((c) => c.status === "good");
@@ -395,12 +408,23 @@ function ReportView({ report }: { report: CvReport }) {
         <p className="mt-1 text-sm text-fg/65">
           Rebuild your CV in a clean, recruiter-friendly template, then check it again to watch the score go up.
         </p>
-        <Link
-          href="/builder"
-          className="mt-4 inline-flex rounded-md bg-brand-600 px-5 py-2.5 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)] hover:bg-brand-500"
-        >
-          Improve it in the builder
-        </Link>
+        {/* From an upload or pasted text we carry the CV across; from the builder it is already there */}
+        {onImprove ? (
+          <button
+            type="button"
+            onClick={onImprove}
+            className="mt-4 inline-flex rounded-md bg-brand-600 px-5 py-2.5 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)] hover:bg-brand-500"
+          >
+            Fix it in the builder
+          </button>
+        ) : (
+          <Link
+            href="/builder"
+            className="mt-4 inline-flex rounded-md bg-brand-600 px-5 py-2.5 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)] hover:bg-brand-500"
+          >
+            Improve it in the builder
+          </Link>
+        )}
       </div>
     </div>
   );

@@ -21,6 +21,12 @@ import type { CvTemplateName } from "./cv-examples";
  * student can copy it across by hand and nothing is silently lost.
  */
 
+/**
+ * Where the CV checker leaves a CV's text for the builder to pick up (sessionStorage,
+ * so it never leaves the browser and disappears when the tab closes).
+ */
+export const CHECKER_HANDOFF_KEY = "cv11-checker-handoff";
+
 export type ImportResult = {
   cv: BuilderCv;
   /** How many of each thing we found, for the "here is what we found" message. */
