@@ -11,8 +11,10 @@ import { SparkleIcon } from "@/components/ui/sparkle-icon";
 import { Field, TextArea } from "./fields";
 import { trackEvent } from "@/lib/track";
 import { VoiceInput } from "./voice-input";
+import { SignaturePad } from "./signature-pad";
 
 const LETTER_KEY = "cv11-letter-v1";
+const SIGNATURE_KEY = "cv11-signature-v1";
 
 /**
  * Print rules for the letter. An off-screen full-size copy (#letter-print) is the
@@ -43,19 +45,32 @@ export function CoverLetterBuilder() {
   const [input, setInput] = useState<LetterInput>({ kind: "job", company: "", role: "", manager: "", why: "", results: "", need: "", contribution: "", helpWith: [], enclosures: [], senderAddress: "", recipientAddress: "", style: "formal" });
   const [body, setBody] = useState("");
   const [date, setDate] = useState("");
+  // Kept under its own key so one signature serves every letter. Saved when it changes, never on load.
+  const [signature, setSignature] = useState("");
+
+  function changeSignature(dataUrl: string) {
+    setSignature(dataUrl);
+    try {
+      if (dataUrl) localStorage.setItem(SIGNATURE_KEY, dataUrl);
+      else localStorage.removeItem(SIGNATURE_KEY);
+    } catch {}
+  }
 
   // Load the CV from the builder, plus any letter already started
   useEffect(() => {
     let loaded: BuilderCv | null = null;
     let letter: Saved | null = null;
+    let savedSignature = "";
     try {
       const raw = localStorage.getItem(BUILDER_STORAGE_KEY);
       if (raw) loaded = { ...blankCv(), ...JSON.parse(raw) };
       const l = localStorage.getItem(LETTER_KEY);
       if (l) letter = JSON.parse(l);
+      savedSignature = localStorage.getItem(SIGNATURE_KEY) ?? "";
     } catch {}
     /* eslint-disable react-hooks/set-state-in-effect -- one-time hydration from storage */
     setCv(loaded ?? blankCv());
+    setSignature(savedSignature);
     if (letter) {
       setInput({
         kind: letter.kind,
@@ -290,6 +305,8 @@ export function CoverLetterBuilder() {
                 </fieldset>
               ))}
 
+              <SignaturePad value={signature} onChange={changeSignature} />
+
               <div>
                 <p className="mb-1.5 text-sm font-medium text-fg/80">{cfg.why.label}</p>
                 {input.why ? (
@@ -336,7 +353,7 @@ export function CoverLetterBuilder() {
               <p className="mb-3 text-xs text-fg/45">Live preview · A4 · matches your CV colour</p>
               <div className="mx-auto max-w-[640px] overflow-hidden rounded-md bg-white shadow-[0_20px_60px_-20px_rgb(0_0_0/0.6)] ring-1 ring-fg/10">
                 <CvPageFrame>
-                  <LetterPage cv={cv} input={input} body={body} date={date} />
+                  <LetterPage cv={cv} input={input} body={body} date={date} signature={signature} />
                 </CvPageFrame>
               </div>
             </div>
@@ -347,7 +364,7 @@ export function CoverLetterBuilder() {
       <div id="letter-print" aria-hidden="true">
         <style>{printCss}</style>
         <div className="flex min-h-[1121px] w-[794px] flex-col bg-white">
-          <LetterPage cv={cv} input={input} body={body} date={date} />
+          <LetterPage cv={cv} input={input} body={body} date={date} signature={signature} />
         </div>
       </div>
     </>
@@ -367,7 +384,7 @@ const addressLines = (text: string) =>
  * address on the left, then "Dear Sir/Madam", the heading in underlined capitals, the body, "Yours
  * faithfully", the name and any enclosures. "Match my CV" keeps the coloured letterhead instead.
  */
-function LetterPage({ cv, input, body, date }: { cv: BuilderCv; input: LetterInput; body: string; date: string }) {
+function LetterPage({ cv, input, body, date, signature }: { cv: BuilderCv; input: LetterInput; body: string; date: string; signature: string }) {
   const cfg = kindConfig(input.kind);
   const accent = cv.accent ?? "#1e3a5f";
   const contact = useMemo(() => [cv.location, cv.phone, cv.email, ...cv.links].map((s) => s.trim()).filter(Boolean), [cv]);
@@ -396,6 +413,14 @@ function LetterPage({ cv, input, body, date }: { cv: BuilderCv; input: LetterInp
         w ? <span key={i} className="block h-2.5 rounded bg-slate-200" style={{ width: `${w}%` }} /> : <span key={i} className="block h-2" />,
       )}
     </div>
+  );
+
+  // The signature sits between "Yours faithfully," and the typed name. With none, leave room to sign by hand.
+  const signed = signature ? (
+    // eslint-disable-next-line @next/next/no-img-element -- a small local data URL, nothing to optimise
+    <img src={signature} alt="" className="mb-1 mt-3 h-14 w-auto max-w-[220px] object-contain object-left" />
+  ) : (
+    <div className="h-14" aria-hidden="true" />
   );
 
   const enclosures =
@@ -436,7 +461,8 @@ function LetterPage({ cv, input, body, date }: { cv: BuilderCv; input: LetterInp
         {bodyBlock}
 
         <p className="mt-8">{closing}</p>
-        <p className="mt-12 font-bold uppercase text-slate-900">{name}</p>
+        {signed}
+        <p className="font-bold uppercase text-slate-900">{name}</p>
         {enclosures}
       </div>
     );
@@ -467,7 +493,8 @@ function LetterPage({ cv, input, body, date }: { cv: BuilderCv; input: LetterInp
       {bodyBlock}
 
       <p className="mt-8">{closing}</p>
-      <p className="mt-10 font-semibold text-slate-900">{name}</p>
+      {signed}
+      <p className="font-semibold text-slate-900">{name}</p>
       {enclosures}
     </div>
   );
