@@ -23,13 +23,12 @@ export const siteConfig = {
    */
   whatsapp: (process.env.NEXT_PUBLIC_WHATSAPP ?? "233256599734").replace(/\D/g, ""),
   /**
-   * The Pro pass shown on the pricing page. These are placeholders to test interest: change the
-   * price and the number of reviews here and the page updates. Nothing is charged yet.
+   * The Pro plan shown on the pricing page, billed every month. These are placeholders to test
+   * interest: change the price and the number of reviews here and the page updates. Nothing is charged yet.
    */
   pro: {
     price: "GH₵ 15",
-    reviews: 5,
-    validDays: 30,
+    reviews: 10, // AI reviews included each month
   },
   nav: [
     { label: "Templates", href: "/templates" },

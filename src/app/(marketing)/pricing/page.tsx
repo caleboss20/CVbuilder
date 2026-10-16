@@ -5,9 +5,9 @@ import { ProWaitlist } from "@/components/marketing/pro-waitlist";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Pricing: Free CV Builder and the Coming Pro Pass",
+  title: "Pricing: Free CV Builder and the Coming Pro Plan",
   description:
-    "CV11 is free for students: the CV builder, templates, PDF downloads, letters and more. Pro adds AI help with your CV for a few cedis, and it is coming soon.",
+    "CV11 is free for students: the CV builder, templates, PDF downloads, letters and more. Pro adds AI help with your CV for a few cedis a month, and it is coming soon.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -25,7 +25,7 @@ const free = [
 
 /** What Pro will add. Marked as coming soon on the page, since none of it is on sale yet. */
 const pro = [
-  `${siteConfig.pro.reviews} AI reviews of your CV, valid for ${siteConfig.pro.validDays} days`,
+  `${siteConfig.pro.reviews} AI reviews of your CV every month`,
   "Suggestions for a stronger summary and bullet points",
   "AI match between your CV and a job advert",
   "Your CV saved to your account, on any phone",
@@ -52,7 +52,7 @@ export default function PricingPage() {
         <div className="text-center">
           <h1 className="text-4xl font-medium tracking-tight text-fg sm:text-5xl">Simple pricing</h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-fg/65 sm:text-lg">
-            Everything you need to make a CV and apply is free. Pro is a small, one-off pass for AI help, with no subscription.
+            Everything you need to make a CV and apply is free. Pro is a small monthly plan for AI help with your CV, and you can cancel any time.
           </p>
         </div>
 
@@ -61,7 +61,7 @@ export default function PricingPage() {
           <section className="flex flex-col rounded-2xl border border-fg/10 bg-fg/[0.03] p-7 sm:p-8">
             <h2 className="text-lg font-medium text-fg">Free</h2>
             <p className="mt-4 flex items-baseline gap-2">
-              <span className="text-5xl font-semibold tracking-tight text-fg">GH₵ 0</span>
+              <span className="whitespace-nowrap text-4xl font-semibold tracking-tight text-fg sm:text-5xl">GH₵ 0</span>
             </p>
             <p className="mt-1 text-sm text-fg/55">Free for students, always.</p>
             <ul className="mt-7 flex-1 space-y-3.5">
@@ -89,12 +89,12 @@ export default function PricingPage() {
 
             <div className="h-full rounded-2xl bg-gradient-to-b from-brand-300/80 via-brand-500/40 to-brand-500/10 p-px transition-transform duration-300 group-hover:-translate-y-1">
               <div className="flex h-full flex-col rounded-[15px] bg-ink-900 p-7 pt-9 sm:p-8 sm:pt-10">
-                <h2 className="text-lg font-medium text-fg">Pro pass</h2>
+                <h2 className="text-lg font-medium text-fg">Pro</h2>
                 <p className="mt-4 flex items-baseline gap-2">
-                  <span className="text-5xl font-semibold tracking-tight text-fg">{siteConfig.pro.price}</span>
-                  <span className="text-sm text-fg/55">once</span>
+                  <span className="whitespace-nowrap text-4xl font-semibold tracking-tight text-fg sm:text-5xl">{siteConfig.pro.price}</span>
+                  <span className="whitespace-nowrap text-sm text-fg/55">per month</span>
                 </p>
-                <p className="mt-1 text-sm text-fg/55">Pay once, no subscription. Planned price, to be confirmed.</p>
+                <p className="mt-1 text-sm text-fg/55">Billed monthly. Cancel any time. Planned price, to be confirmed.</p>
                 <ul className="mt-7 flex-1 space-y-3.5">
                   {pro.map((f) => (
                     <Check key={f}>{f}</Check>
