@@ -268,10 +268,37 @@ export function findSignoff(lines: string[]): { closing: number; block: number[]
   return { closing, block };
 }
 
+/** A date written out ("16 October 2026", "October 16, 2026") or with numbers ("16/10/2026"). */
+const DATE_LINE = /^(\d{1,2}(st|nd|rd|th)?\s+)?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(\d{1,2}(st|nd|rd|th)?,?\s+)?\d{4}$|^\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}$/i;
+
+/**
+ * Finds the top of a formal letter: the sender's address (the first paragraph, before "Dear…") and the
+ * date, if it is on a line of its own before "Dear…". These are the parts that go together at the top
+ * right of a formal letter. Returns null if the letter does not start that way.
+ */
+export function findTopBlock(lines: string[]): { block: number[]; date: number } | null {
+  const salutation = lines.findIndex((l) => SALUTATION.test(l.trim()));
+  if (salutation <= 0) return null;
+
+  let i = 0;
+  while (i < salutation && !lines[i].trim()) i++;
+  const block: number[] = [];
+  while (i < salutation && lines[i].trim() && block.length < 7) block.push(i++);
+  if (!block.length) return null;
+
+  // A line that is only a date is part of the top block too, wherever it sits above "Dear…"
+  const date = lines.findIndex((l, n) => n >= i && n < salutation && DATE_LINE.test(l.trim()));
+  // A date inside the first paragraph is already in the block
+  const dateOutside = date >= 0 && !block.includes(date) ? date : -1;
+  return { block, date: dateOutside };
+}
+
 /**
  * Lays out a letter as a clean A4 PDF with real, selectable text.
  *  - The heading (for example "My request for financial assistance") is made bold, underlined and
  *    centred, in capitals.
+ *  - Choosing right moves the top of the letter (the sender's address and the date) to the top right, as in
+ *    a formal letter. The recipient, heading and body stay on the left.
  *  - The whole sign-off moves together to the chosen side: the closing line ("Yours faithfully,"), the
  *    signature and the typed name. The signature gets a fixed-size space directly under the closing line.
  *  - With no closing line found, the signature goes at the end.
@@ -328,6 +355,26 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
   const signoff = findSignoff(lines);
   const titleIndex = findTitleLine(lines, signoff ? signoff.closing : lines.length);
   const inSignoff = new Set(signoff?.block ?? []);
+  // With right alignment the sender's address and the date form a block at the top right
+  const top = align === "right" ? findTopBlock(lines) : null;
+  const inTop = new Set(top ? [...top.block, ...(top.date >= 0 ? [top.date] : [])] : []);
+
+  /** Draws the sender's address, then the date under it, lined up with each other at the right margin. */
+  const drawTop = ({ block, date }: { block: number[]; date: number }) => {
+    const rows = block.map((n) => lines[n].trim());
+    const dateRow = date >= 0 ? lines[date].trim() : "";
+    const widest = Math.max(...[...rows, dateRow].map((r) => font.widthOfTextAtSize(r, SIZE)));
+    const x = PAGE_W - MARGIN - widest;
+    for (const row of rows) {
+      page.drawText(row, { x, y: y - SIZE, size: SIZE, font, color: ink });
+      y -= LEADING;
+    }
+    if (dateRow) {
+      y -= LEADING * 0.5;
+      page.drawText(dateRow, { x, y: y - SIZE, size: SIZE, font, color: ink });
+      y -= LEADING;
+    }
+  };
 
   /** Draws the sign-off as one block: closing line, signature, then the name lines under it. */
   const drawSignoff = (block: number[]) => {
@@ -366,8 +413,17 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
   };
 
   let signoffDrawn = false;
+  let topDrawn = false;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    if (inTop.has(i)) {
+      // The top block is drawn once, when its first line is reached
+      if (!topDrawn && top) {
+        drawTop(top);
+        topDrawn = true;
+      }
+      continue;
+    }
     if (inSignoff.has(i)) {
       // The sign-off is drawn once, as a block, when its first line is reached
       if (!signoffDrawn && signoff) {
