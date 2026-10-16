@@ -38,8 +38,11 @@ export const templates: TemplateInfo[] = [
   { id: "greyBars", name: "Grey Bars", blurb: "Soft grey bars behind each heading and skills in three columns.", tags: ["simple", "ats"], exampleSlug: "banking" },
   { id: "dividedSimple", name: "Divided Simple", blurb: "Light, open name and a thin line above every section.", tags: ["simple", "ats"], exampleSlug: "marketing" },
   { id: "iconLine", name: "Icon Line", blurb: "Bold centred name with a neat row of contact icons.", tags: ["simple", "ats"], exampleSlug: "economics" },
-  { id: "dateColumn", name: "Date Column", blurb: "Dates on the left so your timeline is clear at a glance.", tags: ["simple", "ats"], exampleSlug: "teaching" },
+  { id: "dateColumn", name: "Date Column", blurb: "Dates on the left so your timeline is clear at a glance.", tags: ["simple", "ats"], exampleSlug: "information-technology" },
   { id: "lavenderBand", name: "Lavender Band", blurb: "Spaced name and soft tinted bands behind each heading.", tags: ["simple", "ats"], exampleSlug: "journalism" },
+  { id: "spacedRule", name: "Spaced Rule", blurb: "Widely spaced bold name, small spaced headings and heavy rules. Plain and very easy to scan.", tags: ["simple", "ats"], exampleSlug: "electrical-engineering" },
+  { id: "labelColumn", name: "Label Column", blurb: "Section names in a left column with the details beside them, under a heavy rule.", tags: ["simple", "ats"], exampleSlug: "human-resource-management" },
+  { id: "accentIcons", name: "Accent Icons", blurb: "Colour on your role and employers, icon contacts, large headings and dashed dividers.", tags: ["simple", "ats"], exampleSlug: "public-health" },
   { id: "photoClassic", name: "Photo Classic", blurb: "Photo beside your name and contact details. Only add a photo if the employer expects one.", tags: ["photo"], exampleSlug: "civil-engineering" },
 
   // Two-column layouts. Neat and modern, though some tracking systems read single columns more reliably.
@@ -55,16 +58,19 @@ export const templates: TemplateInfo[] = [
 /**
  * The templates shown in the homepage's "Find your style" section. Photos are optional and not every
  * employer wants one, so only a few photo designs are shown (seven), mixed in among the plain ATS-safe
- * ones. The first card is the plain Ruled Classic design showing the Medicine CV, with no photo.
+ * ones. The first two cards are plain designs showing the Medicine and Information Technology CVs.
  */
-const HOMEPAGE_FIRST = "ruledClassic";
+// The first two cards show the courses students ask for most: Medicine, then Information Technology. Neither uses a photo.
+const HOMEPAGE_FIRST = ["ruledClassic", "dateColumn"] as const;
 const HOMEPAGE_PHOTO_IDS: CvTemplateName[] = ["sage", "tealHeader", "softBars", "greyHeader", "cleanRule", "blueDiagonal", "navyPanel"];
 
 export function homepageTemplates(): TemplateInfo[] {
   const byId = (id: CvTemplateName) => templates.find((t) => t.id === id);
-  const first = byId(HOMEPAGE_FIRST);
+  const first = HOMEPAGE_FIRST.flatMap((id) => byId(id) ?? []);
   const photo = HOMEPAGE_PHOTO_IDS.flatMap((id) => byId(id) ?? []);
-  const plain = templates.filter((t) => t.tags.includes("ats") && t.id !== HOMEPAGE_FIRST && !HOMEPAGE_PHOTO_IDS.includes(t.id));
+  const plain = templates.filter(
+    (t) => t.tags.includes("ats") && !(HOMEPAGE_FIRST as readonly string[]).includes(t.id) && !HOMEPAGE_PHOTO_IDS.includes(t.id),
+  );
 
   // Alternate photo and plain designs, so the first few cards already show some variety
   const mixed: TemplateInfo[] = [];
@@ -72,7 +78,7 @@ export function homepageTemplates(): TemplateInfo[] {
     if (photo[i]) mixed.push(photo[i]);
     if (plain[i]) mixed.push(plain[i]);
   }
-  return first ? [first, ...mixed] : mixed;
+  return [...first, ...mixed];
 }
 
 /** Two-column layouts, which some hiring software reads less reliably than one column. */

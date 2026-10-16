@@ -22,6 +22,7 @@ import {
   SlateBandCv,
 } from "./cv-templates-more";
 import {
+  AccentIconsCv,
   DateColumnCv,
   DividedSimpleCv,
   GreyBarsCv,
@@ -29,6 +30,7 @@ import {
   GridLeftCv,
   GridSpacedCv,
   IconLineCv,
+  LabelColumnCv,
   LavenderBandCv,
   PhotoClassicCv,
   RuledClassicCv,
@@ -37,6 +39,7 @@ import {
   SideStripeCv,
   SidePanelCv,
   SideTimelineCv,
+  SpacedRuleCv,
   ThinSplitCv,
 } from "./cv-templates-ats";
 import { CleanRuleCv, GreyHeaderCv, SageCv, SoftBarsCv, TealHeaderCv } from "./cv-templates-single";
@@ -123,6 +126,12 @@ export function CvTemplateView({
       return <GridBandCv {...props} />;
     case "gridSpaced":
       return <GridSpacedCv {...props} />;
+    case "spacedRule":
+      return <SpacedRuleCv {...props} />;
+    case "labelColumn":
+      return <LabelColumnCv {...props} />;
+    case "accentIcons":
+      return <AccentIconsCv {...props} />;
     default:
       return <AtsCv doc={doc} role={role} />;
   }

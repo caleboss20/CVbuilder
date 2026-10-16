@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button";
 import { PageShell } from "@/components/marketing/page-shell";
+import { templates } from "@/lib/templates";
 
 export const metadata: Metadata = {
   title: "About CV11",
@@ -31,7 +32,7 @@ export default function AboutPage() {
           <strong>Builds your CV</strong> from a template, a blank page, or a CV you already have (upload it and keep editing).
         </li>
         <li>
-          <strong>Offers 34 templates</strong>, including plain one-column designs that hiring software reads reliably.
+          <strong>Offers {templates.length} templates</strong>, including plain one-column designs that hiring software reads reliably.
         </li>
         <li>
           <strong>Checks a CV</strong> against a job and gives a score out of 100 with clear fixes.

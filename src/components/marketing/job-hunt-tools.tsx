@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SectionHeading } from "./section-heading";
+import { templates } from "@/lib/templates";
 
 /*
  * Everything CV11 does, in six cards. This is what sets it apart: a student gets the
@@ -10,7 +11,7 @@ import { SectionHeading } from "./section-heading";
 const tools: { title: string; text: string; href: string; icon: string; tags?: string[] }[] = [
   {
     title: "Build or upload your CV",
-    text: "34 templates, live preview, PDF and Word. Or upload the CV you already have.",
+    text: `${templates.length} templates, live preview, PDF and Word. Or upload the CV you already have.`,
     href: "/builder",
     icon: "M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6",
   },

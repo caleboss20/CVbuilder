@@ -58,12 +58,17 @@ type HeadingKind =
   | "plain" // small dark text with a thin grey rule under it
   | "bar" // grey fading bar behind the text
   | "tint" // full-width tinted band behind the text
-  | "divider"; // a rule above the text
+  | "divider" // a rule above the text
+  | "spaced" // small, widely spaced capitals with a heavy rule under them
+  | "display" // large capitals with a heavy rule under them
+  | "label"; // a plain bold label, for the left column of a label-column layout
 
 type EntryStyle =
   | "role-first" // "Role, Organisation ........ dates"
   | "org-first" // "ORGANISATION, town ....... dates" then the role in italics
-  | "date-column"; // dates and organisation in a left column, role and bullets on the right
+  | "date-column" // dates and organisation in a left column, role and bullets on the right
+  | "title-caps" // "ROLE ........ dates" in bold capitals, then the organisation in bold
+  | "stacked"; // role, then the organisation in the accent colour, then dates, with dashed lines between
 
 type SkillsStyle =
   | "columns" // bullets in three columns
@@ -71,7 +76,7 @@ type SkillsStyle =
   | "sections" // every skill group is its own section, items joined with dashes
   | "inline"; // one section, items joined with dashes
 
-type HeaderKind = "center" | "left" | "icons" | "photo";
+type HeaderKind = "center" | "left" | "icons" | "photo" | "accent";
 
 type StackConfig = {
   /** Default accent colour; the colour picker overrides it. */
@@ -92,6 +97,10 @@ type StackConfig = {
   heading: HeadingKind;
   entry: EntryStyle;
   skills: SkillsStyle;
+  /** Section names in a left column, with the content beside them. */
+  labelColumn?: boolean;
+  /** How many columns the skills list uses. Three when not set. */
+  skillCols?: 2 | 3;
   titles: { summary: string; experience: string; education: string; skills: string };
 };
 
@@ -131,10 +140,16 @@ function SectionHeading({ kind, accent, title }: { kind: HeadingKind; accent: st
       );
     case "divider":
       return <h3 className={`${base} border-t border-slate-800 pt-3 text-[15px] text-slate-900`}>{title}</h3>;
+    case "spaced":
+      return <h3 className="border-b-2 border-slate-900 pb-1.5 text-[12px] font-bold uppercase tracking-[0.22em] text-slate-900">{title}</h3>;
+    case "display":
+      return <h3 className="border-b-[3px] border-slate-900 pb-1 text-[20px] font-bold uppercase text-slate-900">{title}</h3>;
+    case "label":
+      return <h3 className="text-[14px] font-bold uppercase leading-snug text-slate-900">{title}</h3>;
   }
 }
 
-function Jobs({ jobs, entry }: { jobs: CvJob[]; entry: EntryStyle }) {
+function Jobs({ jobs, entry, accent }: { jobs: CvJob[]; entry: EntryStyle; accent: string }) {
   return (
     <div className="space-y-4">
       {jobs.map((j) => {
@@ -150,6 +165,34 @@ function Jobs({ jobs, entry }: { jobs: CvJob[]; entry: EntryStyle }) {
                 <p className="font-bold text-slate-900">{j.title}</p>
                 <Bullets items={j.bullets} className="mt-1" />
               </div>
+            </div>
+          );
+        }
+        if (entry === "title-caps") {
+          return (
+            <div key={key}>
+              <div className="flex justify-between gap-4 text-slate-900">
+                <b className="uppercase">{j.title}</b>
+                <b className="shrink-0">{j.date}</b>
+              </div>
+              {j.place && <p className="font-bold text-slate-900">{j.place}</p>}
+              <Bullets items={j.bullets} className="mt-1" />
+            </div>
+          );
+        }
+        if (entry === "stacked") {
+          const { org, town } = splitPlace(j.place);
+          return (
+            <div key={key} className="border-t border-dashed border-slate-300 pt-3 first:border-t-0 first:pt-0">
+              <p className="text-[15px] text-slate-900">{j.title}</p>
+              <p className="font-bold" style={{ color: A(accent) }}>
+                {org}
+              </p>
+              <p className="text-[12px] text-slate-500">
+                {j.date}
+                {town && <>  ·  {town}</>}
+              </p>
+              <Bullets items={j.bullets} className="mt-1.5" />
             </div>
           );
         }
@@ -186,7 +229,7 @@ function Jobs({ jobs, entry }: { jobs: CvJob[]; entry: EntryStyle }) {
   );
 }
 
-function Schools({ schools, entry }: { schools: CvEducation[]; entry: EntryStyle }) {
+function Schools({ schools, entry, accent }: { schools: CvEducation[]; entry: EntryStyle; accent: string }) {
   return (
     <div className="space-y-3">
       {schools.map((e) => {
@@ -199,6 +242,17 @@ function Schools({ schools, entry }: { schools: CvEducation[]; entry: EntryStyle
                 <p className="text-slate-500">{e.school}</p>
               </div>
               <p className="font-bold text-slate-900">{e.degree}</p>
+            </div>
+          );
+        }
+        if (entry === "stacked") {
+          return (
+            <div key={key} className="border-t border-dashed border-slate-300 pt-3 first:border-t-0 first:pt-0">
+              <p className="text-[15px] text-slate-900">{e.degree}</p>
+              <p className="font-bold" style={{ color: A(accent) }}>
+                {e.school}
+              </p>
+              <p className="text-[12px] text-slate-500">{e.date}</p>
             </div>
           );
         }
@@ -273,7 +327,35 @@ function StackHeader({ cfg, doc, role, photo }: { cfg: StackConfig } & TemplateP
         </p>
         {role && <p className={cfg.roleClass ?? "mt-3 text-[22px] font-bold uppercase text-slate-900"}>{role}</p>}
         <p className="mt-2 text-[14px]">{doc.contact.join(sep)}</p>
-        <div className="mt-5 border-t border-slate-800" />
+        {cfg.rule === "thick" ? (
+          <div className="mt-5 h-1 bg-slate-900" />
+        ) : cfg.rule !== "none" ? (
+          <div className="mt-5 border-t border-slate-800" />
+        ) : null}
+      </header>
+    );
+  }
+
+  if (cfg.header === "accent") {
+    return (
+      <header>
+        <p className={cfg.nameClass ?? "text-[38px] font-medium leading-none text-slate-900"}>{doc.name}</p>
+        {role && (
+          <p className={cfg.roleClass ?? "mt-1.5 text-[19px] font-semibold"} style={{ color: A(cfg.accent) }}>
+            {role}
+          </p>
+        )}
+        {/* Contact items in three columns, with their icons in the accent colour */}
+        <div className="mt-3 grid grid-cols-3 gap-x-4 gap-y-1 text-[12.5px] font-semibold text-slate-700">
+          {doc.contact.map((c) => (
+            <span key={c} className="inline-flex items-center gap-1.5 break-all">
+              <span style={{ color: A(cfg.accent) }}>
+                <ContactIcon kind={contactKind(c)} />
+              </span>
+              {c}
+            </span>
+          ))}
+        </div>
       </header>
     );
   }
@@ -314,17 +396,25 @@ function StackHeader({ cfg, doc, role, photo }: { cfg: StackConfig } & TemplateP
 /** Builds every section of a stacked CV, in reading order. */
 function stackSections(cfg: StackConfig, doc: CvDoc): ReactNode[] {
   const { accent, heading, entry, titles } = cfg;
-  const section = (key: string, title: string, body: ReactNode) => (
-    <section key={key}>
-      <SectionHeading kind={heading} accent={accent} title={title} />
-      <div className="mt-2.5">{body}</div>
-    </section>
-  );
+  // A label-column layout puts the section name on the left and its content beside it
+  const section = (key: string, title: string, body: ReactNode) =>
+    cfg.labelColumn ? (
+      <section key={key} className="grid grid-cols-[130px_1fr] gap-x-6 border-t border-slate-300 pt-4 first:border-t-0 first:pt-0">
+        <SectionHeading kind={heading} accent={accent} title={title} />
+        <div>{body}</div>
+      </section>
+    ) : (
+      <section key={key}>
+        <SectionHeading kind={heading} accent={accent} title={title} />
+        <div className="mt-2.5">{body}</div>
+      </section>
+    );
+  const skillGrid = cfg.skillCols === 2 ? "grid grid-cols-2 gap-x-6 gap-y-1" : "grid grid-cols-3 gap-x-6 gap-y-1";
 
   const out: ReactNode[] = [];
   if (doc.summary) out.push(section("summary", titles.summary, <p className="text-justify">{doc.summary}</p>));
-  if (doc.experience.length) out.push(section("experience", titles.experience, <Jobs jobs={doc.experience} entry={entry} />));
-  if (doc.education.length) out.push(section("education", titles.education, <Schools schools={doc.education} entry={entry} />));
+  if (doc.experience.length) out.push(section("experience", titles.experience, <Jobs jobs={doc.experience} entry={entry} accent={accent} />));
+  if (doc.education.length) out.push(section("education", titles.education, <Schools schools={doc.education} entry={entry} accent={accent} />));
   if (doc.projects?.length) {
     out.push(
       section(
@@ -371,7 +461,7 @@ function stackSections(cfg: StackConfig, doc: CvDoc): ReactNode[] {
         section(
           "skills",
           titles.skills,
-          <ul className="grid grid-cols-3 gap-x-6 gap-y-1">
+          <ul className={skillGrid}>
             {flatSkills(doc).map((s) => (
               <li key={s} className="flex items-start gap-2">
                 <span className="mt-2 size-1.5 shrink-0 rounded-full bg-slate-700" />
@@ -395,7 +485,7 @@ function stackSections(cfg: StackConfig, doc: CvDoc): ReactNode[] {
           x.title,
           x.title,
           cfg.skills === "columns" ? (
-            <ul className="grid grid-cols-3 gap-x-6 gap-y-1">
+            <ul className={skillGrid}>
               {x.items.map((i) => (
                 <li key={i} className="flex items-start gap-2">
                   <span className="mt-2 size-1.5 shrink-0 rounded-full bg-slate-700" />
@@ -1135,4 +1225,44 @@ export const GridSpacedCv = makeSidebar({
   spaced: true,
   summaryTitle: "Profile Summary",
   experienceTitle: "Work Experience",
+});
+
+/** Widely spaced bold name, small spaced headings with heavy rules, role and date on one line. */
+export const SpacedRuleCv = makeStack({
+  accent: "#111827",
+  header: "left",
+  nameClass: "text-[28px] font-extrabold uppercase tracking-[0.2em] text-slate-900",
+  roleClass: "mt-1 text-[13px] text-slate-600",
+  rule: "none",
+  sep: "  •  ",
+  heading: "spaced",
+  entry: "title-caps",
+  skills: "groups",
+  titles: { summary: "Professional Profile", experience: "Work Experience", education: "Education", skills: "Skills" },
+});
+
+/** Section names in a left column with the content beside them, under a heavy rule. */
+export const LabelColumnCv = makeStack({
+  accent: "#111827",
+  header: "left",
+  nameClass: "text-[40px] font-extrabold uppercase leading-none text-slate-900",
+  roleClass: "mt-2 text-[15px] font-semibold text-slate-700",
+  rule: "thick",
+  sep: "  |  ",
+  heading: "label",
+  labelColumn: true,
+  entry: "role-first",
+  skills: "columns",
+  skillCols: 2,
+  titles: { summary: "Summary", experience: "Work Experience", education: "Education", skills: "Key Skills" },
+});
+
+/** Accent-coloured role and company names, icon contacts, large headings and dashed dividers. */
+export const AccentIconsCv = makeStack({
+  accent: "#2563eb",
+  header: "accent",
+  heading: "display",
+  entry: "stacked",
+  skills: "columns",
+  titles: { summary: "Summary", experience: "Experience", education: "Education", skills: "Skills" },
 });

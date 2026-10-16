@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { templates } from "@/lib/templates";
 
 /**
  * The picture shown when the site is shared on WhatsApp, X, LinkedIn and so on.
@@ -52,7 +53,7 @@ export default function OpenGraphImage() {
         </div>
 
         <div style={{ display: "flex", gap: 14, fontSize: 24, color: "rgba(255,255,255,0.75)" }}>
-          <span>34 templates</span>
+          <span>{templates.length} templates</span>
           <span>·</span>
           <span>PDF and Word</span>
           <span>·</span>

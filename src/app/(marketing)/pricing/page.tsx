@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckIcon } from "@/components/ui/check-icon";
 import { siteConfig } from "@/lib/site";
+import { templates } from "@/lib/templates";
 
 export const metadata: Metadata = {
   title: "Pricing: Free CV Builder and the Coming Pro Plan",
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 
 /** What the free plan includes today. Everything here already works. */
 const free = [
-  "CV builder with 34 templates",
+  `CV builder with ${templates.length} templates`,
   "PDF and Word downloads",
   "CV checker and job match",
   "8 letter types, with a signature",

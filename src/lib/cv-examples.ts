@@ -83,7 +83,10 @@ export type CvTemplateName =
   | "thinSplit"
   | "gridLeft"
   | "gridBand"
-  | "gridSpaced";
+  | "gridSpaced"
+  | "spacedRule"
+  | "labelColumn"
+  | "accentIcons";
 
 export type CvExample = {
   slug: string;
