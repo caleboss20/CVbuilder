@@ -39,7 +39,7 @@ type Saved = LetterInput & { body: string };
 
 export function CoverLetterBuilder() {
   const [cv, setCv] = useState<BuilderCv | null>(null);
-  const [input, setInput] = useState<LetterInput>({ kind: "job", company: "", role: "", manager: "", why: "", results: "", need: "" });
+  const [input, setInput] = useState<LetterInput>({ kind: "job", company: "", role: "", manager: "", why: "", results: "", need: "", contribution: "", helpWith: [], enclosures: [] });
   const [body, setBody] = useState("");
   const [date, setDate] = useState("");
 
@@ -65,6 +65,9 @@ export function CoverLetterBuilder() {
         // Letters saved before these two fields existed simply have none
         results: letter.results ?? "",
         need: letter.need ?? "",
+        contribution: letter.contribution ?? "",
+        helpWith: letter.helpWith ?? [],
+        enclosures: letter.enclosures ?? [],
       });
       setBody(letter.body);
     }
@@ -208,6 +211,34 @@ export function CoverLetterBuilder() {
                 />
               ))}
 
+              {cfg.choices?.map((c) => (
+                <fieldset key={c.key}>
+                  <legend className="mb-2 text-sm font-medium text-fg/80">{c.label}</legend>
+                  <ul className="flex flex-wrap gap-2">
+                    {c.options.map((option) => {
+                      const on = input[c.key].includes(option);
+                      return (
+                        <li key={option}>
+                          <button
+                            type="button"
+                            role="checkbox"
+                            aria-checked={on}
+                            onClick={() => set({ [c.key]: on ? input[c.key].filter((o) => o !== option) : [...input[c.key], option] })}
+                            className={`rounded-full border px-3.5 py-2 text-sm transition-colors ${
+                              on ? "border-brand-400/60 bg-brand-500/15 text-fg" : "border-fg/12 bg-fg/[0.04] text-fg/70 hover:text-fg"
+                            }`}
+                          >
+                            {on ? "✓ " : ""}
+                            {option}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <p className="mt-1.5 text-xs text-fg/45">{c.hint}</p>
+                </fieldset>
+              ))}
+
               <div>
                 <p className="mb-1.5 text-sm font-medium text-fg/80">{cfg.why.label}</p>
                 {input.why ? (
@@ -317,6 +348,18 @@ function LetterPage({ cv, input, body, date }: { cv: BuilderCv; input: LetterInp
 
       <p className="mt-8">{input.manager.trim() ? "Yours sincerely," : "Yours faithfully,"}</p>
       <p className="mt-10 font-semibold text-slate-900">{name}</p>
+
+      {/* Real letters list what is attached, under the signature */}
+      {cfg.choices?.some((c) => c.key === "enclosures") && input.enclosures.length > 0 && (
+        <div className="mt-8 text-[13px]">
+          <p className="font-semibold text-slate-900">Enclosures:</p>
+          <ol className="mt-1 list-decimal space-y-0.5 pl-5">
+            {input.enclosures.map((e) => (
+              <li key={e}>{e}</li>
+            ))}
+          </ol>
+        </div>
+      )}
     </div>
   );
 }

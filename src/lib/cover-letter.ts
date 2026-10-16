@@ -24,8 +24,14 @@ export type LetterInput = {
   why: string;
   /** Scholarship only: results so far, in the student's words ("second year, CGPA 3.7"). */
   results: string;
-  /** Scholarship only: their circumstances, if the scholarship asks about need. */
+  /** Scholarship only: their family situation, if the scholarship asks about need. */
   need: string;
+  /** Scholarship only: what they do themselves to help with costs ("tutor pupils on weekends"). */
+  contribution: string;
+  /** Scholarship only: what they need help paying for, picked from a list. */
+  helpWith: string[];
+  /** The documents they are attaching, listed under the signature as "Enclosures:". */
+  enclosures: string[];
 };
 
 /** What each field means for a given kind of letter, so the form asks the right question. */
@@ -43,7 +49,9 @@ export type LetterKindConfig = {
   /** Ready-made choices that fill in the organisation and the role/scholarship name in one tap. */
   quickPicks?: { label: string; company: string; role: string }[];
   /** Extra questions this letter type asks, beyond the four standard ones. */
-  extras?: { key: "results" | "need"; label: string; placeholder: string; hint: string }[];
+  extras?: { key: "results" | "need" | "contribution"; label: string; placeholder: string; hint: string }[];
+  /** Pick-from-a-list questions: what you need help with, and which documents are enclosed. */
+  choices?: { key: "helpWith" | "enclosures"; label: string; options: string[]; hint: string }[];
   /** "Dear ___" when no name is given, and the first address line. */
   recipient: string;
   /** What the letter is about, in capitals under the address: "APPLICATION FOR ...". */
@@ -113,9 +121,37 @@ export const letterKinds: LetterKindConfig[] = [
       },
       {
         key: "need",
-        label: "Your circumstances, if the scholarship asks (optional)",
-        placeholder: "I am the first of four children, and my parents are small-scale farmers.",
-        hint: "Keep it short, honest and factual. Leave it empty if the scholarship is merit-based.",
+        label: "Your family situation, if the scholarship asks about need (optional)",
+        placeholder: "I am the eldest of four children. My father is a farmer and my mother is a trader.",
+        hint: "Who supports you, and how many people they support. Keep it short, honest and factual. Leave it empty for a merit-only scholarship.",
+      },
+      {
+        key: "contribution",
+        label: "What you do to help with your costs (optional)",
+        placeholder: "tutor pupils on weekends and sell airtime on campus",
+        hint: "Committees like to see that you are already working towards it.",
+      },
+    ],
+    choices: [
+      {
+        key: "helpWith",
+        label: "What do you need help paying for? (optional)",
+        options: ["Tuition fees", "Accommodation", "Learning materials", "Transport", "Living allowance", "Internet and data"],
+        hint: "Tick what you need. We only ask for what you choose.",
+      },
+      {
+        key: "enclosures",
+        label: "Documents you are attaching",
+        options: [
+          "Curriculum vitae (CV)",
+          "Academic transcript",
+          "WASSCE results slip",
+          "Admission letter",
+          "Referee letter",
+          "Proof of financial need",
+          "Copy of national ID",
+        ],
+        hint: "These appear under your signature, as “Enclosures”. Attach the same documents when you send it.",
       },
     ],
     recipient: "Scholarship Committee",
@@ -129,6 +165,14 @@ export const letterKinds: LetterKindConfig[] = [
     role: { label: "Programme", placeholder: "MPhil Economics" },
     manager: { label: "Admissions contact (optional)", placeholder: "The Admissions Officer", hint: "Leave empty to use “Dear Admissions Officer”." },
     why: { label: "Why this programme? (optional)", placeholder: "" },
+    choices: [
+      {
+        key: "enclosures",
+        label: "Documents you are attaching",
+        options: ["Curriculum vitae (CV)", "Academic transcript", "Certificates", "Referee letters", "Statement of purpose", "Copy of national ID"],
+        hint: "These appear under your signature, as “Enclosures”.",
+      },
+    ],
     recipient: "Admissions Officer",
     subject: (r) => `APPLICATION FOR ADMISSION${r ? `: ${r}` : ""}`,
   },
@@ -212,6 +256,14 @@ function profile(cv: BuilderCv) {
   return { introduction, experience, skillText, projectText, degree, award, school: school ? firstPart(school.school) : "" };
 }
 
+/** "tuition, accommodation and books". */
+function joinList(items: string[]): string {
+  return items.length <= 1 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items.at(-1)}`;
+}
+
+/** Lower-cases the first letter so a phrase fits mid-sentence, unless it starts with an acronym like SRC or WASSCE. */
+const lowerUnlessAcronym = (s: string) => (/^[A-Z]{2,}/.test(s) ? s : lower(s));
+
 /** The student's own extra detail, tidied into a sentence. */
 const tidy = (why: string) => (why.trim() ? refineText(why, "summary")[0] : "");
 
@@ -294,19 +346,29 @@ function scholarship(cv: BuilderCv, input: LetterInput): string[] {
       ? `Outside my lectures, I have served as ${role.title.trim()}${role.place.trim() ? ` at ${firstPart(role.place)}` : ""}, where I ${lower(bullet)}. It taught me responsibility and how to work with others.`
       : "";
 
-  // 4. Circumstances: only if the student wrote something. Never invented.
-  const need = input.need.trim()
-    ? `I would like to be open about my circumstances. ${noDot(input.need)}. Support like this would ease that burden and let me concentrate on my studies.`
-    : "";
+  // 4. Financial need. Real letters give a short, specific picture: who supports you, what you do
+  //    yourself, and what you need help with. We only use what the student gave us, never invented.
+  const family = input.need.trim() ? `${noDot(input.need)}.` : "";
+  const self = input.contribution.trim() ? `To help with my costs, I ${lowerUnlessAcronym(noDot(input.contribution))}.` : "";
+  const ask = input.helpWith.length ? `I am asking for support with ${joinList(input.helpWith.map(lowerUnlessAcronym))}.` : "";
+  // Paragraph one is the situation, paragraph two is the request
+  const situation = family || self ? `I would like to be open about my circumstances. ${[family, self].filter(Boolean).join(" ")}` : "";
+  const request =
+    ask || situation
+      ? `${ask ? `${ask} ` : ""}Support like this would ease that burden and let me concentrate on my studies.`
+      : "";
 
   // 5. What the scholarship would let them do
   const plans = tidy(input.why) || "With this support I will focus on my studies and use what I learn to contribute to my community.";
 
   // 6. Enclosures, thanks and how to reach them
   const reach = [cv.phone.trim(), cv.email.trim()].filter(Boolean).join(" or ");
-  const closing = `I believe I meet the requirements of the scholarship, and I have enclosed my CV together with the other documents requested. Thank you for considering my application. I would be glad to discuss it further${reach ? ` and can be reached on ${reach}` : ""}.`;
+  const enclosed = input.enclosures.length
+    ? "I have enclosed the documents listed below, and I can provide more proof if you need it."
+    : "I have enclosed my CV together with the other documents requested.";
+  const closing = `I believe I meet the requirements of the scholarship. ${enclosed} Thank you for considering my application. I would be glad to discuss it further${reach ? ` and can be reached on ${reach}` : ""}.`;
 
-  return [opening, academics, activities, need, plans, closing].filter(Boolean);
+  return [opening, academics, activities, situation, request, plans, closing].filter(Boolean);
 }
 
 function admission(cv: BuilderCv, input: LetterInput): string[] {
@@ -319,7 +381,9 @@ function admission(cv: BuilderCv, input: LetterInput): string[] {
     `I am writing to apply for admission to ${programme} at ${institution}. ${base}`,
     interest,
     (p.skillText + p.projectText).trim(),
-    `I hope to learn from the staff and students at ${institution} and to make a real contribution to the programme. Thank you for considering my application. I look forward to hearing from you.`,
+    `I hope to learn from the staff and students at ${institution} and to make a real contribution to the programme.${
+      input.enclosures.length ? " I have enclosed the documents listed below." : ""
+    } Thank you for considering my application. I look forward to hearing from you.`,
   ].filter(Boolean);
 }
 
