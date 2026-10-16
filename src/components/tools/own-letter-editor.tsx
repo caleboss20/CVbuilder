@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CvFileError, readCvFile } from "@/lib/read-cv-file";
-import { buildLetterPdf, reflowLetterText, renderPages, type PreviewPage } from "@/lib/sign-pdf";
+import { buildLetterPdf, reflowLetterText, renderPages, type LetterRegion, type PreviewPage } from "@/lib/sign-pdf";
 import { trackEvent } from "@/lib/track";
 
 const PLACEHOLDER = `Dear Sir/Madam,
@@ -22,6 +22,11 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
   const [align, setAlign] = useState<"left" | "right">("left");
   const [pages, setPages] = useState<PreviewPage[]>([]);
   const [bytes, setBytes] = useState<Uint8Array | null>(null);
+  // Where each line of the text sits on the preview, so a tap on the preview can find its line
+  const [regions, setRegions] = useState<LetterRegion[]>([]);
+  // The line being edited, outlined on the preview while the text box has focus
+  const [activeLine, setActiveLine] = useState<number | null>(null);
+  const textRef = useRef<HTMLTextAreaElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [fileName, setFileName] = useState("letter");
@@ -33,16 +38,18 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- an empty letter has no preview
       setPages([]);
       setBytes(null);
+      setRegions([]);
       return;
     }
     const id = ++run.current;
     const timer = setTimeout(async () => {
       try {
-        const pdf = await buildLetterPdf(text, signature, align);
-        const rendered = await renderPages(pdf);
+        const built = await buildLetterPdf(text, signature, align);
+        const rendered = await renderPages(built.bytes);
         // A newer edit may have started while this one was building: ignore the stale result
         if (id !== run.current) return;
-        setBytes(pdf);
+        setBytes(built.bytes);
+        setRegions(built.regions);
         setPages(rendered);
         setError("");
       } catch {
@@ -67,6 +74,21 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
     } finally {
       setBusy(false);
     }
+  }
+
+  /** Jumps to a line of the letter in the text box and selects it, ready to be changed. */
+  function editLine(line: number) {
+    const box = textRef.current;
+    if (!box) return;
+    const rows = text.replace(/\r/g, "").split("\n");
+    // The line starts after all the lines before it, plus one character for each line break
+    const start = rows.slice(0, line).reduce((total, row) => total + row.length + 1, 0);
+    box.focus({ preventScroll: true });
+    box.setSelectionRange(start, start + (rows[line]?.length ?? 0));
+    // A text box does not scroll to a selection by itself, so scroll it to roughly where the line is
+    box.scrollTop = Math.max(0, (line / Math.max(1, rows.length)) * box.scrollHeight - box.clientHeight / 2);
+    box.scrollIntoView({ block: "center", behavior: "smooth" });
+    setActiveLine(line);
   }
 
   function download() {
@@ -103,9 +125,11 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
         </label>
         <textarea
           id="own-letter"
+          ref={textRef}
           rows={14}
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onBlur={() => setActiveLine(null)}
           placeholder={PLACEHOLDER}
           className="w-full resize-y rounded-lg border border-fg/12 bg-fg/[0.03] px-3.5 py-3 text-[15px] leading-relaxed text-fg placeholder:text-fg/30 focus:border-brand-400/70 focus:outline-none"
         />
@@ -137,10 +161,26 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
 
       {pages.length > 0 && (
         <div className="space-y-3" aria-label="Preview of your letter">
+          <p className="text-center text-xs text-fg/50">Tap any line of the letter to edit it.</p>
           {pages.map((p, i) => (
-            <div key={i} className="mx-auto max-w-[640px] overflow-hidden rounded-lg bg-white">
+            <div key={i} className="relative mx-auto max-w-[640px] overflow-hidden rounded-lg bg-white">
               {/* eslint-disable-next-line @next/next/no-img-element -- a local page preview, nothing to optimise */}
               <img src={p.src} alt={`Page ${i + 1} of your letter`} className="block w-full" draggable={false} />
+              {/* An invisible button over each line. Positions are fractions of the page, so they fit any screen. */}
+              {regions
+                .filter((r) => r.page === i)
+                .map((r) => (
+                  <button
+                    key={`${r.page}-${r.line}`}
+                    type="button"
+                    aria-label="Edit this part of the letter"
+                    onClick={() => editLine(r.line)}
+                    style={{ left: `${r.x * 100}%`, top: `${r.y * 100}%`, width: `${r.w * 100}%`, height: `${r.h * 100}%` }}
+                    className={`absolute cursor-text rounded-sm outline-1 outline-offset-0 transition-colors hover:bg-slate-900/10 hover:outline hover:outline-slate-500 ${
+                      activeLine === r.line ? "bg-slate-900/10 outline outline-slate-700" : ""
+                    }`}
+                  />
+                ))}
             </div>
           ))}
         </div>

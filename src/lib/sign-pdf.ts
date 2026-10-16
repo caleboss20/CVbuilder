@@ -298,6 +298,12 @@ export function findTopBlock(lines: string[]): { block: number[]; date: number }
   return block.length || dateOutside >= 0 ? { block, date: dateOutside } : null;
 }
 
+/** A tappable area of the preview: where one line of the typed text appears on a page, as fractions of the page. */
+export type LetterRegion = { page: number; line: number; x: number; y: number; w: number; h: number };
+
+/** The finished PDF, and where each line of the text sits on its pages. */
+export type BuiltLetter = { bytes: Uint8Array; regions: LetterRegion[] };
+
 /**
  * Lays out a letter as a clean A4 PDF with real, selectable text.
  *  - The heading (for example "My request for financial assistance") is made bold, underlined and
@@ -308,7 +314,7 @@ export function findTopBlock(lines: string[]): { block: number[]; date: number }
  *    signature and the typed name. The signature gets a fixed-size space directly under the closing line.
  *  - With no closing line found, the signature goes at the end.
  */
-export async function buildLetterPdf(text: string, signaturePng: string, align: "left" | "right"): Promise<Uint8Array> {
+export async function buildLetterPdf(text: string, signaturePng: string, align: "left" | "right"): Promise<BuiltLetter> {
   const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
@@ -337,6 +343,24 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
   const sigW = png ? png.width * scale : 0;
   const sigH = png ? png.height * scale : 0;
   const SIG_SPACE = sigH + 8;
+
+  // Where each line of the text ended up on the page, so tapping the preview can jump back to it
+  const boxes = new Map<string, { page: number; line: number; x0: number; x1: number; top: number; bottom: number }>();
+  const mark = (line: number, x: number, width: number, top: number, height: number) => {
+    const pageIndex = doc.getPageCount() - 1;
+    const key = `${pageIndex}:${line}`;
+    const box = boxes.get(key);
+    const x1 = x + width;
+    const bottom = top - height;
+    if (box) {
+      box.x0 = Math.min(box.x0, x);
+      box.x1 = Math.max(box.x1, x1);
+      box.top = Math.max(box.top, top);
+      box.bottom = Math.min(box.bottom, bottom);
+    } else {
+      boxes.set(key, { page: pageIndex, line, x0: x, x1, top, bottom });
+    }
+  };
 
   type Font = typeof font;
   /** Splits one paragraph into lines that fit the page width. */
@@ -370,13 +394,15 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
     const dateRow = date >= 0 ? lines[date].trim() : "";
     const widest = Math.max(...[...rows, dateRow].map((r) => font.widthOfTextAtSize(r, SIZE)));
     const x = PAGE_W - MARGIN - widest;
-    for (const row of rows) {
+    rows.forEach((row, n) => {
+      mark(block[n], x, font.widthOfTextAtSize(row, SIZE), y, LEADING);
       page.drawText(row, { x, y: y - SIZE, size: SIZE, font, color: ink });
       y -= LEADING;
-    }
+    });
     if (dateRow) {
       // A small gap after an address, but none when the date is the only thing at the top
       if (rows.length) y -= LEADING * 0.5;
+      mark(date, x, font.widthOfTextAtSize(dateRow, SIZE), y, LEADING);
       page.drawText(dateRow, { x, y: y - SIZE, size: SIZE, font, color: ink });
       y -= LEADING;
     }
@@ -392,10 +418,13 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
     if (y - need < MARGIN) nextPage();
 
     rows.forEach((row, n) => {
+      mark(block[n], x, font.widthOfTextAtSize(row, SIZE), y, LEADING);
       page.drawText(row, { x, y: y - SIZE, size: SIZE, font, color: ink });
       y -= LEADING;
       // The signature goes straight under the closing line, before the name
       if (n === 0 && png) {
+        // Tapping the signature selects the closing line it belongs to
+        mark(block[0], x, sigW, y, sigH);
         page.drawImage(png, { x, y: y - sigH + 4, width: sigW, height: sigH });
         y -= SIG_SPACE;
       }
@@ -403,7 +432,7 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
   };
 
   /** Draws the heading: bold, underlined, centred, in capitals. */
-  const drawTitle = (title: string) => {
+  const drawTitle = (title: string, lineIndex: number) => {
     const size = 12;
     const rows = wrap(title.trim().toUpperCase(), bold, size);
     y -= 4;
@@ -411,6 +440,7 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
       if (y - size < MARGIN) nextPage();
       const w = bold.widthOfTextAtSize(row, size);
       const x = (PAGE_W - w) / 2;
+      mark(lineIndex, x, w, y, LEADING + 1);
       page.drawText(row, { x, y: y - size, size, font: bold, color: ink });
       page.drawLine({ start: { x, y: y - size - 2 }, end: { x: x + w, y: y - size - 2 }, thickness: 0.8, color: ink });
       y -= LEADING + 1;
@@ -443,11 +473,12 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
       continue;
     }
     if (i === titleIndex) {
-      drawTitle(line);
+      drawTitle(line, i);
       continue;
     }
     for (const row of wrap(line, font, SIZE)) {
       if (y - SIZE < MARGIN) nextPage();
+      mark(i, MARGIN, font.widthOfTextAtSize(row, SIZE), y, LEADING);
       page.drawText(row, { x: MARGIN, y: y - SIZE, size: SIZE, font, color: ink });
       y -= LEADING;
     }
@@ -459,5 +490,14 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
     if (y - SIG_SPACE < MARGIN) nextPage();
     page.drawImage(png, { x: align === "right" ? PAGE_W - MARGIN - sigW : MARGIN, y: y - sigH, width: sigW, height: sigH });
   }
-  return doc.save();
+  // Turn the boxes into fractions of the page, with a little breathing room, for the preview to use
+  const regions: LetterRegion[] = [...boxes.values()].map((b) => ({
+    page: b.page,
+    line: b.line,
+    x: Math.max(0, (b.x0 - 4) / PAGE_W),
+    y: Math.max(0, (PAGE_H - b.top - 2) / PAGE_H),
+    w: Math.min(1, (b.x1 - b.x0 + 8) / PAGE_W),
+    h: (b.top - b.bottom + 4) / PAGE_H,
+  }));
+  return { bytes: await doc.save(), regions };
 }
