@@ -35,7 +35,32 @@
   color-scheme: light;
 }
 
+/*
+ * The admin dashboard has its own plain black-and-white palette (like Vercel's), separate from the
+ * navy and purple of the student-facing pages. It follows the same light/dark switch.
+ */
+:root {
+  --a-fg-rgb: 255 255 255;
+  --a-bg: #000000;
+  --a-card: #0a0a0a;
+  --a-up: #6ee7b7;
+  --a-down: #fca5a5;
+}
+
+[data-theme="light"] {
+  --a-fg-rgb: 0 0 0;
+  --a-bg: #fafafa;
+  --a-card: #ffffff;
+  --a-up: #047857;
+  --a-down: #b91c1c;
+}
+
 @theme inline {
+  --color-afg: rgb(var(--a-fg-rgb));
+  --color-abg: var(--a-bg);
+  --color-acard: var(--a-card);
+  --color-aup: var(--a-up);
+  --color-adown: var(--a-down);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-fg: var(--fg);

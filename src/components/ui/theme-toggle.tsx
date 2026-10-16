@@ -3,7 +3,7 @@
 import { THEME_STORAGE_KEY } from "@/lib/theme";
 
 /** Switches between dark and light mode. Icons swap via CSS, so no React state is needed. */
-export function ThemeToggle({ className = "" }: { className?: string }) {
+export function ThemeToggle({ className = "", neutral = false }: { className?: string; neutral?: boolean }) {
   function toggle() {
     const root = document.documentElement;
     const next = root.dataset.theme === "light" ? "dark" : "light";
@@ -21,7 +21,10 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       onClick={toggle}
       aria-label="Switch between light and dark mode"
       title="Switch theme"
-      className={`grid size-10 place-items-center rounded-lg text-fg/80 ring-1 ring-fg/15 transition-colors hover:text-fg hover:ring-fg/30 ${className}`}
+      className={`grid size-10 place-items-center rounded-lg ring-1 transition-colors ${
+        // The admin dashboard uses plain black-and-white colours instead of the site's navy
+        neutral ? "text-afg/70 ring-afg/15 hover:text-afg hover:ring-afg/30" : "text-fg/80 ring-fg/15 hover:text-fg hover:ring-fg/30"
+      } ${className}`}
     >
       {/* Sun: shown in dark mode */}
       <svg className="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
