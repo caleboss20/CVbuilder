@@ -11,10 +11,9 @@ import { SparkleIcon } from "@/components/ui/sparkle-icon";
 import { Field, TextArea } from "./fields";
 import { trackEvent } from "@/lib/track";
 import { VoiceInput } from "./voice-input";
-import { SignaturePad } from "./signature-pad";
+import { SIGNATURE_KEY, SignaturePad } from "./signature-pad";
 
 const LETTER_KEY = "cv11-letter-v1";
-const SIGNATURE_KEY = "cv11-signature-v1";
 
 /**
  * Print rules for the letter. An off-screen full-size copy (#letter-print) is the

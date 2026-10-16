@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
+/** Where the saved signature lives in the browser, shared by the letter writer and the sign tool. */
+export const SIGNATURE_KEY = "cv11-signature-v1";
+
 type Point = { x: number; y: number };
 type Stroke = Point[];
 
