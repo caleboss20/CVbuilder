@@ -34,6 +34,33 @@ export const cvTypes: { id: CvType; label: string; summary: string }[] = [
   },
 ];
 
+/**
+ * Section order on the page for each type, as groups. What leads is what makes a type
+ * different: graduate leads with education and projects, skills-based with skills,
+ * academic with education and research. "rest" is everything else (languages,
+ * awards, interests...), and references always come last.
+ */
+export const sectionGroupOrder: Record<CvType, string[]> = {
+  standard: ["contact", "summary", "experience", "education", "projects", "skills", "research", "rest", "references"],
+  graduate: ["contact", "summary", "education", "projects", "experience", "skills", "research", "rest", "references"],
+  skills: ["contact", "summary", "skills", "projects", "experience", "education", "research", "rest", "references"],
+  academic: ["contact", "summary", "education", "research", "experience", "projects", "skills", "rest", "references"],
+};
+
+/** Which group a section belongs to, from the words in its heading ("Professional Experience" -> experience). */
+export function headingGroup(heading: string): string {
+  const h = heading.toLowerCase();
+  if (/contact/.test(h)) return "contact";
+  if (/about|profile|summary|statement|objective/.test(h)) return "summary";
+  if (/experience|employment|work history|internship/.test(h)) return "experience";
+  if (/education|academic background|qualification/.test(h)) return "education";
+  if (/project/.test(h)) return "projects";
+  if (/skill|expertise|competenc|additional information/.test(h)) return "skills";
+  if (/research|publication|presentation/.test(h)) return "research";
+  if (/reference|referee/.test(h)) return "references";
+  return "rest";
+}
+
 /** The three questions, and the answers a student can give. */
 export type GuideAnswers = {
   goal?: "intern" | "job" | "postgrad" | "unsure";

@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { cvExamples, type CvTemplateName } from "@/lib/cv-examples";
-import { accentSwatches, adaptsToCvType, isTwoColumn, templates } from "@/lib/templates";
+import { accentSwatches, isTwoColumn, templates } from "@/lib/templates";
 import { AtsExplainer } from "@/components/ui/ats-explainer";
 import {
   BUILDER_STORAGE_KEY,
@@ -559,7 +559,7 @@ export function Builder() {
             </div>
             <div style={accentStyle} className="mx-auto mt-3 max-w-[640px] overflow-hidden rounded-md bg-white shadow-[0_20px_60px_-20px_rgb(0_0_0/0.6)] ring-1 ring-fg/10">
               <CvPageFrame key={mobileView} fill={strength.score >= FILL_FROM_SCORE || previewingSample}>
-                <HideEmptySections>
+                <HideEmptySections type={cv.cvType}>
                   <CvTemplateView template={cv.template} doc={previewDoc} role={previewRole} photo={previewPhoto} />
                 </HideEmptySections>
               </CvPageFrame>
@@ -712,7 +712,6 @@ function TemplatePicker({
           <h2 className="text-lg font-medium text-fg">Choose a template</h2>
           <p className="text-sm text-fg/50">
             Your details stay the same. Only the design changes.
-            {cv.cvType !== "standard" && " Designs marked Fixed order keep the standard section order."}
           </p>
         </div>
         <button type="button" onClick={onClose} className="rounded-md px-3 py-2 text-sm text-fg/70 ring-1 ring-fg/15 hover:text-fg">
@@ -731,7 +730,7 @@ function TemplatePicker({
                 }`}
               >
                 <CvPageFrame>
-                  <HideEmptySections>
+                  <HideEmptySections type={cv.cvType}>
                     <CvTemplateView template={t.id} doc={doc} role={role} photo={photo} />
                   </HideEmptySections>
                 </CvPageFrame>
@@ -748,11 +747,6 @@ function TemplatePicker({
                 )}
                 {t.tags.includes("photo") && <span className="rounded bg-fg/10 px-1.5 py-0.5 text-fg/60">Photo</span>}
                 {isTwoColumn(t.id) && <span className="rounded bg-fg/10 px-1.5 py-0.5 text-fg/60">Two columns</span>}
-                {cv.cvType !== "standard" && !adaptsToCvType(t.id) && (
-                  <span title="This design keeps the standard section order" className="rounded bg-amber-400/15 px-1.5 py-0.5 text-amber-300">
-                    Fixed order
-                  </span>
-                )}
               </p>
             </button>
           </li>
@@ -847,7 +841,7 @@ function PrintCopy({ cv, onFit }: { cv: BuilderCv; onFit: (scale: number) => voi
     <div id="cv-print" aria-hidden="true" style={accentStyle}>
       <style>{printCss}</style>
       <div ref={pageRef} className="@container flex min-h-[1121px] w-[794px] flex-col bg-white [&>*]:flex-1">
-        <HideEmptySections>
+        <HideEmptySections type={cv.cvType}>
           <CvTemplateView template={cv.template} doc={doc} role={cv.role || "Your role"} photo={cv.photo} />
         </HideEmptySections>
       </div>
