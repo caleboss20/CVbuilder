@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckIcon } from "@/components/ui/check-icon";
-import { ProWaitlist } from "@/components/marketing/pro-waitlist";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -100,12 +99,14 @@ export default function PricingPage() {
                     <Check key={f}>{f}</Check>
                   ))}
                 </ul>
-                <a
-                  href="#join"
-                  className="mt-8 inline-flex h-12 items-center justify-center rounded-md bg-brand-600 text-[15px] font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_22px_rgb(124_128_255/0.55)] transition-all hover:bg-brand-500"
+                {/* Not on sale yet: the sign-up and payment flow replaces this button when Pro launches */}
+                <button
+                  type="button"
+                  disabled
+                  className="mt-8 inline-flex h-12 cursor-not-allowed items-center justify-center rounded-md bg-fg/[0.06] text-[15px] font-medium text-fg/50 ring-1 ring-fg/15"
                 >
-                  Tell me when it launches
-                </a>
+                  Coming soon
+                </button>
               </div>
             </div>
           </section>
@@ -114,10 +115,6 @@ export default function PricingPage() {
         <p className="mx-auto mt-10 max-w-xl text-center text-sm text-fg/50">
           AI suggestions are a starting point. Always read them and keep only what is true about you.
         </p>
-
-        <div className="mt-14">
-          <ProWaitlist />
-        </div>
       </div>
     </div>
   );
