@@ -34,11 +34,12 @@ export const letterGuides: LetterGuide[] = [
     intro:
       "A scholarship letter has one job: to show the committee that you deserve the support and that you will use it well. It should be honest, specific and short enough to read in a minute.",
     include: [
-      "Who you are: your course, your school and your year.",
-      "Your results and achievements: grades, awards, projects and leadership roles, with numbers where you can.",
-      "Why you want this scholarship, and why you need it, said honestly and with dignity.",
-      "What you plan to do with your education, and how it will help others.",
-      "A thank-you, and a line saying your CV and documents are attached.",
+      "The scholarship and the provider, named correctly, and who you are: your course, your school and your year.",
+      "Your results: your CGPA or class, your WASSCE grades if they ask for them, and any awards.",
+      "What you do outside class: leadership, clubs, volunteering or work, with one clear example.",
+      "Your circumstances, only if the scholarship asks about need. Keep it short, honest and factual, and attach the proof they ask for.",
+      "What you will do with the support, and how it will help others.",
+      "A list of what you have enclosed (CV, transcript, referee letters), a thank-you and your contact details.",
     ],
     tips: [
       "Name the scholarship and the provider, so it is clear the letter was written for them.",

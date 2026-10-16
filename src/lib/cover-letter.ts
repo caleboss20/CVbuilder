@@ -22,6 +22,10 @@ export type LetterInput = {
   manager: string;
   /** One extra detail in the student's own words: why this one, how they know you, what you discussed. */
   why: string;
+  /** Scholarship only: results so far, in the student's words ("second year, CGPA 3.7"). */
+  results: string;
+  /** Scholarship only: their circumstances, if the scholarship asks about need. */
+  need: string;
 };
 
 /** What each field means for a given kind of letter, so the form asks the right question. */
@@ -36,6 +40,8 @@ export type LetterKindConfig = {
   role: FieldText;
   manager: FieldText & { hint: string };
   why: FieldText;
+  /** Extra questions this letter type asks, beyond the four standard ones. */
+  extras?: { key: "results" | "need"; label: string; placeholder: string; hint: string }[];
   /** "Dear ___" when no name is given, and the first address line. */
   recipient: string;
   /** What the letter is about, in capitals under the address: "APPLICATION FOR ...". */
@@ -84,7 +90,21 @@ export const letterKinds: LetterKindConfig[] = [
     company: { label: "Scholarship provider", placeholder: "Ghana Scholarships Secretariat" },
     role: { label: "Scholarship name", placeholder: "Mastercard Foundation Scholarship" },
     manager: { label: "Committee or contact (optional)", placeholder: "The Selection Committee", hint: "Leave empty to use “Dear Scholarship Committee”." },
-    why: { label: "What would this scholarship let you do? (optional)", placeholder: "" },
+    why: { label: "What will you do with this scholarship? (optional)", placeholder: "" },
+    extras: [
+      {
+        key: "results",
+        label: "Your results so far (optional)",
+        placeholder: "Second year, CGPA 3.7, WASSCE aggregate 10",
+        hint: "Committees look at this first. Use real figures.",
+      },
+      {
+        key: "need",
+        label: "Your circumstances, if the scholarship asks (optional)",
+        placeholder: "I am the first of four children, and my parents are small-scale farmers.",
+        hint: "Keep it short, honest and factual. Leave it empty if the scholarship is merit-based.",
+      },
+    ],
     recipient: "Scholarship Committee",
     subject: (r) => `APPLICATION FOR ${r || "THE SCHOLARSHIP"}`,
   },
@@ -230,20 +250,50 @@ function jobStyle(cv: BuilderCv, input: LetterInput, kind: "job" | "internship" 
   ].filter(Boolean);
 }
 
+/**
+ * Follows the order real scholarship letters use: the scholarship and your course, your
+ * results, what you do outside class, your circumstances (only if the student gives them),
+ * what you will do with the support, and finally the documents enclosed and thanks.
+ */
 function scholarship(cv: BuilderCv, input: LetterInput): string[] {
   const p = profile(cv);
   const provider = input.company.trim() || "your organisation";
   const typed = input.role.trim();
   const name = !typed ? "the scholarship" : /^the\s/i.test(typed) ? typed : `the ${typed}`;
+
+  // 1. Who you are and what you are applying for
   const study = p.degree ? `I am studying ${p.degree}${p.school ? ` at ${p.school}` : ""}` : p.introduction;
-  const results = p.award ? ` I have been recognised with ${p.award}, and I work hard to keep improving.` : " I work hard to keep improving and I take my studies seriously.";
-  const use = tidy(input.why) || "This support would let me focus on my studies and use what I learn to contribute to my community.";
-  return [
-    `I am writing to apply for ${name} offered by ${provider}. ${study}, and I would be honoured to be considered.${results}`,
-    (p.skillText + p.projectText).trim(),
-    use,
-    "Thank you for considering my application. I have attached my CV, and I would be glad to provide any further information you need.",
-  ].filter(Boolean);
+  const opening = `I am writing to apply for ${name} offered by ${provider}. ${study}, and I would be grateful to be considered for this support.`;
+
+  // 2. Results: what the student typed, plus an award or a project from the CV
+  const results = input.results.trim() ? `My results so far: ${noDot(input.results)}.` : "";
+  const award = p.award ? ` I have also received ${p.award}.` : "";
+  const academics =
+    results || award || p.projectText
+      ? `${results}${award}${p.projectText}`.trim()
+      : "I take my studies seriously and work to do better every semester.";
+
+  // 3. Outside the classroom: the first role on the CV, in the student's own words
+  const role = cv.experience.find((j) => j.title.trim() && j.bullets.some((b) => b.trim()));
+  const bullet = role?.bullets.map((b) => noDot(b)).find(Boolean);
+  const activities =
+    role && bullet
+      ? `Outside my lectures, I have served as ${role.title.trim()}${role.place.trim() ? ` at ${firstPart(role.place)}` : ""}, where I ${lower(bullet)}. It taught me responsibility and how to work with others.`
+      : "";
+
+  // 4. Circumstances: only if the student wrote something. Never invented.
+  const need = input.need.trim()
+    ? `I would like to be open about my circumstances. ${noDot(input.need)}. Support like this would ease that burden and let me concentrate on my studies.`
+    : "";
+
+  // 5. What the scholarship would let them do
+  const plans = tidy(input.why) || "With this support I will focus on my studies and use what I learn to contribute to my community.";
+
+  // 6. Enclosures, thanks and how to reach them
+  const reach = [cv.phone.trim(), cv.email.trim()].filter(Boolean).join(" or ");
+  const closing = `I believe I meet the requirements of the scholarship, and I have enclosed my CV together with the other documents requested. Thank you for considering my application. I would be glad to discuss it further${reach ? ` and can be reached on ${reach}` : ""}.`;
+
+  return [opening, academics, activities, need, plans, closing].filter(Boolean);
 }
 
 function admission(cv: BuilderCv, input: LetterInput): string[] {

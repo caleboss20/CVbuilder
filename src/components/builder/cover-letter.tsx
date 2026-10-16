@@ -39,7 +39,7 @@ type Saved = LetterInput & { body: string };
 
 export function CoverLetterBuilder() {
   const [cv, setCv] = useState<BuilderCv | null>(null);
-  const [input, setInput] = useState<LetterInput>({ kind: "job", company: "", role: "", manager: "", why: "" });
+  const [input, setInput] = useState<LetterInput>({ kind: "job", company: "", role: "", manager: "", why: "", results: "", need: "" });
   const [body, setBody] = useState("");
   const [date, setDate] = useState("");
 
@@ -56,7 +56,16 @@ export function CoverLetterBuilder() {
     /* eslint-disable react-hooks/set-state-in-effect -- one-time hydration from storage */
     setCv(loaded ?? blankCv());
     if (letter) {
-      setInput({ kind: letter.kind, company: letter.company, role: letter.role, manager: letter.manager, why: letter.why });
+      setInput({
+        kind: letter.kind,
+        company: letter.company,
+        role: letter.role,
+        manager: letter.manager,
+        why: letter.why,
+        // Letters saved before these two fields existed simply have none
+        results: letter.results ?? "",
+        need: letter.need ?? "",
+      });
       setBody(letter.body);
     }
     // A link such as /cover-letter?kind=service opens the letter already set to that category
@@ -165,6 +174,17 @@ export function CoverLetterBuilder() {
                   hint={cfg.manager.hint}
                 />
               </div>
+
+              {cfg.extras?.map((x) => (
+                <Field
+                  key={x.key}
+                  label={x.label}
+                  value={input[x.key]}
+                  onChange={(v) => set({ [x.key]: v })}
+                  placeholder={x.placeholder}
+                  hint={x.hint}
+                />
+              ))}
 
               <div>
                 <p className="mb-1.5 text-sm font-medium text-fg/80">{cfg.why.label}</p>
