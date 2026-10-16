@@ -143,6 +143,12 @@ export function CoverLetterBuilder() {
                 ))}
               </div>
 
+              {/* Say what the choice does, so nobody has to guess */}
+              <p className="-mt-2 text-sm text-fg/55">
+                <span className="text-fg/75">What this changes: </span>
+                {letterKinds.find((k) => k.id === input.kind)?.changes}
+              </p>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Company or organisation" value={input.company} onChange={(company) => set({ company })} placeholder="GCB Bank" />
                 <Field label="Role" value={input.role} onChange={(role) => set({ role })} placeholder="Customer Service Intern" />
