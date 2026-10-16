@@ -209,15 +209,78 @@ function printable(text: string): string {
     .replace(/[^\n\u0020-\u007E\u00A0-\u00FF\u2018\u2019\u201C\u201D\u2013\u2014\u2022\u2026\u20AC]/g, "?");
 }
 
+/** Lines that open a letter, which is how we find where the body begins. */
+const SALUTATION = /^(dear\b|to whom\b|sir\s*\/\s*madam|good (morning|afternoon|evening)\b)/i;
+/** A heading someone has marked themselves, such as "RE: Request for support" or "Subject: ...". */
+const EXPLICIT_TITLE = /^(re|ref|subject)\s*:/i;
+
+/** True for a short line that reads like a heading rather than a sentence. */
+function looksLikeTitle(line: string): boolean {
+  const text = line.trim();
+  const words = text.split(/\s+/).length;
+  return text.length > 0 && text.length <= 90 && words <= 14 && !/[.,;:]$/.test(text);
+}
+
 /**
- * Lays out a letter as a clean A4 PDF with real, selectable text. The signature goes straight under
- * the closing line ("Yours faithfully,"), in a fixed-size space so the name below is never pushed far
- * away. With no closing line found, it goes at the end. `align` puts it at the left or right margin.
+ * Finds the line that is the letter's heading, such as "My request for financial assistance", and
+ * returns its index, or -1 if there is none. A heading is the short line standing on its own between
+ * "Dear Sir/Madam," and the first paragraph, or a line the student began with "RE:" or "Subject:".
+ * `limit` stops the search at the closing, so the sign-off is never mistaken for a heading.
+ */
+export function findTitleLine(lines: string[], limit: number): number {
+  for (let i = 0; i < limit; i++) if (EXPLICIT_TITLE.test(lines[i].trim())) return i;
+
+  const salutation = lines.findIndex((l) => SALUTATION.test(l.trim()));
+  if (salutation < 0) return -1;
+  for (let i = salutation + 1; i < Math.min(limit, salutation + 5); i++) {
+    if (!lines[i].trim()) continue;
+    // It must stand alone: nothing but a blank line (or the greeting) above, and a blank line below
+    const aloneAbove = i === salutation + 1 || !lines[i - 1].trim();
+    const aloneBelow = i + 1 >= lines.length || !lines[i + 1].trim();
+    return aloneAbove && aloneBelow && looksLikeTitle(lines[i]) ? i : -1;
+  }
+  return -1;
+}
+
+/**
+ * Finds the sign-off: the closing line ("Yours faithfully,") and the lines that belong with it (the
+ * typed name, and a role or contact line if there are some). Returns the index of the closing line
+ * and the indexes of the lines in the block, or null if the letter has no closing.
+ */
+export function findSignoff(lines: string[]): { closing: number; block: number[] } | null {
+  let closing = -1;
+  lines.forEach((l, i) => {
+    if (CLOSING.test(l.trim())) closing = i;
+  });
+  if (closing < 0) return null;
+
+  const block = [closing];
+  let blanks = 0;
+  for (let i = closing + 1; i < lines.length && block.length < 5; i++) {
+    if (!lines[i].trim()) {
+      // Two blank lines in a row end the block
+      if (++blanks > 1) break;
+      continue;
+    }
+    blanks = 0;
+    block.push(i);
+  }
+  return { closing, block };
+}
+
+/**
+ * Lays out a letter as a clean A4 PDF with real, selectable text.
+ *  - The heading (for example "My request for financial assistance") is made bold, underlined and
+ *    centred, in capitals.
+ *  - The whole sign-off moves together to the chosen side: the closing line ("Yours faithfully,"), the
+ *    signature and the typed name. The signature gets a fixed-size space directly under the closing line.
+ *  - With no closing line found, the signature goes at the end.
  */
 export async function buildLetterPdf(text: string, signaturePng: string, align: "left" | "right"): Promise<Uint8Array> {
   const { PDFDocument, StandardFonts, rgb } = await import("pdf-lib");
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
+  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
 
   const PAGE_W = 595.28;
   const PAGE_H = 841.89;
@@ -241,15 +304,16 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
   const scale = png ? Math.min(FRAME_W / png.width, FRAME_H / png.height) : 0;
   const sigW = png ? png.width * scale : 0;
   const sigH = png ? png.height * scale : 0;
+  const SIG_SPACE = sigH + 8;
 
+  type Font = typeof font;
   /** Splits one paragraph into lines that fit the page width. */
-  const wrap = (paragraph: string): string[] => {
-    const words = paragraph.split(" ");
+  const wrap = (paragraph: string, f: Font, size: number): string[] => {
     const lines: string[] = [];
     let line = "";
-    for (const word of words) {
+    for (const word of paragraph.split(" ")) {
       const test = line ? `${line} ${word}` : word;
-      if (line && font.widthOfTextAtSize(test, SIZE) > textWidth) {
+      if (line && f.widthOfTextAtSize(test, size) > textWidth) {
         lines.push(line);
         line = word;
       } else {
@@ -260,33 +324,78 @@ export async function buildLetterPdf(text: string, signaturePng: string, align: 
     return lines;
   };
 
-  const placeSignature = () => {
-    if (!png) return;
-    if (y - sigH - 6 < MARGIN) nextPage();
-    page.drawImage(png, { x: align === "right" ? PAGE_W - MARGIN - sigW : MARGIN, y: y - sigH - 2, width: sigW, height: sigH });
-    y -= sigH + 8;
+  const lines = printable(text).split("\n");
+  const signoff = findSignoff(lines);
+  const titleIndex = findTitleLine(lines, signoff ? signoff.closing : lines.length);
+  const inSignoff = new Set(signoff?.block ?? []);
+
+  /** Draws the sign-off as one block: closing line, signature, then the name lines under it. */
+  const drawSignoff = (block: number[]) => {
+    const rows = block.map((i) => lines[i].trim());
+    const widest = Math.max(...rows.map((r) => font.widthOfTextAtSize(r, SIZE)), png ? sigW : 0);
+    // A block on the right keeps its lines lined up with each other, with the block's right edge at the margin
+    const x = align === "right" ? PAGE_W - MARGIN - widest : MARGIN;
+    const need = rows.length * LEADING + (png ? SIG_SPACE : 0);
+    if (y - need < MARGIN) nextPage();
+
+    rows.forEach((row, n) => {
+      page.drawText(row, { x, y: y - SIZE, size: SIZE, font, color: ink });
+      y -= LEADING;
+      // The signature goes straight under the closing line, before the name
+      if (n === 0 && png) {
+        page.drawImage(png, { x, y: y - sigH + 4, width: sigW, height: sigH });
+        y -= SIG_SPACE;
+      }
+    });
   };
 
-  let signed = false;
-  for (const paragraph of printable(text).split("\n")) {
-    if (!paragraph.trim()) {
+  /** Draws the heading: bold, underlined, centred, in capitals. */
+  const drawTitle = (title: string) => {
+    const size = 12;
+    const rows = wrap(title.trim().toUpperCase(), bold, size);
+    y -= 4;
+    for (const row of rows) {
+      if (y - size < MARGIN) nextPage();
+      const w = bold.widthOfTextAtSize(row, size);
+      const x = (PAGE_W - w) / 2;
+      page.drawText(row, { x, y: y - size, size, font: bold, color: ink });
+      page.drawLine({ start: { x, y: y - size - 2 }, end: { x: x + w, y: y - size - 2 }, thickness: 0.8, color: ink });
+      y -= LEADING + 1;
+    }
+    y -= 4;
+  };
+
+  let signoffDrawn = false;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (inSignoff.has(i)) {
+      // The sign-off is drawn once, as a block, when its first line is reached
+      if (!signoffDrawn && signoff) {
+        drawSignoff(signoff.block);
+        signoffDrawn = true;
+      }
+      continue;
+    }
+    if (!line.trim()) {
       y -= LEADING * 0.7;
       continue;
     }
-    for (const line of wrap(paragraph)) {
+    if (i === titleIndex) {
+      drawTitle(line);
+      continue;
+    }
+    for (const row of wrap(line, font, SIZE)) {
       if (y - SIZE < MARGIN) nextPage();
-      page.drawText(line, { x: MARGIN, y: y - SIZE, size: SIZE, font, color: ink });
+      page.drawText(row, { x: MARGIN, y: y - SIZE, size: SIZE, font, color: ink });
       y -= LEADING;
     }
-    if (!signed && CLOSING.test(paragraph.trim())) {
-      placeSignature();
-      signed = true;
-    }
   }
+
   // No closing line to sign under: put the signature at the end instead
-  if (!signed) {
+  if (!signoff && png) {
     y -= 10;
-    placeSignature();
+    if (y - SIG_SPACE < MARGIN) nextPage();
+    page.drawImage(png, { x: align === "right" ? PAGE_W - MARGIN - sigW : MARGIN, y: y - sigH, width: sigW, height: sigH });
   }
   return doc.save();
 }

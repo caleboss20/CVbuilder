@@ -110,12 +110,12 @@ export function OwnLetterEditor({ signature }: { signature: string }) {
           className="w-full resize-y rounded-lg border border-fg/12 bg-fg/[0.03] px-3.5 py-3 text-[15px] leading-relaxed text-fg placeholder:text-fg/30 focus:border-brand-400/70 focus:outline-none"
         />
         <p className="mt-1.5 text-xs text-fg/45">
-          Write it all here, including “Dear…” and the closing. Your signature is placed right under “Yours faithfully” or “Yours sincerely”.
+          Write it all here, including “Dear…” and the closing. A heading on its own line under “Dear…”, like “My request for financial assistance”, is made bold and underlined. Your signature is placed right under “Yours faithfully” or “Yours sincerely”.
         </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3 text-sm">
-        <span className="text-fg/60">Signature on the</span>
+        <span className="text-fg/60">Put the closing, signature and name on the</span>
         <div role="radiogroup" aria-label="Signature side" className="flex gap-1 rounded-lg bg-fg/5 p-1">
           {(["left", "right"] as const).map((side) => (
             <button
