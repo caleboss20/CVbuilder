@@ -43,6 +43,7 @@ export const templates: TemplateInfo[] = [
   { id: "spacedRule", name: "Spaced Rule", blurb: "Widely spaced bold name, small spaced headings and heavy rules. Plain and very easy to scan.", tags: ["simple", "ats"], exampleSlug: "electrical-engineering" },
   { id: "labelColumn", name: "Label Column", blurb: "Section names in a left column with the details beside them, under a heavy rule.", tags: ["simple", "ats"], exampleSlug: "human-resource-management" },
   { id: "accentIcons", name: "Accent Icons", blurb: "Colour on your role and employers, icon contacts, large headings and dashed dividers.", tags: ["simple", "ats"], exampleSlug: "public-health" },
+  { id: "contactRight", name: "Contact Right", blurb: "Big bold name with your contacts stacked on the right. Clean title-case headings and thin rules.", tags: ["simple", "ats"], exampleSlug: "marketing" },
   { id: "photoClassic", name: "Photo Classic", blurb: "Photo beside your name and contact details. Only add a photo if the employer expects one.", tags: ["photo"], exampleSlug: "civil-engineering" },
 
   // Two-column layouts. Neat and modern, though some tracking systems read single columns more reliably.

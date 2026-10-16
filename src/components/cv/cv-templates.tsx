@@ -23,6 +23,7 @@ import {
 } from "./cv-templates-more";
 import {
   AccentIconsCv,
+  ContactRightCv,
   DateColumnCv,
   DividedSimpleCv,
   GreyBarsCv,
@@ -132,6 +133,8 @@ export function CvTemplateView({
       return <LabelColumnCv {...props} />;
     case "accentIcons":
       return <AccentIconsCv {...props} />;
+    case "contactRight":
+      return <ContactRightCv {...props} />;
     default:
       return <AtsCv doc={doc} role={role} />;
   }

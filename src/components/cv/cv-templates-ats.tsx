@@ -61,14 +61,16 @@ type HeadingKind =
   | "divider" // a rule above the text
   | "spaced" // small, widely spaced capitals with a heavy rule under them
   | "display" // large capitals with a heavy rule under them
-  | "label"; // a plain bold label, for the left column of a label-column layout
+  | "label" // a plain bold label, for the left column of a label-column layout
+  | "title"; // a title-case heading (not capitals) with a thin rule under it
 
 type EntryStyle =
   | "role-first" // "Role, Organisation ........ dates"
   | "org-first" // "ORGANISATION, town ....... dates" then the role in italics
   | "date-column" // dates and organisation in a left column, role and bullets on the right
   | "title-caps" // "ROLE ........ dates" in bold capitals, then the organisation in bold
-  | "stacked"; // role, then the organisation in the accent colour, then dates, with dashed lines between
+  | "stacked" // role, then the organisation in the accent colour, then dates, with dashed lines between
+  | "italic-right"; // "Role" on the left, "Organisation, town | dates" in italics on the right
 
 type SkillsStyle =
   | "columns" // bullets in three columns
@@ -76,7 +78,7 @@ type SkillsStyle =
   | "sections" // every skill group is its own section, items joined with dashes
   | "inline"; // one section, items joined with dashes
 
-type HeaderKind = "center" | "left" | "icons" | "photo" | "accent";
+type HeaderKind = "center" | "left" | "icons" | "photo" | "accent" | "split";
 
 type StackConfig = {
   /** Default accent colour; the colour picker overrides it. */
@@ -146,6 +148,8 @@ function SectionHeading({ kind, accent, title }: { kind: HeadingKind; accent: st
       return <h3 className="border-b-[3px] border-slate-900 pb-1 text-[20px] font-bold uppercase text-slate-900">{title}</h3>;
     case "label":
       return <h3 className="text-[14px] font-bold uppercase leading-snug text-slate-900">{title}</h3>;
+    case "title":
+      return <h3 className="border-b border-slate-500 pb-0.5 text-[18px] font-semibold text-slate-900">{title}</h3>;
   }
 }
 
@@ -177,6 +181,21 @@ function Jobs({ jobs, entry, accent }: { jobs: CvJob[]; entry: EntryStyle; accen
               </div>
               {j.place && <p className="font-bold text-slate-900">{j.place}</p>}
               <Bullets items={j.bullets} className="mt-1" />
+            </div>
+          );
+        }
+        if (entry === "italic-right") {
+          return (
+            <div key={key}>
+              <div className="flex justify-between gap-4 text-slate-900">
+                <b>{j.title}</b>
+                <i className="shrink-0 text-right">
+                  {j.place}
+                  {j.place && j.date ? " | " : ""}
+                  {j.date}
+                </i>
+              </div>
+              <Bullets items={j.bullets} className="mt-1.5" />
             </div>
           );
         }
@@ -242,6 +261,20 @@ function Schools({ schools, entry, accent }: { schools: CvEducation[]; entry: En
                 <p className="text-slate-500">{e.school}</p>
               </div>
               <p className="font-bold text-slate-900">{e.degree}</p>
+            </div>
+          );
+        }
+        if (entry === "italic-right") {
+          return (
+            <div key={key}>
+              <div className="flex justify-between gap-4 text-slate-900">
+                <b>{e.degree}</b>
+                <i className="shrink-0 text-right">
+                  {e.school}
+                  {e.school && e.date ? " | " : ""}
+                  {e.date}
+                </i>
+              </div>
             </div>
           );
         }
@@ -332,6 +365,26 @@ function StackHeader({ cfg, doc, role, photo }: { cfg: StackConfig } & TemplateP
         ) : cfg.rule !== "none" ? (
           <div className="mt-5 border-t border-slate-800" />
         ) : null}
+      </header>
+    );
+  }
+
+  if (cfg.header === "split") {
+    return (
+      <header className="flex items-start justify-between gap-6">
+        <div className="min-w-0">
+          <p className={cfg.nameClass ?? "text-[36px] font-extrabold leading-tight text-slate-900"}>{doc.name}</p>
+          {role && <p className={cfg.roleClass ?? "mt-1 text-[15px] font-bold text-slate-900"}>{role}</p>}
+        </div>
+        {/* Contacts stacked on the right, each with its icon */}
+        <ul className="min-w-0 shrink space-y-0.5 text-[13px] text-slate-800">
+          {doc.contact.map((c) => (
+            <li key={c} className="flex items-center gap-2 break-all">
+              <ContactIcon kind={contactKind(c)} className="text-slate-900" />
+              {c}
+            </li>
+          ))}
+        </ul>
       </header>
     );
   }
@@ -1266,4 +1319,14 @@ export const AccentIconsCv = makeStack({
   entry: "stacked",
   skills: "columns",
   titles: { summary: "Summary", experience: "Experience", education: "Education", skills: "Skills" },
+});
+
+/** Big bold name with the role under it, contacts stacked with icons at the top right, title-case headings. */
+export const ContactRightCv = makeStack({
+  accent: "#111827",
+  header: "split",
+  heading: "title",
+  entry: "italic-right",
+  skills: "groups",
+  titles: { summary: "Professional Summary", experience: "Professional Experience", education: "Education", skills: "Skills" },
 });

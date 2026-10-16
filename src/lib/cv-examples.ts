@@ -86,7 +86,8 @@ export type CvTemplateName =
   | "gridSpaced"
   | "spacedRule"
   | "labelColumn"
-  | "accentIcons";
+  | "accentIcons"
+  | "contactRight";
 
 export type CvExample = {
   slug: string;
