@@ -52,6 +52,24 @@ export const templates: TemplateInfo[] = [
   { id: "gridSpaced", name: "Grid Spaced", blurb: "Widely spaced name and a ruled two-column grid.", tags: ["simple"], exampleSlug: "architecture" },
 ];
 
+/**
+ * Designs built on the newer layout engines. They reorder their sections to match the
+ * student's CV type (graduate, skills-based, academic). The original designs keep
+ * a fixed order, so the picker says so.
+ */
+const ADAPTIVE = new Set<CvTemplateName>([
+  "ruledClassic", "serifExecutive", "serifNavy", "greyBars", "dividedSimple", "iconLine", "dateColumn", "lavenderBand",
+  "photoClassic", "sideTimeline", "sideStripe", "sidePanel", "thinSplit", "gridLeft", "gridBand", "gridSpaced",
+]);
+
+/** Two-column layouts, which some hiring software reads less reliably than one column. */
+const TWO_COLUMN = new Set<CvTemplateName>([
+  "sideTimeline", "sideStripe", "sidePanel", "thinSplit", "gridLeft", "gridBand", "gridSpaced",
+]);
+
+export const adaptsToCvType = (id: CvTemplateName) => ADAPTIVE.has(id);
+export const isTwoColumn = (id: CvTemplateName) => TWO_COLUMN.has(id);
+
 export const templateFilters: { id: "all" | TemplateTag; label: string }[] = [
   { id: "all", label: "All" },
   { id: "simple", label: "Simple" },

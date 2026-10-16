@@ -3,7 +3,8 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { cvExamples, type CvTemplateName } from "@/lib/cv-examples";
-import { accentSwatches, templates } from "@/lib/templates";
+import { accentSwatches, adaptsToCvType, isTwoColumn, templates } from "@/lib/templates";
+import { AtsExplainer } from "@/components/ui/ats-explainer";
 import {
   BUILDER_STORAGE_KEY,
   blankCv,
@@ -455,6 +456,25 @@ export function Builder() {
             </p>
             <Current cv={cv} update={update} hints={hints} />
 
+            {/* Near the end, nudge students to see their details in other templates: the picker is easy to miss in the top bar */}
+            {step >= steps.length - 3 && (
+              <div className="mt-8 flex flex-col gap-3 rounded-xl border border-brand-400/30 bg-brand-500/[0.08] p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-medium text-fg">Happy with your details?</p>
+                  <p className="mt-0.5 text-sm text-fg/60">
+                    See your own CV in all {templates.length} templates and pick the one you like. Your details stay the same.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPickerOpen(true)}
+                  className="shrink-0 rounded-md bg-brand-600 px-5 py-2.5 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)] hover:bg-brand-500"
+                >
+                  Choose your template
+                </button>
+              </div>
+            )}
+
             <div className="mt-10 flex items-center justify-between gap-3 border-t border-fg/10 pt-6">
               <button
                 type="button"
@@ -690,12 +710,16 @@ function TemplatePicker({
       <div className="flex items-center justify-between border-b border-fg/10 px-4 py-4 sm:px-6">
         <div>
           <h2 className="text-lg font-medium text-fg">Choose a template</h2>
-          <p className="text-sm text-fg/50">Your details stay the same. Only the design changes.</p>
+          <p className="text-sm text-fg/50">
+            Your details stay the same. Only the design changes.
+            {cv.cvType !== "standard" && " Designs marked Fixed order keep the standard section order."}
+          </p>
         </div>
         <button type="button" onClick={onClose} className="rounded-md px-3 py-2 text-sm text-fg/70 ring-1 ring-fg/15 hover:text-fg">
           Close
         </button>
       </div>
+      <AtsExplainer className="mx-4 mt-4 sm:mx-6" />
       <ul className="grid flex-1 grid-cols-2 gap-5 overflow-y-auto p-4 sm:grid-cols-3 sm:p-6 lg:grid-cols-4 xl:grid-cols-5">
         {templates.map((t) => (
           <li key={t.id}>
@@ -716,7 +740,20 @@ function TemplatePicker({
                 {t.name}
                 {cv.template === t.id && <span className="text-xs text-brand-300">Selected</span>}
               </p>
-              <p className="text-xs text-fg/45">{t.tags.includes("ats") ? "ATS-safe" : t.tags.includes("photo") ? "With photo" : "Simple"}</p>
+              <p className="mt-0.5 flex flex-wrap gap-1.5 text-[11px]">
+                {t.tags.includes("ats") && (
+                  <span title="One column, plain headings, no photo" className="rounded bg-emerald-500/15 px-1.5 py-0.5 font-medium text-emerald-300">
+                    ATS-safe
+                  </span>
+                )}
+                {t.tags.includes("photo") && <span className="rounded bg-fg/10 px-1.5 py-0.5 text-fg/60">Photo</span>}
+                {isTwoColumn(t.id) && <span className="rounded bg-fg/10 px-1.5 py-0.5 text-fg/60">Two columns</span>}
+                {cv.cvType !== "standard" && !adaptsToCvType(t.id) && (
+                  <span title="This design keeps the standard section order" className="rounded bg-amber-400/15 px-1.5 py-0.5 text-amber-300">
+                    Fixed order
+                  </span>
+                )}
+              </p>
             </button>
           </li>
         ))}
