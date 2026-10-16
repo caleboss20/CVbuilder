@@ -143,6 +143,11 @@ export function isActionWord(raw: string): boolean {
 const WEAK_PHRASES =
   /responsible for|duties (included|include)|worked on|tasked with|in charge of|hard[- ]working|team player|results[- ]oriented|go[- ]getter|references available (up)?on request/gi;
 
+/** The filler phrases found in `text`, lowercased and without repeats. */
+export function weakPhrasesIn(text: string): string[] {
+  return [...new Set((text.match(WEAK_PHRASES) ?? []).map((p) => p.toLowerCase()))];
+}
+
 export const EMAIL = /[\w.+-]+@[\w-]+\.[\w.-]+/;
 // Ghana mobile numbers (024 123 4567, +233 24 123 4567) and other long digit runs
 export const PHONE = /(\+?233|\b0)[\s-]?\d{2}[\s-]?\d{3}[\s-]?\d{4}|\+?\d[\d\s-]{8,}\d/;

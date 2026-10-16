@@ -11,6 +11,7 @@ import {
   type BuilderCv,
 } from "@/lib/builder";
 import { AddButton, Field, ItemCard, LinesField, PhotoInput, TagInput, TextArea } from "./fields";
+import { BulletCoach } from "./bullet-coach";
 import { VoiceInput } from "./voice-input";
 
 export type Update = (patch: Partial<BuilderCv>) => void;
@@ -170,7 +171,8 @@ export function ExperienceStep({ cv, update, hints }: StepProps) {
             <p className="mb-1.5 text-sm font-medium text-fg/80">What you did</p>
             <div className="space-y-2">
               {job.bullets.map((b, bi) => (
-                <div key={bi} className="flex items-start gap-2">
+                <div key={bi}>
+                <div className="flex items-start gap-2">
                   <span className="mt-3 size-1.5 shrink-0 rounded-full bg-brand-300" aria-hidden="true" />
                   <textarea
                     rows={2}
@@ -195,6 +197,18 @@ export function ExperienceStep({ cv, update, hints }: StepProps) {
                   >
                     ×
                   </button>
+                </div>
+                {/* Live advice for this bullet, lined up with the text box above */}
+                <div className="ml-3.5 pr-10">
+                  <BulletCoach
+                    text={b}
+                    onChange={(next) => {
+                      const bullets = [...job.bullets];
+                      bullets[bi] = next;
+                      set(patchAt(list, i, { bullets }));
+                    }}
+                  />
+                </div>
                 </div>
               ))}
             </div>
