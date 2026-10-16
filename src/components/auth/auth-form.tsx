@@ -24,7 +24,7 @@ function friendly(message: string): string {
  * One form for both sign up and log in. Email and password only for now. Students who are
  * already signed in are sent straight to their account.
  */
-export function AuthForm({ mode }: { mode: "login" | "signup" }) {
+export function AuthForm({ mode, after = "/account" }: { mode: "login" | "signup"; after?: string }) {
   const router = useRouter();
   const { user, loading } = useUser();
   const [email, setEmail] = useState("");
@@ -36,8 +36,8 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const signup = mode === "signup";
 
   useEffect(() => {
-    if (user) router.replace("/account");
-  }, [user, router]);
+    if (user) router.replace(after);
+  }, [user, router, after]);
 
   if (!authConfigured) {
     return (

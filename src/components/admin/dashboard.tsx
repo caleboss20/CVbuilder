@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { AuthForm } from "@/components/auth/auth-form";
 import { useUser } from "@/components/auth/use-user";
 import { Logo } from "@/components/ui/logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -71,12 +71,12 @@ export function AdminDashboard() {
   else if (userLoading || (user && !stats && !error)) body = <Skeleton />;
   else if (!user || error === "not-signed-in")
     body = (
-      <Notice title="Log in to see the numbers">
-        <Link href="/login" className="text-afg underline">
-          Log in
-        </Link>{" "}
-        with the email on the admin list.
-      </Notice>
+      <div className={`${cardClass} mx-auto mt-12 max-w-sm p-6`}>
+        <h1 className="text-base font-medium">Admin log in</h1>
+        <p className="mb-5 mt-1.5 text-sm text-afg/55">Use the email that is on the admin list.</p>
+        {/* Stays on this page after logging in, instead of going to the student account page */}
+        <AuthForm mode="login" after="/admin" />
+      </div>
     );
   else if (error === "not-admin") body = <Notice title="This account is not an admin">You are logged in as {user.email}. Add that email to the admin list in Supabase (see supabase/schema.sql).</Notice>;
   else if (error === "not-set-up") body = <Notice title="The dashboard is not set up yet">Run supabase/schema.sql in the Supabase SQL Editor, then refresh this page.</Notice>;
@@ -86,13 +86,14 @@ export function AdminDashboard() {
   return (
     <div className="min-h-screen bg-abg text-afg">
       <header className="sticky top-0 z-20 border-b border-afg/10 bg-abg/90 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
+        <div className="mx-auto flex min-h-14 max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2 sm:px-6">
           <Logo />
           <span className="text-afg/25" aria-hidden="true">
             /
           </span>
           <span className="text-sm font-medium">Analytics</span>
-          <div className="ml-auto flex items-center gap-2">
+          {/* On a phone these drop onto their own line instead of squeezing the title */}
+          <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
             <div role="radiogroup" aria-label="Period" className="flex rounded-md border border-afg/10 p-0.5 text-xs">
               {RANGES.map((r) => (
                 <button
@@ -101,7 +102,7 @@ export function AdminDashboard() {
                   role="radio"
                   aria-checked={days === r.days}
                   onClick={() => setDays(r.days)}
-                  className={`rounded px-2.5 py-1.5 transition-colors ${days === r.days ? "bg-afg/10 text-afg" : "text-afg/50 hover:text-afg"}`}
+                  className={`whitespace-nowrap rounded px-2.5 py-1.5 transition-colors ${days === r.days ? "bg-afg/10 text-afg" : "text-afg/50 hover:text-afg"}`}
                 >
                   {r.label}
                 </button>
