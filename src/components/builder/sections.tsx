@@ -12,6 +12,7 @@ import {
 } from "@/lib/builder";
 import { AddButton, Field, ItemCard, LinesField, PhotoInput, TagInput, TextArea } from "./fields";
 import { buildSummaryStarter, summaryGoals } from "@/lib/summary-starter";
+import { AiAssist } from "./ai-assist";
 import { BulletCoach } from "./bullet-coach";
 import { VoiceInput } from "./voice-input";
 
@@ -131,6 +132,16 @@ export function SummaryStep({ cv, update, hints }: StepProps) {
           </span>
         }
       />
+      <AiAssist
+        kind="improve-summary"
+        text={cv.summary}
+        context={{
+          course: cv.education[0]?.degree ?? "",
+          targetRole: cv.role,
+          skills: cv.skills.map((s) => s.items).join(", "),
+        }}
+        onUse={(summary) => update({ summary })}
+      />
       <Tip>
         A simple formula: <b className="text-fg">who you are</b> (course, year, school) + <b className="text-fg">what you’re good at</b>{" "}
         (2 skills or experiences) + <b className="text-fg">what you want</b> (internship, national service, first job).
@@ -231,6 +242,16 @@ export function ExperienceStep({ cv, update, hints }: StepProps) {
                       set(patchAt(list, i, { bullets }));
                     }}
                   />
+                  <AiAssist
+                    kind="improve-bullet"
+                    text={b}
+                    context={{ role: job.title }}
+                    onUse={(next) => {
+                      const bullets = [...job.bullets];
+                      bullets[bi] = next;
+                      set(patchAt(list, i, { bullets }));
+                    }}
+                  />
                 </div>
                 </div>
               ))}
@@ -280,6 +301,12 @@ export function ProjectsStep({ cv, update, hints }: StepProps) {
               hints?.projects[i]?.detail,
               "Co-built a React Native app where students buy and sell items on campus, used by 500+ students.",
             )}
+          />
+          <AiAssist
+            kind="improve-project"
+            text={p.detail}
+            context={{ name: p.name, course: cv.education[0]?.degree ?? "" }}
+            onUse={(detail) => set(patchAt(list, i, { detail }))}
           />
         </ItemCard>
       ))}
