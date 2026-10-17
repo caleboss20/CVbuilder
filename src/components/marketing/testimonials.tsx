@@ -94,7 +94,8 @@ function TestimonialCard({ t, hidden = false }: { t: Testimonial; hidden?: boole
       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="text-brand-400/60">
         <path d="M9.5 6C6.5 7 4.5 9.6 4.5 13v5h6v-6h-3c0-2 1-3.5 3-4.3zM19.5 6c-3 1-5 3.6-5 7v5h6v-6h-3c0-2 1-3.5 3-4.3z" />
       </svg>
-      <blockquote className="mt-4 flex-1 text-[15px] leading-relaxed text-fg/80">{t.quote}</blockquote>
+      <p className="mt-4 text-lg font-medium leading-snug text-fg">{t.title}</p>
+      <blockquote className="mt-2 flex-1 text-[15px] leading-relaxed text-fg/80">{t.quote}</blockquote>
       <figcaption className="mt-6 flex items-center gap-3 border-t border-fg/10 pt-5">
         <Image
           src={t.photo}

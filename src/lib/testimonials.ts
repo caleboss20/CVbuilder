@@ -2,6 +2,8 @@ export type Testimonial = {
   name: string;
   course: string;
   school: string;
+  /** A short headline above the quote, drawn from what the student said. */
+  title: string;
   quote: string;
   photo: string;
   /**
@@ -22,6 +24,7 @@ export const testimonials: Testimonial[] = [
     name: "Frank Agyare",
     course: "BSc Computer Science",
     school: "KNUST",
+    title: "From rough notes to a sent application in one night",
     quote:
       "I had projects but no idea how to put them on paper. The AI turned my rough notes into proper bullet points and I sent my CV for an internship the same night.",
     photo: "/images/testimonials/student-a.webp",
@@ -30,6 +33,7 @@ export const testimonials: Testimonial[] = [
     name: "Wilhelmina Adjah",
     course: "BSc Business Administration",
     school: "KNUST",
+    title: "A professional CV in about ten minutes",
     quote:
       "My old CV was a messy Word file. With CV11 I picked a clean template, filled in my details and had a PDF ready in about ten minutes. It finally looks professional.",
     photo: "/images/testimonials/student-b.webp",
@@ -38,6 +42,7 @@ export const testimonials: Testimonial[] = [
     name: "Michaela Asante",
     course: "BSc Nursing",
     school: "UCC",
+    title: "My ward experience finally stands out",
     quote:
       "I needed a CV for my rotation placement and had nothing on it but school. The nursing example showed me what to include, and now my ward experience actually stands out.",
     photo: "/images/testimonials/student-c.webp",
