@@ -37,7 +37,7 @@ export async function generateJson<T>(opts: {
         responseMimeType: "application/json",
         responseSchema: opts.schema,
         temperature: opts.temperature ?? 0.3,
-        maxOutputTokens: 800,
+        maxOutputTokens: 2048,
       },
     }),
     signal: AbortSignal.timeout(LIMITS.timeoutMs),
