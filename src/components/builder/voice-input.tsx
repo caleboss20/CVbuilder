@@ -4,6 +4,7 @@ import { useState } from "react";
 import { refineText, type RefineKind } from "@/lib/refine";
 import { useSpeech } from "@/lib/speech";
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
+import { HeardCheck } from "./heard-check";
 
 const prompts: Record<RefineKind, string> = {
   bullets: "Tell us what you did there, in your own words. E.g. “I helped customers and counted stock every evening, maybe 50 customers a day.”",
@@ -16,7 +17,16 @@ const prompts: Record<RefineKind, string> = {
  * CV lines, they review and add them. Speech works in Chrome, Edge and Android;
  * elsewhere the mic is hidden and typing still works.
  */
-export function VoiceInput({ kind, onAdd }: { kind: RefineKind; onAdd: (lines: string[]) => void }) {
+export function VoiceInput({
+  kind,
+  onAdd,
+  context,
+}: {
+  kind: RefineKind;
+  onAdd: (lines: string[]) => void;
+  /** Facts that help the AI guess misheard words, such as the course or role. */
+  context?: Record<string, string>;
+}) {
   const [open, setOpen] = useState(false);
   const [lines, setLines] = useState<string[] | null>(null);
   const speech = useSpeech();
@@ -91,6 +101,7 @@ export function VoiceInput({ kind, onAdd }: { kind: RefineKind; onAdd: (lines: s
             className="mt-3 w-full resize-y rounded-lg border border-fg/12 bg-ink-950/60 px-3 py-2.5 text-sm leading-relaxed text-fg placeholder:text-fg/35 focus:border-brand-400/70 focus:outline-none"
           />
           {speech.error && <p className="mt-2 text-xs text-amber-300">{speech.error}</p>}
+          <HeardCheck text={speech.text} onUse={speech.setText} context={context} />
           {speech.supported && (
             <p className="mt-2 text-xs text-fg/50">
               Voice typing is still in beta and can mishear names, places and accents. Read the text above and fix any

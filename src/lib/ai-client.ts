@@ -33,3 +33,26 @@ export async function askAi(kind: AiKind, body: Record<string, string>, token: s
     return { ok: false, message: "Could not reach the server. Check your internet." };
   }
 }
+
+export type TranscriptChange = { heard: string; meant: string };
+
+/** The result of checking a transcript for mishearings. */
+export type TranscriptCheck =
+  | { ok: true; corrected: string; changes: TranscriptChange[] }
+  | { ok: false; message: string };
+
+/** Asks the AI which words in a transcript were probably misheard. Never throws. */
+export async function askTranscriptCheck(body: Record<string, string>, token: string | undefined): Promise<TranscriptCheck> {
+  try {
+    const res = await fetch("/api/ai/fix-transcript", {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${token ?? ""}` },
+      body: JSON.stringify(body),
+    });
+    const data = (await res.json()) as { corrected?: string; changes?: TranscriptChange[]; error?: string };
+    if (!res.ok) return { ok: false, message: data.error ?? "The AI could not help just now." };
+    return { ok: true, corrected: data.corrected ?? body.transcript, changes: data.changes ?? [] };
+  } catch {
+    return { ok: false, message: "Could not reach the server. Check your internet." };
+  }
+}

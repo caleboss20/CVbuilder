@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { askAi, type AiKind, type AiResult } from "@/lib/ai-client";
+import { AiConsentNotice, hasAiConsent } from "./ai-consent";
 import { useAiAccess } from "./use-ai-access";
 
 /** Which request field carries the student's text, for each kind of suggestion. */
@@ -10,17 +11,6 @@ const TEXT_FIELD: Record<AiKind, string> = {
   "improve-project": "detail",
   "improve-summary": "draft",
 };
-
-const CONSENT_KEY = "cv11-ai-consent-v1";
-
-/** Whether this student has already agreed to their line being sent to Google. Just a convenience, so a blocked store means asking again. */
-function hasConsented(): boolean {
-  try {
-    return localStorage.getItem(CONSENT_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
 
 /**
  * "Improve with AI" under a text box. The student taps it, sees a suggestion with a short reason,
@@ -53,7 +43,7 @@ export function AiAssist({
   if (!allowed || text.trim().split(/\s+/).filter(Boolean).length < minWords) return null;
 
   async function ask() {
-    if (!hasConsented()) return setAskingConsent(true);
+    if (!hasAiConsent()) return setAskingConsent(true);
     setAskingConsent(false);
     setBusy(true);
     const value = await askAi(kind, { ...context, [TEXT_FIELD[kind]]: text }, token);
@@ -65,32 +55,7 @@ export function AiAssist({
 
   return (
     <div className="mt-1.5 text-xs" aria-live="polite">
-      {askingConsent && !current && (
-        <div className="rounded-lg border border-fg/15 bg-fg/[0.03] p-3 text-fg/70">
-          <p>
-            To write this, we send <b className="text-fg">only the text in this box</b> to Google&apos;s AI. We do not send your name,
-            phone or email. Google may use it to improve its products.{" "}
-            <a href="/privacy#ai" target="_blank" className="underline">Read more</a>
-          </p>
-          <div className="mt-2 flex gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                try {
-                  localStorage.setItem(CONSENT_KEY, "1");
-                } catch {}
-                void ask();
-              }}
-              className="font-medium text-brand-300 hover:text-fg"
-            >
-              OK, continue
-            </button>
-            <button type="button" onClick={() => setAskingConsent(false)} className="text-fg/50 hover:text-fg">
-              Not now
-            </button>
-          </div>
-        </div>
-      )}
+      {askingConsent && !current && <AiConsentNotice onAccept={() => void ask()} onDecline={() => setAskingConsent(false)} />}
 
       {!current && !askingConsent && (
         <button type="button" onClick={ask} disabled={busy} className="font-medium text-brand-300 hover:text-fg disabled:opacity-50">

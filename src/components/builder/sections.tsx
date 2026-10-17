@@ -94,7 +94,7 @@ export function SummaryStep({ cv, update, hints }: StepProps) {
   return (
     <div className="space-y-5">
       <StepIntro title="Professional summary">Two or three sentences that sum up who you are and what you want.</StepIntro>
-      <VoiceInput kind="summary" onAdd={([summary]) => summary && update({ summary })} />
+      <VoiceInput kind="summary" onAdd={([summary]) => summary && update({ summary })} context={{ course: cv.education[0]?.degree ?? "", role: cv.role }} />
 
       {/* Only while the box is empty, so it can never overwrite something the student wrote */}
       {!cv.summary.trim() && (
@@ -199,6 +199,7 @@ export function ExperienceStep({ cv, update, hints }: StepProps) {
           </div>
           <VoiceInput
             kind="bullets"
+            context={{ course: cv.education[0]?.degree ?? "", role: job.title }}
             onAdd={(lines) => set(patchAt(list, i, { bullets: [...job.bullets.filter((b) => b.trim()), ...lines] }))}
           />
           <div>
@@ -291,7 +292,7 @@ export function ProjectsStep({ cv, update, hints }: StepProps) {
           onDown={i < list.length - 1 ? () => set(move(list, i, 1)) : undefined}
         >
           <Field label="Project name" value={p.name} onChange={(name) => set(patchAt(list, i, { name }))} placeholder={ph(hints?.projects[i]?.name, "Campus Marketplace App")} />
-          <VoiceInput kind="project" onAdd={([detail]) => detail && set(patchAt(list, i, { detail }))} />
+          <VoiceInput kind="project" onAdd={([detail]) => detail && set(patchAt(list, i, { detail }))} context={{ course: cv.education[0]?.degree ?? "", role: p.name }} />
           <TextArea
             label="What it was and what it achieved"
             rows={2}

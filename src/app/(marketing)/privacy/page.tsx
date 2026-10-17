@@ -48,9 +48,9 @@ export default function PrivacyPage() {
 
       <h2 id="ai">AI suggestions</h2>
       <p>
-        Some tools have an optional &quot;Improve with AI&quot; button. It works only when you tap it, and it needs a CV11 account so we can
+        Some tools have an optional &quot;Improve with AI&quot; or &quot;Check what we heard&quot; button. It works only when you tap it, and it needs a CV11 account so we can
         count your free daily tries. When you tap it, <strong>only the text in that box</strong>, such as one bullet point, a project
-        description or your summary, plus the job title, course or skills listed next to it, is sent through our server to Google&apos;s
+        description, your summary or what you said in the voice box, plus the job title, course or skills listed next to it, is sent through our server to Google&apos;s
         Gemini AI, which writes the suggestion. We do not send your name, phone number, email address or the rest of your CV, and we
         do not store the text or the suggestion.
       </p>
