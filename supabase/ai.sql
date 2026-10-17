@@ -14,9 +14,11 @@
 create table if not exists public.ai_settings (
   id boolean primary key default true check (id),       -- one row only
   per_user_daily integer not null default 5,             -- free AI requests per student per day
-  site_daily integer not null default 300                -- AI requests for the whole site per day
+  site_daily integer not null default 450  -- AI requests for the whole site per day (Google's free limit is 500)
 );
 insert into public.ai_settings (id) values (true) on conflict do nothing;
+-- Earlier versions of this file started at 300; raise it to fit the free Flash-Lite allowance
+update public.ai_settings set site_daily = 450 where site_daily = 300;
 
 alter table public.ai_settings enable row level security;
 drop policy if exists "owner reads ai settings" on public.ai_settings;

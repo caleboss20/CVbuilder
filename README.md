@@ -128,7 +128,7 @@ Open <http://localhost:3000>. The builder, checker, templates and PDF tools all 
 | `NEXT_PUBLIC_SUPABASE_URL` | Accounts, cloud sync, analytics | Safe to expose. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Accounts, cloud sync, analytics | The public anon key only. Never use a service-role key. |
 | `GEMINI_API_KEY` | AI suggestions | Server only. Never prefix with `NEXT_PUBLIC_`. |
-| `GEMINI_MODEL` | AI suggestions | Optional. Defaults to a fast Flash model. |
+| `GEMINI_MODEL` | AI suggestions | Optional. Defaults to `gemini-3.5-flash-lite`, which has the largest free allowance. |
 | `AI_ACCESS` | AI suggestions | `admin` (default) or `everyone`. |
 | `NEXT_PUBLIC_WHATSAPP` | Support button | Optional, digits with country code. |
 

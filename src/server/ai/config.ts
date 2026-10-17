@@ -9,8 +9,12 @@ import "server-only";
 /** The Gemini key. Undefined until the owner adds one, and the AI then stays switched off. */
 export const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-/** Which Gemini model to call. A fast, cheap one is plenty for rewriting a CV line. */
-export const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-3.8-flash";
+/**
+ * Which Gemini model to call. Flash-Lite is fast and has by far the biggest free allowance
+ * (500 requests a day, against 20 for the full Flash model), and with the examples in rules.ts
+ * it stays faithful to what the student wrote.
+ */
+export const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-3.5-flash-lite";
 
 /**
  * Who may use the AI. "admin" while we test it, "everyone" once credits and payments exist.

@@ -27,7 +27,7 @@ const SCHEMA = {
 };
 
 /** Extra rules for a summary. They override the "one line" rule that suits bullets. */
-const SUMMARY_RULES = `For a CV summary: write 2 to 3 sentences, 35 to 60 words, in the first person without using "I" (for example "Final-year Accounting student with...").
+const SUMMARY_RULES = `For a CV summary: write 2 to 3 sentences, never fewer than 30 and never more than 60 words, in the first person without using "I" (for example "Final-year Accounting student with...").
 Say who the student is, what they can do, and what they are looking for. Use only the facts given below.`;
 
 /**

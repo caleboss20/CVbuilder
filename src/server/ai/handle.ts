@@ -34,6 +34,10 @@ export async function handleAiRequest<Input>(
     return Response.json({ ...(result as object), remaining: guard.remaining });
   } catch (err) {
     await guard.refund();
+    // Google's own per-minute limit: many students at once. Nothing is broken, so say so kindly
+    if (err instanceof GeminiError && err.status === 429) {
+      return Response.json({ error: "Lots of students are using the AI right now. Please try again in a minute." }, { status: 429 });
+    }
     // Log the real cause for us; students only see a calm message
     console.error(`[ai] ${name} failed:`, err instanceof GeminiError ? err.message : err);
     return Response.json({ error: "The AI could not help just now. Please try again." }, { status: 502 });
