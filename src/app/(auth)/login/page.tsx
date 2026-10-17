@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AuthForm } from "@/components/auth/auth-form";
-import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthScreen } from "@/components/auth/auth-screen";
 
 export const metadata: Metadata = {
   title: "Log in",
@@ -9,8 +9,12 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <AuthShell title="Welcome back" intro="Log in to open your CV on any phone. You never need an account to build or download a CV.">
+    <AuthScreen
+      title="Log in to CV11"
+      intro="Open your CV on any phone. You never need an account to build or download a CV."
+      switchTo={{ label: "Sign Up", href: "/signup" }}
+    >
       <AuthForm mode="login" />
-    </AuthShell>
+    </AuthScreen>
   );
 }

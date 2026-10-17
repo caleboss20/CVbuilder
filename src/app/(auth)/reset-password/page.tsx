@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthScreen } from "@/components/auth/auth-screen";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 
 export const metadata: Metadata = {
@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function ResetPasswordPage() {
   return (
-    <AuthShell title="Choose a new password">
+    <AuthScreen title="Choose a new password" switchTo={{ label: "Log in", href: "/login" }}>
       <ResetPasswordForm />
-    </AuthShell>
+    </AuthScreen>
   );
 }

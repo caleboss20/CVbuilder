@@ -14,11 +14,12 @@ import { useUser } from "./use-user";
  */
 const TONES = {
   site: {
-    input: "border-fg/12 bg-fg/[0.03] text-fg placeholder:text-fg/35 focus:border-brand-400/70",
+    input: "border-fg/15 bg-fg/[0.03] text-fg placeholder:text-fg/40 focus:border-fg/50",
     label: "text-fg/80",
+    // The same blue button as the homepage, so every primary button on the site matches
     submit: "bg-brand-600 text-white ring-1 ring-brand-300/60 shadow-[0_0_22px_rgb(124_128_255/0.5)] hover:bg-brand-500 disabled:shadow-none",
-    muted: "text-fg/60",
-    link: "text-brand-300 hover:text-fg",
+    muted: "text-fg/55",
+    link: "text-fg underline-offset-4 hover:underline",
     notice: "text-emerald-300",
   },
   neutral: {
@@ -26,7 +27,7 @@ const TONES = {
     label: "text-afg/80",
     submit: "bg-afg text-abg hover:opacity-90",
     muted: "text-afg/55",
-    link: "text-afg underline underline-offset-2 hover:opacity-80",
+    link: "text-afg underline-offset-4 hover:underline",
     notice: "text-aup",
   },
 } as const;
@@ -72,7 +73,7 @@ export function AuthForm({
 
   const signup = mode === "signup";
   const tone = neutral ? TONES.neutral : TONES.site;
-  const inputClass = `mt-1.5 w-full rounded-lg border px-3.5 py-3 text-[15px] focus:outline-none ${tone.input}`;
+  const inputClass = `h-12 w-full rounded-md border px-3.5 text-[15px] focus:outline-none ${tone.input}`;
 
   useEffect(() => {
     if (user) router.replace(after);
@@ -131,9 +132,10 @@ export function AuthForm({
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5" noValidate>
-      <label className={`block text-sm font-medium ${tone.label}`}>
-        Email
+    <form onSubmit={submit} className="space-y-3" noValidate>
+      {/* The placeholders say what each box is, as on Vercel; the labels stay for screen readers */}
+      <label className="block">
+        <span className="sr-only">Email address</span>
         <input
           type="email"
           autoComplete="email"
@@ -141,14 +143,20 @@ export function AuthForm({
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
+          placeholder="Email address"
           className={inputClass}
         />
       </label>
 
-      <label className={`block text-sm font-medium ${tone.label}`}>
-        Password
-        <PasswordInput value={password} onChange={setPassword} autoComplete={signup ? "new-password" : "current-password"} neutral={neutral} />
+      <label className="block">
+        <span className="sr-only">Password</span>
+        <PasswordInput
+          value={password}
+          onChange={setPassword}
+          autoComplete={signup ? "new-password" : "current-password"}
+          placeholder={signup ? "Password (8+ characters)" : "Password"}
+          neutral={neutral}
+        />
       </label>
 
       {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
@@ -159,10 +167,10 @@ export function AuthForm({
         disabled={busy || loading || !email.trim()}
         className={`flex h-12 w-full items-center justify-center rounded-md text-[15px] font-medium disabled:opacity-50 ${tone.submit}`}
       >
-        {busy ? "Please wait…" : signup ? "Create my account" : "Log in"}
+        {busy ? "Please wait…" : signup ? "Create account" : "Log in"}
       </button>
 
-      <div className={`flex flex-wrap items-center justify-between gap-2 text-sm ${tone.muted}`}>
+      <div className={`space-y-2 pt-3 text-center text-sm ${tone.muted}`}>
         {signup ? (
           <p>
             Already have an account?{" "}
@@ -172,19 +180,19 @@ export function AuthForm({
           </p>
         ) : (
           <>
-            {allowSignup ? (
+            {allowSignup && (
               <p>
-                New here?{" "}
+                Don’t have an account?{" "}
                 <Link href="/signup" className={tone.link}>
-                  Create an account
+                  Sign Up
                 </Link>
               </p>
-            ) : (
-              <span />
             )}
-            <button type="button" onClick={forgot} className={tone.link}>
-              Forgot password?
-            </button>
+            <p>
+              <button type="button" onClick={forgot} className={tone.link}>
+                Forgot password?
+              </button>
+            </p>
           </>
         )}
       </div>

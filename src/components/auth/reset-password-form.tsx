@@ -41,16 +41,16 @@ export function ResetPasswordForm() {
   if (!loading && !user) {
     return (
       <p className="text-sm text-fg/70">
-        This link has expired or was already used. <Link href="/login" className="text-brand-300 underline">Ask for a new one from the log-in page</Link>.
+        This link has expired or was already used. <Link href="/login" className="text-fg underline underline-offset-4">Ask for a new one from the log-in page</Link>.
       </p>
     );
   }
 
   return (
-    <form onSubmit={submit} className="space-y-5">
-      <label className="block text-sm font-medium text-fg/80">
-        New password
-        <PasswordInput value={password} onChange={setPassword} autoComplete="new-password" />
+    <form onSubmit={submit} className="space-y-3">
+      <label className="block">
+        <span className="sr-only">New password</span>
+        <PasswordInput value={password} onChange={setPassword} autoComplete="new-password" placeholder="New password (8+ characters)" />
       </label>
       {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
       <button
