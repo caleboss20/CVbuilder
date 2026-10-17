@@ -26,7 +26,7 @@ export async function improveBullet(input: { text: string; role?: string; field?
   const system = [CV_RULES, industryHint(input.field)].filter(Boolean).join("\n\n");
   const prompt = [
     input.role ? `Role: ${input.role}` : "",
-    "Rewrite this CV bullet. In `why`, say in one plain sentence what you improved.",
+    "Rewrite this CV bullet. In the why field, say in one plain sentence what you improved.",
     `<student_text>${input.text}</student_text>`,
   ]
     .filter(Boolean)
