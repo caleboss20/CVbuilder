@@ -18,15 +18,15 @@ export const GEMINI_MODEL = process.env.GEMINI_MODEL ?? "gemini-3.8-flash";
  */
 export const AI_ACCESS: "admin" | "everyone" = process.env.AI_ACCESS === "everyone" ? "everyone" : "admin";
 
-/** Hard limits on what one request may send, to protect the budget and the prompt. */
+/**
+ * Hard limits on what one request may send. The daily number of requests per person and per site
+ * lives in the database (supabase/ai.sql, table ai_settings), so it can change without a deploy.
+ */
 export const LIMITS = {
   /** Longest bullet or summary we accept, in characters. */
   textChars: 600,
   /** Longest voice transcript we accept, in characters. */
   transcriptChars: 2000,
-  /** Requests per signed-in person in the time window below. */
-  requestsPerWindow: 20,
-  windowMs: 10 * 60 * 1000,
   /** Give up on Gemini after this long so a student is never left waiting. */
   timeoutMs: 15_000,
 } as const;

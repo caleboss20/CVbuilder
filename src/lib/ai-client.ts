@@ -10,6 +10,8 @@ export type AiSuggestion = {
   improved: string;
   /** One sentence on what changed, or what the student could add. */
   why: string;
+  /** Free tries left today, when the server says. */
+  remaining?: number;
 };
 
 /** Either a suggestion, or a message that is safe to show the student. */
@@ -26,7 +28,7 @@ export async function askAi(kind: AiKind, body: Record<string, string>, token: s
     const data = (await res.json()) as Partial<AiSuggestion> & { error?: string };
     if (!res.ok) return { ok: false, message: data.error ?? "The AI could not help just now." };
     if (!data.improved) return { ok: false, message: "No safe suggestion this time. Try adding a little more detail." };
-    return { ok: true, suggestion: { improved: data.improved, why: data.why ?? "" } };
+    return { ok: true, suggestion: { improved: data.improved, why: data.why ?? "", remaining: data.remaining } };
   } catch {
     return { ok: false, message: "Could not reach the server. Check your internet." };
   }

@@ -29,8 +29,11 @@ export async function handleAiRequest<Input>(
   if (typeof input === "string") return Response.json({ error: input }, { status: 400 });
 
   try {
-    return Response.json(await run(input));
+    const result = await run(input);
+    // Tell the browser how many free tries are left, so it can show "3 left today"
+    return Response.json({ ...(result as object), remaining: guard.remaining });
   } catch (err) {
+    await guard.refund();
     // Log the real cause for us; students only see a calm message
     console.error(`[ai] ${name} failed:`, err instanceof GeminiError ? err.message : err);
     return Response.json({ error: "The AI could not help just now. Please try again." }, { status: 502 });
