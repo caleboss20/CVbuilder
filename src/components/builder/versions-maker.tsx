@@ -6,6 +6,7 @@ import { CvPageFrame } from "@/components/cv/cv-page-frame";
 import { CvTemplateView } from "@/components/cv/cv-templates";
 import { HideEmptySections } from "@/components/cv/hide-empty-sections";
 import { Logo } from "@/components/ui/logo";
+import { trackEvent } from "@/lib/track";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { BUILDER_STORAGE_KEY, blankCv, cvStrength, toDoc, uid, type BuilderCv } from "@/lib/builder";
 import {
@@ -96,6 +97,7 @@ export function VersionsMaker() {
     }
     setPrinting(null);
     setBusy(false);
+    trackEvent("cv_versions_downloaded", { count: queue.current.length });
   }
 
   // Downloads go through the same payment gate as the builder: one payment covers every version of this CV

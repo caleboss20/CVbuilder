@@ -23,6 +23,7 @@ import { pageSize } from "@/lib/certificate-design-types";
 import { designById } from "@/lib/certificate-designs";
 import type { PreviewPage } from "@/lib/sign-pdf";
 import { whatsappLink } from "@/lib/site";
+import { trackEvent } from "@/lib/track";
 
 /** A name to show in the preview before the organiser has pasted a list. */
 const PLACEHOLDER_NAME = "Akosua Mensah";
@@ -187,6 +188,7 @@ export function CertificateMaker() {
     if (names.length === 1) {
       try {
         save(await buildCombinedPdf(settings, names), `${fileNameFor(names[0], new Set())}.pdf`, "application/pdf");
+        trackEvent("certificates_made", { count: 1, design: settings.design });
       } catch {
         setError("Something went wrong while making the PDF. Please try again.");
       }
@@ -201,6 +203,7 @@ export function CertificateMaker() {
       for (const file of files) entries[`${fileNameFor(file.name, used)}.pdf`] = file.bytes;
       // PDFs are already compressed, so storing them uncompressed is faster
       save(zipSync(entries, { level: 0 }), `${base}.zip`, "application/zip");
+      trackEvent("certificates_made", { count: names.length, design: settings.design });
     } catch {
       setError("Something went wrong while making the files. Please try again, or try fewer names.");
     }
@@ -213,6 +216,7 @@ export function CertificateMaker() {
     try {
       const bytes = await buildCombinedPdf(settings, names, (done) => setProgress({ done, total: names.length, what: "Making the PDF" }));
       save(bytes, `${base}.pdf`, "application/pdf");
+      trackEvent("certificates_made", { count: names.length, design: settings.design });
     } catch {
       setError("Something went wrong while making the PDF. Please try again, or try fewer names.");
     }

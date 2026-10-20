@@ -13,7 +13,9 @@ export type TrackedEvent =
   | "letter_signed" // signed a letter they already had
   | "text_pdf_downloaded" // turned pasted text, an assignment or code into a PDF
   | "share_whatsapp" // tapped Share on WhatsApp after finishing
-  | "cv_backup_saved"; // saved a backup file of their CV
+  | "cv_backup_saved" // saved a backup file of their CV
+  | "certificates_made" // made a batch of certificates (the number made is sent, never the names)
+  | "cv_versions_downloaded"; // downloaded one or more versions of a CV (the number is sent)
 
 /** Records an event. Analytics must never break the app, so any failure is ignored. */
 export function trackEvent(name: TrackedEvent, data?: Record<string, string | number>) {

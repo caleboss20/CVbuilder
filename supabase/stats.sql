@@ -32,7 +32,21 @@ where name = 'cv_downloaded'
 group by 1
 order by downloads desc;
 
--- 5. Of the people who started a CV, how many finished one (same device)
+-- 5. Certificates and CV versions (counts only; the names and CVs are never sent)
+select
+  coalesce(sum((props ->> 'count')::int) filter (where name = 'certificates_made'), 0)        as certificates_made,
+  count(*) filter (where name = 'certificates_made')                                          as certificate_batches,
+  coalesce(sum((props ->> 'count')::int) filter (where name = 'cv_versions_downloaded'), 0)   as cv_versions_downloaded
+from public.events;
+
+-- 5b. Which certificate designs people choose
+select props ->> 'design' as design, count(*) as batches
+from public.events
+where name = 'certificates_made'
+group by 1
+order by batches desc;
+
+-- 6. Of the people who started a CV, how many finished one (same device)
 select
   count(distinct device) filter (where name = 'cv_started')    as started,
   count(distinct device) filter (where name = 'cv_downloaded') as finished
