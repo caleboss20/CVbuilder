@@ -14,6 +14,7 @@ const BACKUP_KEYS = [
   SIGNATURE_KEY, // the signature
   APPLICATIONS_KEY, // the application tracker
   "cv11-nss-checklist-v1", // the national service checklist
+  "cv11-versions-v1", // the CV versions (see cv-versions.ts), so they come back on a new phone too
 ] as const;
 
 /** The saved data, keyed by browser storage key. */
