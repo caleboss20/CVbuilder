@@ -48,6 +48,12 @@ export type BuilderCv = {
    * come from the closest field, relabelled with this name (see course-match.ts).
    */
   courseName?: string;
+  /**
+   * Which CV this is, for payments: paying unlocks downloads of one CV id for a while. Made in the
+   * browser when the editor opens (never in blankCv, which can run during server render), and a new
+   * CV always gets a new one.
+   */
+  cvId?: string;
   /** Active building time in ms, and when the CV was first downloaded. */
   timeSpent?: number;
   finishedAt?: number;

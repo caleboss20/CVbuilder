@@ -23,12 +23,14 @@ export const siteConfig = {
    */
   whatsapp: (process.env.NEXT_PUBLIC_WHATSAPP ?? "233256599734").replace(/\D/g, ""),
   /**
-   * The Pro plan shown on the pricing page, billed every month. These are placeholders to test
-   * interest: change the price and the number of reviews here and the page updates. Nothing is charged yet.
+   * Paying to download a CV. `enabled` follows NEXT_PUBLIC_PAYMENTS_ENABLED, so every "free" claim on
+   * the site can switch to the honest wording the moment payments go live. `price` and `days` are
+   * only what students read; the price actually charged lives in the database (supabase/payments.sql).
    */
-  pro: {
-    price: "GH₵ 15",
-    reviews: 10, // AI reviews included each month
+  download: {
+    enabled: process.env.NEXT_PUBLIC_PAYMENTS_ENABLED === "true",
+    price: "GH₵ 7",
+    days: 30,
   },
   nav: [
     { label: "Templates", href: "/templates" },
@@ -44,7 +46,7 @@ export const siteConfig = {
 export type ShareKind = "cv" | "letter" | "sign";
 
 const SHARE_MESSAGES: Record<ShareKind, string> = {
-  cv: "I just made my CV for free on CV11, a CV builder for students in Ghana.",
+  cv: "I just made my CV on CV11, a CV builder for students in Ghana.",
   letter: "I just wrote my application letter on CV11. It is free for students in Ghana.",
   sign: "I signed my letter as a PDF on CV11, no printing or scanning. It is free.",
 };
