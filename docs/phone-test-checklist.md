@@ -48,8 +48,36 @@ Tick each one. Write down the phone and browser for anything that fails.
 - [ ] **Share on WhatsApp** opens WhatsApp with the message and the CV11 link.
 
 ## 9. Pricing
-- [ ] `/pricing`: the Pro card's badge sits on its top edge, the price stays on one line, and the button reads **Coming soon**.
+- [ ] `/pricing` with payments **off**: one card, "Free", with PDF and Word downloads listed as included. No Pro plan anywhere.
+- [ ] `/pricing` with payments **on** (`NEXT_PUBLIC_PAYMENTS_ENABLED=true`): a "Build" card (GH₵ 0) and a "Download" card (GH₵ 7 per CV). The price stays on one line and the badge sits on the card's top edge.
 
 ## 10. Everything else
 - [ ] Light and dark mode both look right (toggle in the top bar).
 - [ ] Nothing is cut off at the edges, and no text overlaps buttons.
+
+## 11. CV versions (`/builder/versions`)
+- [ ] With a CV saved, the page shows three version cards, each with a **full, readable thumbnail** (not cut off) and different templates.
+- [ ] Rename a version, change its role line, template and colour. The thumbnail updates. Reload: your changes are still there.
+- [ ] **Add a version**, **Give each a different template** and **Use one template for all** work.
+- [ ] Tap **Download PDF** on one version: the save dialog opens with a file name like `Name_Company_CV`, and the PDF is not blank and fits one page.
+- [ ] **Download all**: on a phone this may be unreliable. Note what happens, and confirm one-at-a-time downloads always work.
+- [ ] With no CV saved, the page says "Build your CV first" and links to the builder.
+
+## 12. Certificates (`/certificates`)
+- [ ] The **Pick a design** and **Use my own certificate** tabs both work, and switching keeps what you typed.
+- [ ] The gallery shows all 23 designs (wide and tall) without sideways scrolling. Tapping one changes the preview.
+- [ ] **Try it with sample Ghanaian names** fills 10 names. The ZIP downloads, opens, and holds 10 PDFs named after the people.
+- [ ] Paste 15 names: the amber notice says only the first 10 will be made. One name gives a single PDF, not a ZIP.
+- [ ] Add a logo and **drag it with your finger** on the preview. The page does not scroll while dragging. The size slider works. The downloaded PDF has the logo where you left it.
+- [ ] A name with a Ghanaian letter (for example `Kɔfi Ɛnyonam`) shows correctly in the preview and the PDF.
+- [ ] **Use my own certificate**: upload a Canva PDF and then a photo of a certificate. Drag the name onto the blank line, change font, colour and size, and download. The name sits where the preview showed it.
+
+## 13. Accounts and payments (only after payments are switched on and tested with Paystack test cards)
+- [ ] Tap **Download PDF** while logged out: a "Create a free account to download" box appears. After signing up and confirming the email, you land back on your CV with the payment box.
+- [ ] Pay with a test card: you return to your CV, see "You're all set", and the PDF downloads. A second download within 30 days asks for nothing.
+- [ ] Close the payment page halfway, then return: nothing is charged twice, and the CV unlocks if the payment went through.
+- [ ] Making versions of a paid CV needs no second payment.
+
+## 14. Homepage
+- [ ] The **Certificates for everyone who showed up** section shows a neat pinboard of wide and tall previews, and the button opens `/certificates`.
+- [ ] The menu has a **Certificates** link, and the menu does not crowd or wrap badly at phone width.

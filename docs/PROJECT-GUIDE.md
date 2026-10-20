@@ -2,6 +2,12 @@
 
 > **Who this is for.** Two readers. **Investors and partners** get the product, the problem, the business model and the honest state of things in sections 1 to 6. **Developers (human or AI) who take over this codebase** get the architecture, the file-by-file map, the data model, the flows, the setup and the rules in sections 7 to 16. Everything here describes what is actually in the repository. Where something is planned but not built, it says so.
 >
+> **The documentation set.** This guide is the hub. Go deeper with:
+> - [`INVESTOR-BRIEF.md`](INVESTOR-BRIEF.md): the case for CV11 in plain business terms, unit economics, go-to-market, competition, risks and a diligence map.
+> - [`FEATURES.md`](FEATURES.md): exactly how every feature behaves, with the real rules and numbers (scoring weights, limits, algorithms).
+> - [`DEVELOPER-HANDBOOK.md`](DEVELOPER-HANDBOOK.md): recipes for common changes, data shapes, API contracts, the security model, a troubleshooting log, testing guidance and technical debt.
+> - [`phone-test-checklist.md`](phone-test-checklist.md): the manual checks for a real phone.
+>
 > Last updated: 20 October 2026. Live site: <https://cv11-one.vercel.app>. Repository: `caleboss20/CVbuilder`, branch `main`.
 
 ---
@@ -47,7 +53,7 @@ The two ideas that shape everything:
 | **Text to PDF and letter signing** | Anyone | Turn pasted text or an existing letter into a signed PDF | Free |
 | **Interview prep, tracker, national service checklist** | Students | Practice questions by field, an application tracker, a checklist | Free |
 | **AI writing help** | Students | Rewrites a bullet, a project description or a summary; fixes misheard voice input | Built, owner-only while quality is tested |
-| **Bulk certificate maker** | Event organisers, clubs, schools, training centres | Paste names, pick one of 23 designs, download a certificate for each person | Free up to 10 per batch; paid tiers planned |
+| **Bulk certificate maker** | Event organisers, clubs, schools, training centres | Paste names, pick one of 23 designs **or upload their own certificate (a Canva PDF or a photo)**, drag a logo or the name into place, download a certificate for each person | Free up to 10 per batch; paid tiers planned |
 
 ---
 
@@ -67,7 +73,7 @@ Status key: **Live** = on the public site today. **Built, off** = finished and t
 
 ### 3.1 CV builder (Live)
 
-- **Start in three ways:** pick a course (examples for about 30 fields of study, plus matching for any course typed in), upload an existing CV to continue editing it, or start blank. A short three-question guide picks the right *type* of CV (standard, graduate, skills-based, academic) so students never need to know the difference.
+- **Start in three ways:** pick a course (30 course examples, plus matching for any course typed in), upload an existing CV to continue editing it, or start blank. A short three-question guide picks the right *type* of CV (standard, graduate, skills-based, academic) so students never need to know the difference.
 - **Editor:** steps for personal details, summary, education, experience, projects, skills, extras and references, in an order that depends on the CV type. Dimmed placeholder text from the chosen course's example shows students what good looks like without ever writing it into their CV.
 - **Live preview:** the full A4 page, scaled to fit any screen. A short CV is stretched to fill the page; a long one is shrunk to fit one page.
 - **Coaching with no AI:** a quiet line under each bullet point (weak opener, missing number, too long) and tappable stronger opening words; a summary starter drafted from what the student already typed; a keyword matcher that compares a pasted job advert with the CV and adds missing skills in one tap.
@@ -112,6 +118,8 @@ Four small features behind **Improve with AI** and **Check what we heard** butto
 - Currently restricted to the owner (`AI_ACCESS=admin`). Opening it to everyone is one environment variable.
 
 ### 3.8 Bulk certificate maker (Live)
+
+**Two ways to work.** *Pick a design* (below), or *Use my own certificate*: the organiser uploads a certificate they already have (a Canva PDF, or a photo or scan) with the name left blank, drags the name to the right place, chooses its font, colour and size, and every name is written onto it. A PDF stays sharp vector art. The same free limit applies to both ways. See `FEATURES.md` section 15.8, and 15.9 for how charging beyond the free amount is designed.
 
 Paste a list of names (WhatsApp, Excel, typed). The tool cleans it (removes numbering, fixes ALL CAPS and lowercase names including Ghanaian letters, drops repeats). Pick one of **23 original designs** (19 wide, 4 tall) in a gallery, pick a colour, fill in the event, date, signers and an optional drawn signature, and optionally add the organiser's **logo**, which can be dragged anywhere on the certificate and resized. Download **a ZIP of separate PDFs** (one per person, named after them), or **one PDF to print**. One name gives a single PDF.
 
@@ -171,7 +179,7 @@ These are the designed models and the cost facts behind them. **No revenue figur
 | CV checker, letters, signing, Text to PDF, interview prep, tracker, NSS checklist | Live | |
 | Accounts, password reset, cloud save, backup | Live | Email sending uses Supabase's default sender: needs the owner's own SMTP before real volume (see 6.3) |
 | Admin analytics and AI lab | Live (owner only) | |
-| Bulk certificates (23 designs, logo, ZIP, free 10 per batch) | Live | |
+| Bulk certificates (23 designs, logo, upload-your-own, ZIP, free 10 per batch) | Live | Charging beyond the free amount is designed but not built (`FEATURES.md` 15.9) |
 | AI writing help and voice clean-up | Built, owner-only | Needs `supabase/ai.sql` run, a Gemini key, and `AI_ACCESS=everyone` to open |
 | Payments (Paystack, GH₵ 7 per CV) | Built, off | Needs Paystack keys, `supabase/payments.sql`, and `NEXT_PUBLIC_PAYMENTS_ENABLED=true`. Not tested with real money |
 | Certificate QR verification page | Planned | Needs a database table and a public page |
@@ -187,6 +195,12 @@ These are the designed models and the cost facts behind them. **No revenue figur
 - **Free AI tier terms.** Google may use free-tier inputs to improve its products. Students are told before first use. Moving to a paid Gemini tier removes this.
 - **Single developer, no automated tests.** Quality is checked by lint, the TypeScript compiler, production builds, manual testing and the checklist in `docs/phone-test-checklist.md`. See 6.4.
 - **Templates and designs are original drawings** made to match reference styles, not copies of anyone's artwork. If exact commercial templates are ever wanted, their licences must be checked first. The organiser-logo feature and a planned "upload your own background" are the safe route for branded looks.
+
+### 6.2b Known gaps in consistency (worth fixing soon)
+
+- **AI wording vs reality.** Several marketing lines promise AI ("let AI help", "the AI suggests stronger lines as you type", "AI writes it stronger", an FAQ entry, the site description). Today students get the **rule-based** helpers; the real AI is owner-only and the homepage AI demo is **scripted** (`src/lib/ai-demo.ts`). Either open the AI to students or reword those lines, so the site matches the principle of honesty in section 7. Files: `src/lib/site.ts`, `faqs.ts`, `components/marketing/hero.tsx`, `how-it-works.tsx`, `problems.tsx`, `final-cta.tsx`.
+- **Certificates and versions are counted but not on the dashboard.** `certificates_made` and `cv_versions_downloaded` are recorded anonymously; read them with queries 5 and 5b in `supabase/stats.sql` until the dashboard shows them.
+- **No pay-screen analytics yet.** "Reached the pay screen" and "paid" are not recorded; add them before payments go live so the funnel can be measured.
 
 ### 6.3 Owner checklist (things only the owner can do)
 
@@ -315,7 +329,10 @@ callyCV/
 ├─ AGENTS.md                    Rules for AI coding agents (Next.js 16 warning; re-added by `next dev`)
 ├─ README.md                    Public project page for GitHub
 ├─ docs/
-│  ├─ PROJECT-GUIDE.md          This document
+│  ├─ PROJECT-GUIDE.md          This document (the hub)
+│  ├─ INVESTOR-BRIEF.md         The business case, economics and diligence map
+│  ├─ FEATURES.md               Exactly how each feature behaves
+│  ├─ DEVELOPER-HANDBOOK.md     Recipes, data shapes, APIs, security, troubleshooting
 │  └─ phone-test-checklist.md   Manual test steps for a real phone
 ├─ public/
 │  ├─ fonts/                    Font files plus their licences (OFL and DejaVu)
@@ -416,6 +433,8 @@ callyCV/
 | `certificates.ts` | The engine: settings, kinds of certificate, fonts, drawing a page, combined and separate PDFs, preview, logo placement. |
 | `certificate-names.ts` | Clean a pasted list; the free-batch constants; sample Ghanaian names; safe file names. |
 | `certificate-logo.ts` | Read a logo image and shrink it to a small PNG. |
+| `certificate-own.ts` | "Use my own certificate": read an uploaded PDF or photo, embed it as the page, and write each name onto it where the organiser placed it. |
+| `save-file.ts` | Start a browser download of some bytes under a file name. |
 
 **Accounts, payments, analytics, content, misc**
 
@@ -435,7 +454,7 @@ callyCV/
 |---|---|
 | `cv/` | The CV renderers. `cv-templates.tsx` routes a template id to a renderer; `cv-templates-ats.tsx` (two config-driven engines, the largest file), `cv-templates-single.tsx`, `cv-templates-more.tsx`, `ats-cv.tsx` hold the designs; `cv-parts.tsx` shared pieces; `cv-page-frame.tsx` scales a page to fit; `hide-empty-sections.tsx` tidies half-filled CVs; `cv-icon.tsx` contact icons. |
 | `builder/` | `builder.tsx` (the editor), `sections.tsx` (the form steps), `fields.tsx` (inputs), `start-screen.tsx`, `type-guide.tsx`, `import-card.tsx`, `job-match-panel.tsx`, `bullet-coach.tsx`, `voice-input.tsx`, `signature-pad.tsx`, `cover-letter.tsx`, `backup-card.tsx`, `cloud-sync-panel.tsx`, `completion-card.tsx`, `confirm-dialog.tsx`, `build-timer.tsx`, background effects (`portal-glow.tsx`, `sky-background.tsx`). **Newer:** `print-copy.tsx` (the one-page print copy shared by the builder and versions), `versions-maker.tsx` (the versions page), `use-download-gate.tsx` and `pay-return.tsx` (payments), `ai-assist.tsx`, `ai-consent.tsx`, `heard-check.tsx`, `use-ai-access.ts` (AI buttons). |
-| `tools/` | `certificate-maker.tsx` (the certificate page), `sign-letter.tsx`, `own-letter-editor.tsx`. |
+| `tools/` | `certificates-tool.tsx` (the two tabs on the certificate page), `certificate-maker.tsx` (pick a design), `own-certificate-maker.tsx` (upload your own certificate), `sign-letter.tsx`, `own-letter-editor.tsx`. |
 | `checker/` | `cv-checker.tsx`, `score-card.tsx`. |
 | `tracker/` | `application-tracker.tsx`, `national-service-checklist.tsx`. |
 | `marketing/` | Homepage sections and site chrome: `navbar`, `footer`, `hero`, `how-it-works`, `job-hunt-tools`, `templates-section`, `template-gallery`, `certificates-section`, `testimonials`, `faq`, `final-cta`, `whatsapp-button`, `analytics`, `nav-progress`, `page-shell` and visual helpers. |
