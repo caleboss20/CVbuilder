@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CertificateMaker } from "@/components/tools/certificate-maker";
+import { CertificatesTool } from "@/components/tools/certificates-tool";
 
 export const metadata: Metadata = {
   title: "Bulk Certificate Maker: Make Certificates for Everyone at Once",
@@ -23,7 +23,7 @@ export default function CertificatesPage() {
           </p>
         </div>
         <div className="mt-12">
-          <CertificateMaker />
+          <CertificatesTool />
         </div>
       </div>
     </div>

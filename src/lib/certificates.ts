@@ -141,7 +141,7 @@ export function defaultLogoPlace(design: CertDesign, aspect: number): LogoPlace 
 
 // ---------------------------------------------------------------------- fonts
 
-type Fonts = {
+export type Fonts = {
   /** Light serif for titles. */
   title: PDFFont;
   /** Bold serif for titles and names in capitals. */
@@ -165,7 +165,7 @@ type Fonts = {
  * reused. `text` is everything that will be written, so the wider fallback font is only loaded
  * when it is really needed.
  */
-async function embedFonts(doc: PDFDocument, text: string): Promise<Fonts> {
+export async function embedFonts(doc: PDFDocument, text: string): Promise<Fonts> {
   const { default: fontkit } = await import("@pdf-lib/fontkit");
   doc.registerFontkit(fontkit);
   const load = async (file: string) => doc.embedFont(await loadFontFile(file), { subset: true });
@@ -184,7 +184,7 @@ async function embedFonts(doc: PDFDocument, text: string): Promise<Fonts> {
 }
 
 /** The wanted font if it can draw every letter of `text`, otherwise the DejaVu fallback. */
-function pick(fonts: Fonts, wanted: PDFFont, text: string): PDFFont {
+export function pick(fonts: Fonts, wanted: PDFFont, text: string): PDFFont {
   const set = fonts.chars.get(wanted);
   if (set && Array.from(text).every((ch) => set.has(ch.codePointAt(0)!))) return wanted;
   return (wanted === fonts.body ? fonts.fallback : fonts.fallbackBold) ?? wanted;
@@ -210,7 +210,7 @@ export function fillBody(s: Pick<CertSettings, "body" | "event" | "date" | "issu
 // ------------------------------------------------------------------- one page
 
 /** Turns a PNG data URL into bytes. */
-function dataUrlBytes(dataUrl: string): Uint8Array {
+export function dataUrlBytes(dataUrl: string): Uint8Array {
   const binary = atob(dataUrl.split(",")[1] ?? "");
   return Uint8Array.from(binary, (c) => c.charCodeAt(0));
 }
