@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Field, TextArea } from "@/components/builder/fields";
 import { SignaturePad } from "@/components/builder/signature-pad";
 import { readLogo } from "@/lib/certificate-logo";
@@ -11,18 +11,23 @@ import {
   KINDS,
   buildCombinedPdf,
   buildSeparatePdfs,
+  defaultLogoPlace,
   defaultSettings,
   previewCertificate,
-  supportsLogo,
   type CertDesign,
   type CertKind,
   type CertSettings,
+  type LogoPlace,
 } from "@/lib/certificates";
+import { pageSize } from "@/lib/certificate-design-types";
+import { designById } from "@/lib/certificate-designs";
 import type { PreviewPage } from "@/lib/sign-pdf";
 import { whatsappLink } from "@/lib/site";
 
 /** A name to show in the preview before the organiser has pasted a list. */
 const PLACEHOLDER_NAME = "Akosua Mensah";
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 /** Starts a browser download of some bytes. */
 function save(data: Uint8Array | Blob, fileName: string, type: string) {
@@ -56,8 +61,11 @@ export function CertificateMaker() {
   const [progress, setProgress] = useState<{ done: number; total: number; what: string } | null>(null);
   const [error, setError] = useState("");
   const [logoError, setLogoError] = useState("");
+  // The logo's own size in pixels, to keep its shape when it is moved to another design
+  const [logoSize, setLogoSize] = useState<{ width: number; height: number } | null>(null);
+  // The preview picture, so a dragged logo can be turned into a position on the page
+  const previewBox = useRef<HTMLDivElement>(null);
 
-  const logoAllowed = supportsLogo(settings.design);
   const parsed = useMemo(() => parseNames(namesText), [namesText]);
   // The free version makes up to FREE_BATCH certificates at a time; the rest wait for the paid plan
   const names = parsed.names.slice(0, FREE_BATCH);
@@ -79,7 +87,7 @@ export function CertificateMaker() {
   useEffect(() => {
     let cancelled = false;
     const timer = setTimeout(() => {
-      previewCertificate(settings, previewName)
+      previewCertificate({ ...settings, logo: "" }, previewName)
         .then((page) => {
           if (!cancelled) {
             setPreview(page);
@@ -119,7 +127,55 @@ export function CertificateMaker() {
   }
 
   function pickDesign(id: CertDesign) {
-    set({ design: id, color: DESIGNS.find((d) => d.id === id)?.color ?? settings.color });
+    const patch: Partial<CertSettings> = { design: id, color: DESIGNS.find((d) => d.id === id)?.color ?? settings.color };
+    // A tall page and a wide page need different spots, so the logo returns to the new design's usual place
+    const turns = pageSize(designById(id)).width !== pageSize(designById(settings.design)).width;
+    if (settings.logo && turns && logoSize) patch.logoPlace = defaultLogoPlace(id, logoSize.width / logoSize.height);
+    set(patch);
+  }
+
+  /** Moves or resizes the logo. Positions are fractions of the page, kept a little inside the edges. */
+  function placeLogo(patch: Partial<LogoPlace>) {
+    setSettings((s) => {
+      if (!s.logoPlace) return s;
+      const next = { ...s.logoPlace, ...patch };
+      return { ...s, logoPlace: { x: clamp(next.x, 0.02, 0.98), y: clamp(next.y, 0.02, 0.98), w: clamp(next.w, 0.05, 0.6) } };
+    });
+  }
+
+  /** Starts dragging the logo with a finger or mouse: it follows the pointer until it is let go. */
+  function dragLogo(e: React.PointerEvent<HTMLDivElement>) {
+    const place = settings.logoPlace;
+    const box = previewBox.current?.getBoundingClientRect();
+    if (!place || !box) return;
+    e.preventDefault();
+    const start = { px: e.clientX, py: e.clientY, x: place.x, y: place.y };
+    const move = (ev: PointerEvent) => placeLogo({ x: start.x + (ev.clientX - start.px) / box.width, y: start.y + (ev.clientY - start.py) / box.height });
+    const stop = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
+  }
+
+  /** The arrow keys nudge the logo, for people who do not use a mouse or touch. */
+  function nudgeLogo(e: React.KeyboardEvent<HTMLDivElement>) {
+    const step = e.shiftKey ? 0.05 : 0.01;
+    const place = settings.logoPlace;
+    if (!place) return;
+    const moves: Record<string, Partial<LogoPlace>> = {
+      ArrowLeft: { x: place.x - step },
+      ArrowRight: { x: place.x + step },
+      ArrowUp: { y: place.y - step },
+      ArrowDown: { y: place.y + step },
+    };
+    const patch = moves[e.key];
+    if (!patch) return;
+    e.preventDefault();
+    placeLogo(patch);
   }
 
   const ready = names.length > 0 && !progress;
@@ -309,44 +365,62 @@ export function CertificateMaker() {
         {/* 5. Logo */}
         <section className={`${section} space-y-3`}>
           <h2 className={heading}>5. Your logo (optional)</h2>
-          {logoAllowed ? (
-            <>
-              <p className="text-sm text-fg/60">Add your school, club or company logo. A PNG with a see-through background looks best.</p>
-              <div className="flex flex-wrap items-center gap-3">
-                <label className="inline-flex h-10 cursor-pointer items-center rounded-md px-4 text-sm font-medium text-fg ring-1 ring-fg/20 hover:bg-fg/5">
-                  {settings.logo ? "Change logo" : "Choose a logo"}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="sr-only"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      e.target.value = "";
-                      if (!file) return;
-                      try {
-                        set({ logo: await readLogo(file) });
-                        setLogoError("");
-                      } catch (err) {
-                        setLogoError(err instanceof Error ? err.message : "We could not use that picture.");
-                      }
-                    }}
-                  />
-                </label>
-                {settings.logo && (
-                  <>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- a small picture made on this device */}
-                    <img src={settings.logo} alt="Your logo" className="h-10 max-w-32 rounded bg-white/90 object-contain p-1" />
-                    <button type="button" onClick={() => set({ logo: "" })} className="text-sm text-fg/55 hover:text-fg">
-                      Remove
-                    </button>
-                  </>
-                )}
-              </div>
-              {logoError && <p className="text-sm text-amber-300" role="alert">{logoError}</p>}
-            </>
-          ) : (
-            <p className="text-sm text-fg/60">This design already has a medal at the top, so there is no room for a logo. Choose another design to add one.</p>
+          <p className="text-sm text-fg/60">
+            Add your school, club or company logo, then drag it on the certificate to put it exactly where you want. A PNG with a see-through
+            background looks best.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="inline-flex h-10 cursor-pointer items-center rounded-md px-4 text-sm font-medium text-fg ring-1 ring-fg/20 hover:bg-fg/5">
+              {settings.logo ? "Change logo" : "Choose a logo"}
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!file) return;
+                  try {
+                    const logo = await readLogo(file);
+                    setLogoSize({ width: logo.width, height: logo.height });
+                    // A new logo starts in the design's usual spot; one being replaced keeps the place and size it had
+                    set({ logo: logo.dataUrl, logoPlace: settings.logoPlace ?? defaultLogoPlace(settings.design, logo.width / logo.height) });
+                    setLogoError("");
+                  } catch (err) {
+                    setLogoError(err instanceof Error ? err.message : "We could not use that picture.");
+                  }
+                }}
+              />
+            </label>
+            {settings.logo && (
+              <button type="button" onClick={() => set({ logo: "", logoPlace: undefined })} className="text-sm text-fg/55 hover:text-fg">
+                Remove
+              </button>
+            )}
+          </div>
+          {settings.logo && settings.logoPlace && (
+            <div className="space-y-2.5">
+              <label className="block text-sm font-medium text-fg/80">
+                Logo size
+                <input
+                  type="range"
+                  min={5}
+                  max={50}
+                  value={Math.round(settings.logoPlace.w * 100)}
+                  onChange={(e) => placeLogo({ w: Number(e.target.value) / 100 })}
+                  className="mt-1.5 block w-full"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => logoSize && set({ logoPlace: defaultLogoPlace(settings.design, logoSize.width / logoSize.height) })}
+                className="text-sm font-medium text-brand-300 hover:text-fg"
+              >
+                Put it back in the usual spot
+              </button>
+            </div>
           )}
+          {logoError && <p className="text-sm text-amber-300" role="alert">{logoError}</p>}
         </section>
       </div>
 
@@ -354,8 +428,26 @@ export function CertificateMaker() {
       <div className="lg:sticky lg:top-24 lg:self-start">
         <div className="overflow-hidden rounded-xl border border-fg/10 bg-fg/[0.03] p-3">
           {preview ? (
-            // eslint-disable-next-line @next/next/no-img-element -- a locally made picture
-            <img src={preview.src} alt={`Preview of the certificate for ${previewName}`} className="mx-auto h-auto max-h-[72vh] w-auto max-w-full rounded-md bg-white object-contain" />
+            <div ref={previewBox} className="relative mx-auto w-fit max-w-full">
+              {/* eslint-disable-next-line @next/next/no-img-element -- a locally made picture */}
+              <img src={preview.src} alt={`Preview of the certificate for ${previewName}`} className="block h-auto max-h-[72vh] w-auto max-w-full rounded-md bg-white object-contain" />
+              {settings.logo && settings.logoPlace && (
+                // The logo is drawn here, above the picture, so it moves under the finger at once. The same
+                // position and size are used when the PDFs are made.
+                <div
+                  tabIndex={0}
+                  role="group"
+                  aria-label="Your logo. Drag it to move it, or use the arrow keys."
+                  onPointerDown={dragLogo}
+                  onKeyDown={nudgeLogo}
+                  style={{ left: `${settings.logoPlace.x * 100}%`, top: `${settings.logoPlace.y * 100}%`, width: `${settings.logoPlace.w * 100}%`, touchAction: "none" }}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-sm outline-1 outline-dashed outline-brand-300/80 hover:outline-brand-300 focus-visible:outline-2 focus-visible:outline-brand-400 active:cursor-grabbing"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element -- the organiser's own picture */}
+                  <img src={settings.logo} alt="" draggable={false} className="pointer-events-none block w-full select-none" />
+                </div>
+              )}
+            </div>
           ) : (
             <div className="aspect-[1.414] w-full animate-pulse rounded-md bg-fg/10" />
           )}
