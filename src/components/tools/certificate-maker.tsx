@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Field, TextArea } from "@/components/builder/fields";
 import { SignaturePad } from "@/components/builder/signature-pad";
+import { readLogo } from "@/lib/certificate-logo";
 import { FREE_BATCH, MAX_NAMES, SAMPLE_NAMES, fileNameFor, parseNames } from "@/lib/certificate-names";
 import {
   COLORS,
@@ -12,6 +13,7 @@ import {
   buildSeparatePdfs,
   defaultSettings,
   previewCertificate,
+  supportsLogo,
   type CertDesign,
   type CertKind,
   type CertSettings,
@@ -53,7 +55,9 @@ export function CertificateMaker() {
   const [thumbs, setThumbs] = useState<Partial<Record<CertDesign, string>>>({});
   const [progress, setProgress] = useState<{ done: number; total: number; what: string } | null>(null);
   const [error, setError] = useState("");
+  const [logoError, setLogoError] = useState("");
 
+  const logoAllowed = supportsLogo(settings.design);
   const parsed = useMemo(() => parseNames(namesText), [namesText]);
   // The free version makes up to FREE_BATCH certificates at a time; the rest wait for the paid plan
   const names = parsed.names.slice(0, FREE_BATCH);
@@ -300,6 +304,49 @@ export function CertificateMaker() {
               <SignaturePad value={settings.signature} onChange={(signature) => set({ signature })} />
             </div>
           </details>
+        </section>
+
+        {/* 5. Logo */}
+        <section className={`${section} space-y-3`}>
+          <h2 className={heading}>5. Your logo (optional)</h2>
+          {logoAllowed ? (
+            <>
+              <p className="text-sm text-fg/60">Add your school, club or company logo. A PNG with a see-through background looks best.</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="inline-flex h-10 cursor-pointer items-center rounded-md px-4 text-sm font-medium text-fg ring-1 ring-fg/20 hover:bg-fg/5">
+                  {settings.logo ? "Change logo" : "Choose a logo"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = "";
+                      if (!file) return;
+                      try {
+                        set({ logo: await readLogo(file) });
+                        setLogoError("");
+                      } catch (err) {
+                        setLogoError(err instanceof Error ? err.message : "We could not use that picture.");
+                      }
+                    }}
+                  />
+                </label>
+                {settings.logo && (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element -- a small picture made on this device */}
+                    <img src={settings.logo} alt="Your logo" className="h-10 max-w-32 rounded bg-white/90 object-contain p-1" />
+                    <button type="button" onClick={() => set({ logo: "" })} className="text-sm text-fg/55 hover:text-fg">
+                      Remove
+                    </button>
+                  </>
+                )}
+              </div>
+              {logoError && <p className="text-sm text-amber-300" role="alert">{logoError}</p>}
+            </>
+          ) : (
+            <p className="text-sm text-fg/60">This design already has a medal at the top, so there is no room for a logo. Choose another design to add one.</p>
+          )}
         </section>
       </div>
 

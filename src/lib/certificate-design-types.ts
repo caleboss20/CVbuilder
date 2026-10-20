@@ -53,19 +53,25 @@ export type Layout = {
   introColor: string;
   nameColor: string;
   lineColor: string;
-  /** Which font writes CERTIFICATE. */
-  titleFont: "title" | "bold";
+  /** Which font writes CERTIFICATE: the light serif, a bold sans, or the bold display serif. */
+  titleFont: "title" | "bold" | "display";
   titleSize: number;
   /** Extra space between the letters of the title. Defaults to a value that suits the font. */
   titleSpacing?: number;
   subtitleSize?: number;
   subtitleSpacing?: number;
   /** The name's font: handwriting (default), the title serif, or bold sans. */
-  nameFont?: "script" | "title" | "bold";
+  nameFont?: "script" | "title" | "bold" | "display";
   /** Write names in capitals (for designs whose name font is not handwriting). */
   nameCaps?: boolean;
   /** Skip the line under the name when the design draws its own divider. */
   noNameLine?: boolean;
+  /**
+   * Where the organiser's logo goes: centred on `cx`, starting at `top`, fitted inside maxW by maxH.
+   * Left out, a spot above the title is worked out. `false` means the design has no room for one,
+   * because a medal already sits there.
+   */
+  logo?: false | { cx: number; top: number; maxW: number; maxH: number };
 };
 
 export type DrawContext = { page: PDFPage; main: string; bold: PDFFont };

@@ -255,7 +255,7 @@ export const MORE_DESIGNS: DesignDef[] = [
       layout({
         cx: W / 2, w: 640, title: 113, subtitle: 156, intro: 197, name: 284, nameLine: 300, body: 337, sig: 490,
         slots: (two) => (two ? [229, 613] : [229]), titleColor: "#0a1f44", subtitleColor: "#0a1f44", introColor: "#0a1f44", nameColor: "#4a7dc9", lineColor: "#4a7dc9", ink: "#0a1f44",
-        titleFont: "bold", titleSize: 54, titleSpacing: 1, subtitleSize: 20, subtitleSpacing: 4,
+        titleFont: "display", titleSize: 52, titleSpacing: 2, subtitleSize: 20, subtitleSpacing: 4,
       }),
     draw({ page, main, bold }) {
       void bold;
@@ -284,7 +284,7 @@ export const MORE_DESIGNS: DesignDef[] = [
       layout({
         cx: W / 2, w: 600, title: 150, subtitle: 182, intro: 224, name: 285, nameLine: 297, body: 342, sig: 462,
         slots: (two) => (two ? [W / 2 - 200, W / 2 + 200] : [W / 2 - 200]), titleColor: main, subtitleColor: main, introColor: main, nameColor: main, lineColor: main, ink: darken(main, 0.3),
-        titleSize: 56, subtitleSize: 16, subtitleSpacing: 6, nameFont: "title", nameCaps: true, noNameLine: true,
+        titleFont: "display", titleSize: 50, titleSpacing: 2, subtitleSize: 16, subtitleSpacing: 6, nameFont: "display", nameCaps: true, noNameLine: true,
       }),
     draw({ page, main }) {
       const soft = lighten(main, 0.55);
