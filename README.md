@@ -19,6 +19,8 @@ Build a clean, ATS-friendly CV in minutes, write a cover letter, check your CV b
 
 ---
 
+> **Want the full picture?** [`docs/PROJECT-GUIDE.md`](docs/PROJECT-GUIDE.md) explains the whole product, the business model, the architecture, every folder and file, the database, the key flows, the settings and the rules for working in the code. It is written for investors and for any developer (human or AI) taking over the project.
+
 ## Why this exists
 
 Most CV tools are built for people in the US or Europe. They put basic features behind a paywall, ask for an account before you can download, and give a Ghanaian final-year student nothing that fits their situation: national service, attachment, a first CV with no job history.
