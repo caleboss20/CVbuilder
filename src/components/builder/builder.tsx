@@ -12,6 +12,7 @@ import {
   cvFromCourse,
   cvStrength,
   toDoc,
+  uid,
   type BuilderCv,
 } from "@/lib/builder";
 import { CvPageFrame } from "@/components/cv/cv-page-frame";
@@ -46,6 +47,7 @@ import { trackEvent } from "@/lib/track";
 import { AuthNav } from "@/components/auth/auth-nav";
 import { BackupCard } from "./backup-card";
 import { ShareNudge } from "@/components/ui/share-nudge";
+import { useDownloadGate } from "./use-download-gate";
 import Link from "next/link";
 
 const stepDefs = {
@@ -146,6 +148,14 @@ export function Builder() {
     }
   }, []);
 
+  // Give every CV an id the first time it is edited, so a payment can be tied to it
+  useEffect(() => {
+    if (status !== "editing" || cv.cvId) return;
+    const id = typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${uid()}${uid()}${uid()}`;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time id for a CV that has none
+    setCv((c) => (c.cvId ? c : { ...c, cvId: id }));
+  }, [status, cv.cvId]);
+
   // Autosave, debounced
   useEffect(() => {
     if (status !== "editing") return;
@@ -168,6 +178,21 @@ export function Builder() {
   const strength = useMemo(() => cvStrength(cv), [cv]);
   const accentStyle = cvStyle(cv, strength.score);
   const templateName = templates.find((t) => t.id === cv.template)?.name ?? "Template";
+
+  // Downloads go through the payment gate (a no-op while payments are off)
+  const gate = useDownloadGate({ cvId: cv.cvId, onPdf: downloadPdfNow, onWord: downloadWordNow });
+
+  // Coming back from sign-up (?download=1) or from Paystack (?paid=1): pick up where the student left off
+  const resumed = useRef(false);
+  useEffect(() => {
+    if (resumed.current || status !== "editing" || !cv.cvId || !gate.ready) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("download") !== "1" && params.get("paid") !== "1") return;
+    resumed.current = true;
+    // Clean the address so a refresh does not open the pop-up again
+    window.history.replaceState(null, "", "/builder");
+    void gate.request();
+  }, [status, cv.cvId, gate]);
 
   // The picked course's example CV: shown as dimmed placeholders in the form, and as
   // a sample preview until the student types their name. Never saved into their CV.
@@ -257,13 +282,13 @@ export function Builder() {
     });
   }
 
-  async function downloadWord() {
+  async function downloadWordNow() {
     const { downloadDocx } = await import("@/lib/docx-export");
     await downloadDocx(doc, cv.role.trim(), cv.accent, `${(cv.name || "My").trim().replace(/\s+/g, "_")}_CV`);
     setShareNudge(true);
   }
 
-  function download() {
+  function downloadPdfNow() {
     const prev = document.title;
     // The browser uses the page title as the PDF file name
     document.title = `${(cv.name || "My").trim().replace(/\s+/g, "_")}_CV`;
@@ -399,7 +424,7 @@ export function Builder() {
             </button>
             <button
               type="button"
-              onClick={downloadWord}
+              onClick={() => void gate.request("word")}
               title="Editable Word file, for employers who ask for .docx"
               className="hidden rounded-md px-3 py-2 text-sm font-medium text-fg ring-1 ring-fg/15 hover:bg-fg/5 sm:block"
             >
@@ -407,7 +432,7 @@ export function Builder() {
             </button>
             <button
               type="button"
-              onClick={download}
+              onClick={() => void gate.request("pdf")}
               className="hidden rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)] hover:bg-brand-500 sm:block"
             >
               Download PDF
@@ -540,7 +565,7 @@ export function Builder() {
               ) : (
                 <button
                   type="button"
-                  onClick={download}
+                  onClick={() => void gate.request("pdf")}
                   className="rounded-md bg-brand-600 px-5 py-2.5 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)] hover:bg-brand-500"
                 >
                   Finish and download PDF
@@ -616,18 +641,20 @@ export function Builder() {
         </aside>
       </div>
 
+      {gate.dialog}
+
       {/* Mobile sticky download */}
       <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-fg/10 bg-ink-950/95 p-3 backdrop-blur-xl sm:hidden">
         <button
           type="button"
-          onClick={downloadWord}
+          onClick={() => void gate.request("word")}
           className="flex-1 rounded-md py-3 text-sm font-medium text-fg ring-1 ring-fg/15"
         >
           Download Word
         </button>
         <button
           type="button"
-          onClick={download}
+          onClick={() => void gate.request("pdf")}
           className="flex-1 rounded-md bg-brand-600 py-3 text-sm font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_18px_rgb(124_128_255/0.45)]"
         >
           Download PDF

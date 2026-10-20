@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { authConfigured } from "@/lib/auth-config";
+import { takeResume } from "@/lib/payments";
 import { getSupabase } from "@/lib/supabase";
 import { PasswordInput } from "./password-input";
 import { useUser } from "./use-user";
@@ -76,8 +77,9 @@ export function AuthForm({
   const inputClass = `h-12 w-full rounded-md border px-3.5 text-[15px] focus:outline-none ${tone.input}`;
 
   useEffect(() => {
-    if (user) router.replace(after);
-  }, [user, router, after]);
+    // Someone who was stopped at a Download button goes back to it; everyone else to `after`
+    if (user) router.replace((!neutral && takeResume()) || after);
+  }, [user, router, after, neutral]);
 
   if (!authConfigured) {
     return (

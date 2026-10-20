@@ -1,13 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { authConfigured } from "@/lib/auth-config";
+import { DOWNLOAD_DAYS, DOWNLOAD_PRICE, paymentsEnabled, takeResume } from "@/lib/payments";
 import { getSupabase } from "@/lib/supabase";
 import { useUser } from "./use-user";
 
-/** What a signed-in student sees: who they are, their plan, and a way to sign out. */
+/** What a signed-in student sees: who they are, how downloads work, and a way to sign out. */
 export function AccountPanel() {
+  const router = useRouter();
   const { user, loading } = useUser({ eager: true });
+
+  // A student who confirmed their email while trying to download lands here: send them back to their CV
+  useEffect(() => {
+    if (!user) return;
+    const back = takeResume();
+    if (back) router.replace(back);
+  }, [user, router]);
 
   if (!authConfigured) return <p className="text-sm text-fg/70">Accounts are not switched on yet.</p>;
   if (loading) return <p className="text-sm text-fg/55">Loading…</p>;
@@ -36,9 +47,10 @@ export function AccountPanel() {
           <dd className="mt-1 break-all text-fg">{user.email}</dd>
         </div>
         <div>
-          <dt className="text-xs uppercase tracking-wide text-fg/45">Plan</dt>
+          <dt className="text-xs uppercase tracking-wide text-fg/45">Pricing</dt>
           <dd className="mt-1 text-fg">
-            Free · <Link href="/pricing" className="text-brand-300 hover:text-fg">See Pro</Link>
+            {paymentsEnabled ? `Free to build. ${DOWNLOAD_PRICE} to download a CV, then ${DOWNLOAD_DAYS} days of downloads.` : "Free"} ·{" "}
+            <Link href="/pricing" className="text-brand-300 hover:text-fg">Details</Link>
           </dd>
         </div>
       </dl>
