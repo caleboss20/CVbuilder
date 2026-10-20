@@ -39,7 +39,14 @@ export type CertSettings = {
   signature: string;
   /** The organiser's logo as a PNG data URL, or "". */
   logo: string;
+  /**
+   * Where the logo sits, as fractions of the page: its centre (x, y) and its width. The organiser drags
+   * it anywhere, so nothing is fixed. Missing means the design's usual spot.
+   */
+  logoPlace?: LogoPlace;
 };
+
+export type LogoPlace = { x: number; y: number; w: number };
 
 /** Accent colours offered for every design. */
 export const COLORS: { name: string; hex: string }[] = [
@@ -103,14 +110,16 @@ export function defaultSettings(): CertSettings {
   };
 }
 
+type LogoBox = { cx: number; top: number; maxW: number; maxH: number };
+
 /**
- * Where the logo goes on designs whose default spot (centred above the title) would collide with
- * their artwork. `false` means a medal already sits there, so that design has no room for a logo.
+ * Where the logo starts on designs whose usual spot (centred above the title) would collide with
+ * their artwork. It is only a starting point: the organiser can drag the logo anywhere.
  */
-const LOGO_SPOTS: Partial<Record<CertDesign, Layout["logo"]>> = {
-  whiteWave: false,
-  ornateCream: false,
-  excellence: false,
+const LOGO_SPOTS: Partial<Record<CertDesign, LogoBox>> = {
+  whiteWave: { cx: PAGE_H - 85, top: 40, maxW: 100, maxH: 60 },
+  ornateCream: { cx: 110, top: 64, maxW: 90, maxH: 60 },
+  excellence: { cx: 110, top: 64, maxW: 90, maxH: 60 },
   goldFrame: { cx: PAGE_W / 2, top: 100, maxW: 150, maxH: 30 },
   royalGold: { cx: 421, top: 56, maxW: 180, maxH: 46 },
   ribbonBlue: { cx: 490, top: 116, maxW: 150, maxH: 34 },
@@ -118,9 +127,16 @@ const LOGO_SPOTS: Partial<Record<CertDesign, Layout["logo"]>> = {
   ornateBlue: { cx: PAGE_W / 2, top: 56, maxW: 160, maxH: 40 },
 };
 
-/** Whether a design has room for the organiser's logo. */
-export function supportsLogo(design: CertDesign): boolean {
-  return LOGO_SPOTS[design] !== false;
+/**
+ * Where a newly added logo starts on a design: the design's usual spot, as fractions of the page.
+ * `aspect` is the logo's width divided by its height.
+ */
+export function defaultLogoPlace(design: CertDesign, aspect: number): LogoPlace {
+  const def = designById(design);
+  const dims = pageSize(def);
+  const box = logoBox(design, def.layout("#000000"));
+  const w = Math.min(box.maxW, box.maxH * aspect);
+  return { x: box.cx / dims.width, y: (box.top + box.maxH / 2) / dims.height, w: w / dims.width };
 }
 
 // ---------------------------------------------------------------------- fonts
@@ -210,9 +226,8 @@ async function embedImages(doc: PDFDocument, settings: CertSettings): Promise<Im
 }
 
 /** The spot for the logo when a design does not say: centred above the title, as large as the room allows. */
-function logoBox(design: CertDesign, L: Layout): { cx: number; top: number; maxW: number; maxH: number } | null {
+function logoBox(design: CertDesign, L: Layout): LogoBox {
   const spot = LOGO_SPOTS[design] ?? L.logo;
-  if (spot === false) return null;
   if (spot) return spot;
   const capTop = L.title - L.titleSize * 0.78;
   const top = Math.max(44, capTop - 62);
@@ -230,13 +245,12 @@ function drawCertificate(doc: PDFDocument, fonts: Fonts, settings: CertSettings,
 
   design.draw({ page, main, bold: fonts.bold });
 
-  // The organiser's logo, fitted into its box
-  const box = logoBox(settings.design, L);
-  if (images.logo && box) {
-    const scale = Math.min(box.maxW / images.logo.width, box.maxH / images.logo.height);
-    const w = images.logo.width * scale;
-    const h = images.logo.height * scale;
-    page.drawImage(images.logo, { x: box.cx - w / 2, y: Y(box.top + (box.maxH + h) / 2), width: w, height: h });
+  // The organiser's logo, wherever they put it (or the design's usual spot until they move it)
+  if (images.logo) {
+    const place = settings.logoPlace ?? defaultLogoPlace(settings.design, images.logo.width / images.logo.height);
+    const w = place.w * dims.width;
+    const h = (w * images.logo.height) / images.logo.width;
+    page.drawImage(images.logo, { x: place.x * dims.width - w / 2, y: Y(place.y * dims.height + h / 2), width: w, height: h });
   }
 
   // Title and subtitle

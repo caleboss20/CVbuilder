@@ -8,8 +8,10 @@ const MAX_FILE_BYTES = 8 * 1024 * 1024;
 const MAX_WIDTH = 420;
 const MAX_HEIGHT = 280;
 
-/** Returns the logo as a PNG data URL, or throws an Error with a message that is safe to show. */
-export async function readLogo(file: File): Promise<string> {
+export type Logo = { dataUrl: string; width: number; height: number };
+
+/** Returns the logo as a PNG data URL with its size, or throws an Error with a message that is safe to show. */
+export async function readLogo(file: File): Promise<Logo> {
   if (!file.type.startsWith("image/")) throw new Error("Please choose a picture, such as a PNG or JPG.");
   if (file.size > MAX_FILE_BYTES) throw new Error("That picture is too large. Please use one under 8 MB.");
 
@@ -28,5 +30,5 @@ export async function readLogo(file: File): Promise<string> {
   if (!context) throw new Error("Your browser could not process the picture.");
   context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
   bitmap.close();
-  return canvas.toDataURL("image/png");
+  return { dataUrl: canvas.toDataURL("image/png"), width: canvas.width, height: canvas.height };
 }

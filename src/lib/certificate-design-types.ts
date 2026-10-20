@@ -67,11 +67,10 @@ export type Layout = {
   /** Skip the line under the name when the design draws its own divider. */
   noNameLine?: boolean;
   /**
-   * Where the organiser's logo goes: centred on `cx`, starting at `top`, fitted inside maxW by maxH.
-   * Left out, a spot above the title is worked out. `false` means the design has no room for one,
-   * because a medal already sits there.
+   * Where a newly added logo starts: centred on `cx`, starting at `top`, fitted inside maxW by maxH.
+   * Left out, a spot above the title is worked out. The organiser can drag it anywhere afterwards.
    */
-  logo?: false | { cx: number; top: number; maxW: number; maxH: number };
+  logo?: { cx: number; top: number; maxW: number; maxH: number };
 };
 
 export type DrawContext = { page: PDFPage; main: string; bold: PDFFont };
