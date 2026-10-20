@@ -1,4 +1,8 @@
+import { siteConfig } from "./site";
+
 export type Faq = { q: string; a: string };
+
+const { enabled: paid, price, days } = siteConfig.download;
 
 export const faqs: Faq[] = [
   {
@@ -6,12 +10,16 @@ export const faqs: Faq[] = [
     a: "CV11 is a free CV builder made for students and fresh graduates in Ghana. Pick a template, answer simple questions about your course, projects and activities, let the AI tidy up your wording, then download a clean PDF. Most students finish their first CV in one sitting.",
   },
   {
-    q: "Is CV11 really free for students?",
-    a: "Yes. You can build your CV, use every template and download your PDF for free. There is no watermark with our name on your CV and no trial that runs out.",
+    q: paid ? "How much does CV11 cost?" : "Is CV11 really free for students?",
+    a: paid
+      ? `Building your CV, previewing it, every template, the CV checker and the letters are free. Downloading a finished CV costs ${price}, paid once with mobile money or a card. That one payment covers PDF and Word downloads of that CV for ${days} days, so fixing a typo later costs nothing. There is no watermark with our name on your CV and no subscription.`
+      : "Yes. You can build your CV, use every template and download your PDF for free. There is no watermark with our name on your CV and no trial that runs out.",
   },
   {
     q: "Do I need to create an account?",
-    a: "No. You can start building straight away. Creating a free account is only useful if you want to come back to your CV later from another phone or laptop.",
+    a: paid
+      ? "Not to build or preview your CV. You need a free account when you download it, so your payment is tied to you and safe. An account also lets you open your CV from another phone or laptop."
+      : "No. You can start building straight away. Creating a free account is only useful if you want to come back to your CV later from another phone or laptop.",
   },
   {
     q: "I have no work experience. What do I put on my CV?",

@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { siteConfig } from "@/lib/site";
 import { templates } from "@/lib/templates";
 
 /**
@@ -49,7 +50,7 @@ export default function OpenGraphImage() {
           <div style={{ fontSize: 76, fontWeight: 700, lineHeight: 1.05, maxWidth: 900 }}>
             Build a professional CV in minutes
           </div>
-          <div style={{ fontSize: 32, color: "#a5a8ff" }}>Free for students and graduates in Ghana</div>
+          <div style={{ fontSize: 32, color: "#a5a8ff" }}>{siteConfig.download.enabled ? "Free to build, for students and graduates in Ghana" : "Free for students and graduates in Ghana"}</div>
         </div>
 
         <div style={{ display: "flex", gap: 14, fontSize: 24, color: "rgba(255,255,255,0.75)" }}>

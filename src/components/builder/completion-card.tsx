@@ -30,7 +30,7 @@ export function CompletionCard({ data, onClose }: { data: Completion; onClose: (
   const minutes = Math.max(1, Math.round(data.ms / 60000));
   const share = encodeURIComponent(
     // ?ref=whatsapp lets analytics show how many visitors arrive from shared CVs
-    `I just built my CV in ${minutes} minute${minutes === 1 ? "" : "s"} with ${siteConfig.name}. It's free for students: ${siteConfig.url}/?ref=whatsapp`,
+    `I just built my CV in ${minutes} minute${minutes === 1 ? "" : "s"} with ${siteConfig.name}. It's free to build: ${siteConfig.url}/?ref=whatsapp`,
   );
 
   const stats = [

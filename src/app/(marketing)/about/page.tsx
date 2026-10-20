@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button";
 import { PageShell } from "@/components/marketing/page-shell";
+import { siteConfig } from "@/lib/site";
 import { templates } from "@/lib/templates";
 
 export const metadata: Metadata = {
@@ -48,7 +49,16 @@ export default function AboutPage() {
       <h2>What we stand for</h2>
       <ul>
         <li>
-          <strong>Free for students.</strong> Every template and every download, with no watermark and no trial that runs out.
+          {siteConfig.download.enabled ? (
+            <>
+              <strong>Free to build, a few cedis to download.</strong> Every template, the checker and the letters are free. Downloading your finished CV is{" "}
+              {siteConfig.download.price}, paid once, with no watermark and no subscription.
+            </>
+          ) : (
+            <>
+              <strong>Free for students.</strong> Every template and every download, with no watermark and no trial that runs out.
+            </>
+          )}
         </li>
         <li>
           <strong>Private by default.</strong> There is no account. Your CV is saved on your own device, and files you upload are read

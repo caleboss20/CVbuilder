@@ -8,7 +8,8 @@ import { CvTemplate } from "@/components/cv/cv-templates";
 import { CvIcon } from "@/components/cv/cv-icon";
 import { ButtonLink } from "@/components/ui/button";
 
-// Every course page is prebuilt from generateStaticParams, so reading params here is fine
+// Every course page is prebuilt from generateStaticParams, 
+// so reading params here is fine
 export const instant = false;
 
 export function generateStaticParams() {
@@ -121,7 +122,7 @@ export default async function CvExamplePage({ params }: PageProps<"/cv-examples/
               <ButtonLink href="/builder" className="mt-5 w-full">
                 Use this example
               </ButtonLink>
-              <p className="mt-3 text-center text-xs text-fg/40">Free for students · No sign-up needed</p>
+              <p className="mt-3 text-center text-xs text-fg/40">{siteConfig.download.enabled ? "Free to build and preview" : "Free for students · No sign-up needed"}</p>
             </div>
           </aside>
         </div>

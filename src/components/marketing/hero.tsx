@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ButtonLink } from "@/components/ui/button";
 import { Magnetic } from "@/components/ui/magnetic";
 import { SparkleIcon } from "@/components/ui/sparkle-icon";
+import { siteConfig } from "@/lib/site";
 import { HeroCursorField } from "./hero-cursor-field";
 import { HeroCvPreview } from "./hero-cv-preview";
 
@@ -84,7 +85,7 @@ export function Hero() {
               />
             ))}
           </span>
-          Free for students &amp; fresh graduates
+          {siteConfig.download.enabled ? "Free to build, for students & fresh graduates" : "Free for students & fresh graduates"}
         </p>
 
         <h1
@@ -132,7 +133,9 @@ export function Hero() {
           <span className="text-brand-300">92%</span> ATS match
         </p>
         <p className="relative mt-2 text-center text-xs text-fg/40">
-          No sign-up needed · No watermark · Unlimited PDF downloads
+          {siteConfig.download.enabled
+            ? `Free to build and preview · No watermark · Only ${siteConfig.download.price} when you download`
+            : "No sign-up needed · No watermark · Unlimited PDF downloads"}
         </p>
       </div>
     </section>

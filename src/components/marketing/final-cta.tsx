@@ -3,6 +3,7 @@ import { LazyMount } from "@/components/ui/lazy-mount";
 import { Magnetic } from "@/components/ui/magnetic";
 import { CvTemplate } from "@/components/cv/cv-templates";
 import { getCvExample, type CvExample } from "@/lib/cv-examples";
+import { siteConfig } from "@/lib/site";
 import { InView } from "./in-view";
 
 const perks = [
@@ -43,7 +44,7 @@ export function FinalCta() {
           </h2>
           <p className="mt-4 max-w-md text-base text-fg/65 sm:text-lg">
             Answer a few simple questions about your course, skills and experience, and get a
-            professional CV ready in minutes. It’s free for students.
+            professional CV ready in minutes. {siteConfig.download.enabled ? "It’s free to build." : "It’s free for students."}
           </p>
 
           <ul className="mt-7 space-y-3">
