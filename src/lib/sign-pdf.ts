@@ -202,7 +202,7 @@ const BUILT_IN_FONT_CHARS = /[^\n\u0020-\u007E\u00A0-\u00FF\u2018\u2019\u201C\u2
 
 /** The full fonts, fetched once and kept for later letters. They live in /public/fonts. */
 const fontFiles = new Map<string, Promise<ArrayBuffer>>();
-function loadFontFile(name: string): Promise<ArrayBuffer> {
+export function loadFontFile(name: string): Promise<ArrayBuffer> {
   let file = fontFiles.get(name);
   if (!file) {
     file = fetch(`/fonts/${name}`).then((r) => {
