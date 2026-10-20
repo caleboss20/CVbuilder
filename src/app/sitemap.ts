@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...letterGuides.map((g) => ({ url: `${siteConfig.url}/letters/${g.slug}`, changeFrequency: "monthly" as const, priority: 0.7 })),
     { url: `${siteConfig.url}/tracker`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteConfig.url}/national-service`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${siteConfig.url}/certificates`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteConfig.url}/sign-letter`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${siteConfig.url}/pricing`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${siteConfig.url}/interview-prep`, changeFrequency: "monthly", priority: 0.7 },

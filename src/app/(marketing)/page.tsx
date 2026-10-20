@@ -1,4 +1,5 @@
 import { AiDemo } from "@/components/marketing/ai-demo";
+import { CertificatesSection } from "@/components/marketing/certificates-section";
 import { CvExamplesMarquee } from "@/components/marketing/cv-examples-marquee";
 import { Faq } from "@/components/marketing/faq";
 import { FinalCta } from "@/components/marketing/final-cta";
@@ -36,6 +37,7 @@ export default function HomePage() {
       <HowItWorks />
       <JobHuntTools />
       <TemplatesSection />
+      <CertificatesSection />
       <CvExamplesMarquee />
       <Testimonials />
       <Faq />

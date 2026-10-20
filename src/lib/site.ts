@@ -37,6 +37,7 @@ export const siteConfig = {
     { label: "CV examples", href: "/cv-examples" },
     { label: "CV checker", href: "/cv-checker" },
     { label: "Letters", href: "/letters" },
+    { label: "Certificates", href: "/certificates" },
     { label: "Guides", href: "/blog" },
     { label: "Pricing", href: "/pricing" },
   ],
