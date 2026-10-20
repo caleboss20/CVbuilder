@@ -188,7 +188,7 @@ See the table in `PROJECT-GUIDE.md` section 11 and the SQL files. `payments`: `r
 
 ### 3.8 Browser storage keys
 
-`cv11-builder-v1` (CV), `cv11-versions-v1`, `cv11-letter-v1`, `cv11-signature-v1`, `cv11-applications-v1`, `cv11-nss-checklist-v1`, `cv11-theme`, `cv11-best-time`, `cv11-idle`, `cv11-ai-consent-v1`, `cv11-resume-v1`, `cv11-device`, `cv11-owner`, `cv11-admin-checked`, and `cv11-checker-handoff` in `sessionStorage`. The five data keys (CV, versions, letter, signature, tracker, checklist) are what a backup file and cloud save carry (`BACKUP_KEYS` in `backup.ts`): **add a new data key there** or it will be lost on restore.
+`cv11-builder-v1` (CV), `cv11-versions-v1`, `cv11-letter-v1`, `cv11-signature-v1`, `cv11-applications-v1`, `cv11-nss-checklist-v1`, `cv11-theme`, `cv11-best-time`, `cv11-idle`, `cv11-ai-consent-v1`, `cv11-resume-v1`, `cv11-device`, `cv11-owner`, `cv11-admin-checked`, and `cv11-checker-handoff` in `sessionStorage`. The six data keys (CV, versions, letter, signature, tracker, checklist) are what a backup file and cloud save carry (`BACKUP_KEYS` in `backup.ts`): **add a new data key there** or it will be lost on restore.
 
 ---
 
@@ -386,7 +386,7 @@ Honest list, roughly in order of value to fix.
 10. **Docs drift.** `docs/phone-test-checklist.md` once said the Pro plan existed; keep docs updated in the same commit as the change.
 11. **The pricing text for certificate tiers** is a proposal only; nothing in code charges for certificates yet.
 12. **An empty `callycv/` folder** sits at the repository root and can be deleted.
-13. **Backup and cloud save carry five data keys**; any new data key must be added to `BACKUP_KEYS` (`backup.ts`).
+13. **Backup and cloud save carry six data keys**; any new data key must be added to `BACKUP_KEYS` (`backup.ts`).
 
 ---
 
