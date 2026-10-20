@@ -32,6 +32,15 @@ export const siteConfig = {
     price: "GH₵ 7",
     days: 30,
   },
+  /**
+   * The bulk certificate maker. `freeBatch` is how many certificates one free batch may hold: change
+   * the number here (or set NEXT_PUBLIC_FREE_CERTIFICATES) and the tool, the homepage and the
+   * messages all follow. `maxBatch` is the most any batch may hold at all.
+   */
+  certificates: {
+    freeBatch: Number(process.env.NEXT_PUBLIC_FREE_CERTIFICATES) || 10,
+    maxBatch: 500,
+  },
   nav: [
     { label: "Templates", href: "/templates" },
     { label: "CV examples", href: "/cv-examples" },

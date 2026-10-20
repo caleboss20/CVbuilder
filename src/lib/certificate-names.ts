@@ -3,11 +3,13 @@
  * names, one per certificate. Pure functions, so it is easy to test and runs in the browser.
  */
 
-/** The most certificates one batch may hold, for any plan. */
-export const MAX_NAMES = 500;
+import { siteConfig } from "./site";
 
-/** How many certificates one free batch may hold. Bigger batches are for the paid plan, when it opens. */
-export const FREE_BATCH = 10;
+/** The most certificates one batch may hold, for any plan. Set in src/lib/site.ts. */
+export const MAX_NAMES = siteConfig.certificates.maxBatch;
+
+/** How many certificates one free batch may hold. Change it in src/lib/site.ts (siteConfig.certificates.freeBatch). */
+export const FREE_BATCH = siteConfig.certificates.freeBatch;
 
 /** Example Ghanaian names, a mix of women and men, for trying the tool without typing. */
 export const SAMPLE_NAMES = [
