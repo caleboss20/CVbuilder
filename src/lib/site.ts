@@ -41,6 +41,10 @@ export const siteConfig = {
     freeBatch: Number(process.env.NEXT_PUBLIC_FREE_CERTIFICATES) || 10,
     maxBatch: 500,
   },
+  /** CV versions (the same CV in several looks, one for each company). `max` is the most one CV may have. */
+  cvVersions: {
+    max: 10,
+  },
   nav: [
     { label: "Templates", href: "/templates" },
     { label: "CV examples", href: "/cv-examples" },
