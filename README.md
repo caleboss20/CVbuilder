@@ -84,6 +84,15 @@ flowchart LR
 
 Status: the AI is currently switched on for the site owner only while quality is tested. Opening it to students is one environment variable (`AI_ACCESS=everyone`).
 
+### Payments
+
+Building and previewing a CV is free. Downloading it costs GH₵ 7, paid once through [Paystack](https://paystack.com) (mobile money or card), and unlocks that one CV for 30 days.
+
+- **Sign up, then pay, then download.** A student who taps Download without an account is sent to sign up, and is brought back to their CV afterwards, even after confirming an email in another tab.
+- **The server never trusts the browser.** The price and rules live in Postgres (`supabase/payments.sql`). Our server asks Paystack directly whether the money arrived, and only then calls a database function that unlocks the CV. That function needs a secret that only the server holds, so a student cannot mark their own payment as paid. Paystack's webhook is verified with an HMAC-SHA512 signature, and a payment is safe to confirm twice.
+- **No service-role key.** Even the server only uses the public anon key. Everything it may do is limited by row-level security and by those database functions.
+- **Switched off by default.** Nothing is charged, and no copy on the site changes, until `NEXT_PUBLIC_PAYMENTS_ENABLED=true`. Every "free" claim on the site follows that same switch.
+
 ## Project structure
 
 ```
@@ -103,7 +112,8 @@ src/
 supabase/
 ├─ schema.sql            Tables, row-level security, admin functions
 ├─ stats.sql             Analytics queries
-└─ ai.sql                AI usage limits
+├─ ai.sql                AI usage limits
+└─ payments.sql          Payments, price and download access
 docs/                    Manual test checklists
 ```
 
@@ -130,11 +140,14 @@ Open <http://localhost:3000>. The builder, checker, templates and PDF tools all 
 | `GEMINI_API_KEY` | AI suggestions | Server only. Never prefix with `NEXT_PUBLIC_`. |
 | `GEMINI_MODEL` | AI suggestions | Optional. Defaults to `gemini-3.5-flash-lite`, which has the largest free allowance. |
 | `AI_ACCESS` | AI suggestions | `admin` (default) or `everyone`. |
+| `PAYSTACK_SECRET_KEY` | Payments | Server only. Use a `sk_test_` key until you go live. |
+| `PAYMENT_CONFIRM_SECRET` | Payments | Server only. Copy `confirm_secret` from the `pay_settings` table after running `payments.sql`. |
+| `NEXT_PUBLIC_PAYMENTS_ENABLED` | Payments | `true` turns the paywall on. Leave unset until the three above work. |
 | `NEXT_PUBLIC_WHATSAPP` | Support button | Optional, digits with country code. |
 
 ### Database setup (optional)
 
-In the Supabase SQL editor, run `supabase/schema.sql`, then `supabase/stats.sql`, then `supabase/ai.sql`. Add your own email to the `admins` table to see the dashboard at `/admin`.
+In the Supabase SQL editor, run `supabase/schema.sql`, then `supabase/stats.sql`, then `supabase/ai.sql`, then `supabase/payments.sql`. Add your own email to the `admins` table to see the dashboard at `/admin`.
 
 ### Scripts
 
@@ -158,7 +171,7 @@ npm run lint    # ESLint
 - [x] AI suggestions for bullets, projects and summaries, with daily limits and consent
 - [ ] Voice clean-up that shows "we heard" against "we think you meant"
 - [ ] Suggestions while typing, using the free rule-based coach first
-- [ ] Pro plan with mobile-money payments
+- [x] Pay-per-CV download with Paystack (built; switched on after test-mode checks)
 - [ ] More fields, templates and letter types
 
 ## Author
