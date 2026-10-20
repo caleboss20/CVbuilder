@@ -1,9 +1,7 @@
 import "server-only";
 
+import { bearerToken, callSupabase, userFromToken } from "../supabase-rest";
 import { AI_ACCESS } from "./config";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 /** What a guard decided: either let the request through, or the error to send back. */
 export type GuardResult =
@@ -16,28 +14,9 @@ export type GuardResult =
     }
   | { ok: false; status: number; error: string };
 
-/** Calls a Supabase REST endpoint as the signed-in person. Returns null if the call fails. */
-async function asUser(token: string, path: string, init: RequestInit = {}): Promise<Response | null> {
-  if (!SUPABASE_URL || !ANON_KEY) return null;
-  try {
-    return await fetch(`${SUPABASE_URL}${path}`, {
-      ...init,
-      headers: { apikey: ANON_KEY, authorization: `Bearer ${token}`, "content-type": "application/json" },
-      cache: "no-store",
-    });
-  } catch {
-    return null;
-  }
-}
-
-/** Looks up whether a Supabase access token is valid (not bad, not expired). */
-async function tokenIsValid(token: string): Promise<boolean> {
-  return (await asUser(token, "/auth/v1/user"))?.ok === true;
-}
-
 /** Asks the database (the `is_admin` function) whether this person is the site owner. */
 async function isAdmin(token: string): Promise<boolean> {
-  const res = await asUser(token, "/rest/v1/rpc/is_admin", { method: "POST", body: "{}" });
+  const res = await callSupabase("/rest/v1/rpc/is_admin", { token, body: {} });
   return res?.ok === true && (await res.json()) === true;
 }
 
@@ -46,7 +25,7 @@ async function isAdmin(token: string): Promise<boolean> {
  * every server instance. Settings and counts live in supabase/ai.sql.
  */
 async function takeCredit(token: string): Promise<GuardResult> {
-  const res = await asUser(token, "/rest/v1/rpc/ai_use_credit", { method: "POST", body: "{}" });
+  const res = await callSupabase("/rest/v1/rpc/ai_use_credit", { token, body: {} });
   if (!res?.ok) {
     // Most likely supabase/ai.sql has not been run yet. Fail closed so the AI can never run uncounted.
     console.error("[ai] ai_use_credit failed:", res?.status);
@@ -64,17 +43,17 @@ async function takeCredit(token: string): Promise<GuardResult> {
     ok: true,
     remaining: credit.remaining,
     refund: async () => {
-      await asUser(token, "/rest/v1/rpc/ai_refund_credit", { method: "POST", body: "{}" });
+      await callSupabase("/rest/v1/rpc/ai_refund_credit", { token, body: {} });
     },
   };
 }
 
 /** Runs all checks for an AI request, cheapest first: signed in, allowed, and has credit left. */
 export async function guardRequest(request: Request): Promise<GuardResult> {
-  const token = request.headers.get("authorization")?.replace(/^Bearer /i, "");
+  const token = bearerToken(request);
   if (!token) return { ok: false, status: 401, error: "Please log in to use the AI." };
 
-  if (!(await tokenIsValid(token))) return { ok: false, status: 401, error: "Your session has expired. Please log in again." };
+  if (!(await userFromToken(token))) return { ok: false, status: 401, error: "Your session has expired. Please log in again." };
 
   if (AI_ACCESS === "admin" && !(await isAdmin(token))) {
     return { ok: false, status: 403, error: "The AI is not open to everyone yet." };
