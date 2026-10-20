@@ -3,8 +3,11 @@
  * names, one per certificate. Pure functions, so it is easy to test and runs in the browser.
  */
 
-/** The most certificates one batch may hold for now. */
+/** The most certificates one batch may hold, for any plan. */
 export const MAX_NAMES = 500;
+
+/** How many certificates one free batch may hold. Bigger batches are for the paid plan, when it opens. */
+export const FREE_BATCH = 10;
 
 /** Example Ghanaian names, a mix of women and men, for trying the tool without typing. */
 export const SAMPLE_NAMES = [

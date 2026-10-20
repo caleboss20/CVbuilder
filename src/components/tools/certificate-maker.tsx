@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Field, TextArea } from "@/components/builder/fields";
 import { SignaturePad } from "@/components/builder/signature-pad";
-import { MAX_NAMES, SAMPLE_NAMES, fileNameFor, parseNames } from "@/lib/certificate-names";
+import { FREE_BATCH, MAX_NAMES, SAMPLE_NAMES, fileNameFor, parseNames } from "@/lib/certificate-names";
 import {
   COLORS,
   DESIGNS,
@@ -17,6 +17,7 @@ import {
   type CertSettings,
 } from "@/lib/certificates";
 import type { PreviewPage } from "@/lib/sign-pdf";
+import { whatsappLink } from "@/lib/site";
 
 /** A name to show in the preview before the organiser has pasted a list. */
 const PLACEHOLDER_NAME = "Akosua Mensah";
@@ -54,7 +55,10 @@ export function CertificateMaker() {
   const [error, setError] = useState("");
 
   const parsed = useMemo(() => parseNames(namesText), [namesText]);
-  const names = parsed.names;
+  // The free version makes up to FREE_BATCH certificates at a time; the rest wait for the paid plan
+  const names = parsed.names.slice(0, FREE_BATCH);
+  const leftOut = Math.max(parsed.names.length - FREE_BATCH, 0);
+  const biggerBatch = whatsappLink(`Hi CV11, I need to make ${parsed.names.length} certificates at once. How can I get a bigger batch?`);
   const set = (patch: Partial<CertSettings>) => setSettings((s) => ({ ...s, ...patch }));
 
   // Today's date as the default, filled in after the page loads so the prerendered page never depends on the clock
@@ -86,26 +90,24 @@ export function CertificateMaker() {
     };
   }, [settings, previewName]);
 
-  // Small pictures of each design, in the chosen colour
+  // Small pictures of every design in its own colours, drawn once one after another
   useEffect(() => {
     let cancelled = false;
-    const timer = setTimeout(async () => {
+    (async () => {
       for (const design of DESIGNS) {
         try {
-          const page = await previewCertificate({ ...settings, design: design.id }, PLACEHOLDER_NAME);
+          const page = await previewCertificate({ ...defaultSettings(), design: design.id, color: design.color, date: "12 March 2026", event: "your event" }, PLACEHOLDER_NAME);
           if (cancelled) return;
           setThumbs((t) => ({ ...t, [design.id]: page.src }));
         } catch {
           return;
         }
       }
-    }, 600);
+    })();
     return () => {
       cancelled = true;
-      clearTimeout(timer);
     };
-    // Only the colour and the kind of certificate change how a thumbnail looks
-  }, [settings.color, settings.subtitle, settings.signer1.name]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   function pickKind(kind: CertKind) {
     const k = KINDS[kind];
@@ -121,6 +123,15 @@ export function CertificateMaker() {
 
   async function downloadZip() {
     setError("");
+    // A single certificate is just a PDF named after the person, not a ZIP holding one file
+    if (names.length === 1) {
+      try {
+        save(await buildCombinedPdf(settings, names), `${fileNameFor(names[0], new Set())}.pdf`, "application/pdf");
+      } catch {
+        setError("Something went wrong while making the PDF. Please try again.");
+      }
+      return;
+    }
     setProgress({ done: 0, total: names.length, what: "Making certificates" });
     try {
       const files = await buildSeparatePdfs(settings, names, (done) => setProgress({ done, total: names.length, what: "Making certificates" }));
@@ -153,8 +164,9 @@ export function CertificateMaker() {
       <div className="space-y-5">
         {/* 1. Design */}
         <section className={section}>
-          <h2 className={heading}>1. Choose a design</h2>
-          <ul className="mt-4 grid grid-cols-3 gap-3">
+          <h2 className={heading}>1. Choose a template</h2>
+          <p className="mt-1 text-sm text-fg/60">{DESIGNS.length} designs. Tap one, then change its colour below.</p>
+          <ul className="mt-4 grid max-h-[26rem] grid-cols-2 gap-3 overflow-y-auto pr-1 sm:grid-cols-3">
             {DESIGNS.map((d) => (
               <li key={d.id}>
                 <button
@@ -163,12 +175,14 @@ export function CertificateMaker() {
                   aria-pressed={settings.design === d.id}
                   className={`block w-full overflow-hidden rounded-lg border text-left ${settings.design === d.id ? "border-brand-400 ring-2 ring-brand-400/40" : "border-fg/12 hover:border-fg/30"}`}
                 >
-                  {thumbs[d.id] ? (
-                    // eslint-disable-next-line @next/next/no-img-element -- a locally made picture, not a file to optimise
-                    <img src={thumbs[d.id]} alt="" className="aspect-[1.414] w-full bg-white object-cover" />
-                  ) : (
-                    <span className="block aspect-[1.414] w-full animate-pulse bg-fg/10" />
-                  )}
+                  <span className="block aspect-[4/3] w-full bg-fg/[0.06]">
+                    {thumbs[d.id] ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- a locally made picture, not a file to optimise
+                      <img src={thumbs[d.id]} alt="" className="size-full object-contain" />
+                    ) : (
+                      <span className="block size-full animate-pulse bg-fg/10" />
+                    )}
+                  </span>
                   <span className="block px-2 py-1.5 text-xs font-medium text-fg/80">{d.label}</span>
                 </button>
               </li>
@@ -204,7 +218,7 @@ export function CertificateMaker() {
               placeholder={"Akosua Mensah\nKwame Boateng\nAbena Owusu"}
               hint={
                 <span>
-                  {names.length > 0 ? <b className="text-fg">{names.length} names</b> : "No names yet"}
+                  {parsed.names.length > 0 ? <b className="text-fg">{parsed.names.length} names</b> : "No names yet"}
                   {parsed.recased > 0 && ` · fixed capital letters on ${parsed.recased}`}
                   {parsed.duplicates > 0 && ` · removed ${parsed.duplicates} repeated`}
                   {parsed.overLimit > 0 && ` · ${parsed.overLimit} over the limit of ${MAX_NAMES} were left out`}
@@ -212,9 +226,28 @@ export function CertificateMaker() {
               }
             />
           </div>
-          <button type="button" onClick={() => setNamesText(SAMPLE_NAMES.join("\n"))} className="mt-3 text-sm font-medium text-brand-300 hover:text-fg">
+          <button type="button" onClick={() => setNamesText(SAMPLE_NAMES.slice(0, FREE_BATCH).join("\n"))} className="mt-3 text-sm font-medium text-brand-300 hover:text-fg">
             Try it with sample Ghanaian names
           </button>
+          {leftOut > 0 && (
+            <div className="mt-4 rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-fg/80" role="status">
+              <p>
+                The free version makes up to <b className="text-fg">{FREE_BATCH} certificates</b> at a time. You pasted {parsed.names.length}, so the{" "}
+                <b className="text-fg">first {FREE_BATCH}</b> will be made and {leftOut} will be left out.
+              </p>
+              <p className="mt-1.5 text-fg/65">
+                Download these first, then paste the rest. Or{" "}
+                {biggerBatch ? (
+                  <a href={biggerBatch} target="_blank" rel="noopener noreferrer" className="font-medium text-brand-300 underline underline-offset-2">
+                    message us about a bigger batch
+                  </a>
+                ) : (
+                  "ask us about a bigger batch"
+                )}
+                .
+              </p>
+            </div>
+          )}
         </section>
 
         {/* 3. What it says */}
@@ -275,7 +308,7 @@ export function CertificateMaker() {
         <div className="overflow-hidden rounded-xl border border-fg/10 bg-fg/[0.03] p-3">
           {preview ? (
             // eslint-disable-next-line @next/next/no-img-element -- a locally made picture
-            <img src={preview.src} alt={`Preview of the certificate for ${previewName}`} className="aspect-[1.414] w-full rounded-md bg-white object-contain" />
+            <img src={preview.src} alt={`Preview of the certificate for ${previewName}`} className="mx-auto h-auto max-h-[72vh] w-auto max-w-full rounded-md bg-white object-contain" />
           ) : (
             <div className="aspect-[1.414] w-full animate-pulse rounded-md bg-fg/10" />
           )}
@@ -296,7 +329,7 @@ export function CertificateMaker() {
 
         <div className="mt-4 space-y-2.5">
           <button type="button" onClick={downloadZip} disabled={!ready} className={primaryButton}>
-            {names.length > 0 ? `Download ${names.length} certificates (ZIP)` : "Add names to download"}
+            {names.length === 0 ? "Add names to download" : names.length === 1 ? "Download the certificate (PDF)" : `Download ${names.length} certificates (ZIP)`}
           </button>
           <button type="button" onClick={downloadOnePdf} disabled={!ready} className={secondaryButton}>
             Download one PDF to print
