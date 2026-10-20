@@ -30,6 +30,7 @@ CV11 is built around that student. It is free to use, needs no sign-up, works we
 | Tool | What you get |
 |---|---|
 | **CV builder** | Step-by-step builder with live preview, 30+ templates, photo support, reorderable entries, and one-tap PDF or Word download. |
+| **CV versions** | Make the same CV in up to 10 looks, one for each company: pick a template (mixed or all the same), a colour and a role line for each, then download every version as its own real-text PDF, named after the company. The print code is shared with the builder, so quality is identical and the CV never leaves the device. |
 | **Course examples** | Ready-made example CVs by field (medicine, IT, nursing, business and more) so a student can see what a strong CV in their area looks like. |
 | **CV checker** | Upload a CV and get a score with specific fixes: weak verbs, missing numbers, length, and the keywords recruiters in your industry expect. |
 | **Cover letters** | Guided letters in the formal Ghanaian layout, with sender and recipient addresses and a drawn or uploaded signature. |

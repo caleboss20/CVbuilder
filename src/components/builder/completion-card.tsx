@@ -96,6 +96,12 @@ export function CompletionCard({ data, onClose }: { data: Completion; onClose: (
             >
               Track your applications
             </Link>
+            <Link
+              href="/builder/versions"
+              className="flex w-full items-center justify-center rounded-md py-2.5 text-sm font-medium text-fg ring-1 ring-fg/15 hover:bg-fg/5"
+            >
+              Applying to several companies? Make versions
+            </Link>
             <a
               href={`https://wa.me/?text=${share}`}
               target="_blank"
