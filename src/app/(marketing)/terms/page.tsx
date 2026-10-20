@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/marketing/page-shell";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -45,6 +46,22 @@ export default function TermsPage() {
         mistakes. Download and keep a copy of any CV you care about. To the extent the law allows, we are not responsible for losses
         that come from using, or being unable to use, the site.
       </p>
+
+      {siteConfig.download.enabled && (
+        <>
+          <h2>Payments and refunds</h2>
+          <p>
+            Building and previewing a CV, the CV checker and the letters are free. Downloading a finished CV costs {siteConfig.download.price}, paid
+            once through Paystack with mobile money or a card. One payment unlocks PDF and Word downloads of that one CV for{" "}
+            {siteConfig.download.days} days, and you can edit the CV and download it again during that time. A new CV needs a new payment.
+          </p>
+          <p>
+            If you were charged but could not download, or you were charged twice for the same CV, message us on WhatsApp with the email you
+            signed up with and we will fix it or refund you. Because a downloaded file cannot be taken back, we do not refund a CV that you have
+            successfully downloaded. We never see or store your card or mobile money details; Paystack handles them.
+          </p>
+        </>
+      )}
 
       <h2>Changes</h2>
       <p>

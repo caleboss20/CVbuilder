@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/marketing/page-shell";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -61,6 +62,18 @@ export default function PrivacyPage() {
         button completely; every tool works without it.
       </p>
       <p>We keep a simple count of how many AI requests each account makes per day, to apply the daily limit. The count holds no CV content.</p>
+
+      {siteConfig.download.enabled && (
+        <>
+          <h2>Payments</h2>
+          <p>
+            When you pay to download a CV, you are sent to Paystack, which takes your mobile money or card payment under its own privacy
+            policy. CV11 never sees your card number or mobile money PIN. We keep a record of the payment: your account, a random code for the
+            CV you paid for, the amount, the Paystack reference and the time. That record holds none of the CV&apos;s content. We use it to open your
+            downloads and to sort out any problem with a payment.
+          </p>
+        </>
+      )}
 
       <h2>Cookies and tracking</h2>
       <p>
