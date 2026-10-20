@@ -34,6 +34,7 @@ CV11 is built around that student. It is free to use, needs no sign-up, works we
 | **CV checker** | Upload a CV and get a score with specific fixes: weak verbs, missing numbers, length, and the keywords recruiters in your industry expect. |
 | **Cover letters** | Guided letters in the formal Ghanaian layout, with sender and recipient addresses and a drawn or uploaded signature. |
 | **Text to PDF** | Turn any text, a letter, notes or even code, into a clean PDF, tap a line to edit it, and sign it. |
+| **Bulk certificates** | Paste a list of names, pick one of three original designs, and download a certificate for every person as a ZIP of separate PDFs or one PDF to print. Names are cleaned automatically (capitals, numbering, duplicates), long and Ghanaian-letter names fit, and everything is made on the organiser's own device. |
 | **Interview prep** | Common questions by field with guidance on how to answer. |
 | **Application tracker** | Keep track of where you applied and what happened. |
 | **Voice input** | Say what you did in your own words and get tidy CV lines back. |
