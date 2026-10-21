@@ -82,6 +82,7 @@ export type AdminOverview = {
     shared_people: number;
     verify_batches: number;
     verify_certificates: number;
+    verify_scans: number;
     organisers: number;
   };
   grants: { email: string; max_names: number; expires_at: string; note: string | null }[];

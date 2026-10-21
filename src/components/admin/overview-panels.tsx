@@ -81,6 +81,7 @@ export function OverviewPanels({ overview, missing }: { overview: AdminOverview 
           ["People on shared links", n(c.shared_people)],
           ["Certificates with a verify QR", n(c.verify_certificates)],
           ["Verify QR batches", n(c.verify_batches)],
+          ["Times a QR was scanned", n(c.verify_scans)],
           ["Organisers", n(c.organisers)],
         ]}
       />

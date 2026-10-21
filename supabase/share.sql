@@ -34,6 +34,8 @@ alter table public.cert_events add column if not exists cap integer not null def
 -- true for a batch recorded only so its certificates can carry a verify QR: it has no design, is never
 -- shared by link and does not count towards the 20 shared events
 alter table public.cert_events add column if not exists verify_only boolean not null default false;
+-- how many times a certificate of this event was checked through its QR code
+alter table public.cert_events add column if not exists scans integer not null default 0;
 create index if not exists cert_events_owner on public.cert_events (owner);
 
 create table if not exists public.cert_recipients (
@@ -316,20 +318,27 @@ $$;
 -- name, the event, who issued it and when. A deleted or expired event no longer verifies.
 create or replace function public.cert_verify(p_ref text)
 returns jsonb
-language sql
+language plpgsql
 security definer
 set search_path = public
-stable
 as $$
-  select coalesce(
-    (select jsonb_build_object('valid', true, 'name', r.name, 'title', e.title,
-                               'issuer', nullif(btrim(coalesce(e.settings->>'issuer', '')), ''), 'issued', e.created_at)
-       from public.cert_events e
-       join public.cert_recipients r on r.event_id = e.id
-      where e.slug = split_part(p_ref, '.', 1)
-        and r.id::text = split_part(p_ref, '.', 2)
-        and e.released and e.expires_at > now()),
-    jsonb_build_object('valid', false));
+declare
+  answer jsonb;
+begin
+  select jsonb_build_object('valid', true, 'name', r.name, 'title', e.title,
+                            'issuer', nullif(btrim(coalesce(e.settings->>'issuer', '')), ''), 'issued', e.created_at)
+    into answer
+    from public.cert_events e
+    join public.cert_recipients r on r.event_id = e.id
+   where e.slug = split_part(p_ref, '.', 1)
+     and r.id::text = split_part(p_ref, '.', 2)
+     and e.released and e.expires_at > now();
+
+  if answer is null then return jsonb_build_object('valid', false); end if;
+  -- Count the check, for the owner's dashboard
+  update public.cert_events set scans = scans + 1 where slug = split_part(p_ref, '.', 1);
+  return answer;
+end;
 $$;
 
 -- ------------------------------------------------------------ manage a shared event afterwards

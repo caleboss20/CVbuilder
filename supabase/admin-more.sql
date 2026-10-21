@@ -1,6 +1,6 @@
 -- More numbers for the admin dashboard: money, certificates, shared events, bigger-batch unlocks, AI use.
 -- Run this once in Supabase: SQL Editor > New query > paste > Run. It is safe to run again.
--- It needs schema.sql, payments.sql and share.sql to have been run first (ai.sql is optional).
+-- It needs schema.sql, payments.sql and share.sql (run share.sql again first if it is older than the scan counter) to have been run first (ai.sql is optional).
 --
 -- admin_overview(days) answers only for people on the admin list (public.is_admin()), like admin_stats().
 
@@ -63,6 +63,7 @@ begin
       'shared_people', (select count(*) from public.cert_recipients r join public.cert_events e on e.id = r.event_id where not e.verify_only),
       'verify_batches', (select count(*) from public.cert_events where verify_only),
       'verify_certificates', (select count(*) from public.cert_recipients r join public.cert_events e on e.id = r.event_id where e.verify_only),
+      'verify_scans', (select coalesce(sum(scans), 0) from public.cert_events),
       'organisers', (select count(distinct owner) from public.cert_events)
     ),
     'grants', (
