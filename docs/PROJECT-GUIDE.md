@@ -53,7 +53,7 @@ The two ideas that shape everything:
 | **Text to PDF and letter signing** | Anyone | Turn pasted text or an existing letter into a signed PDF | Free |
 | **Interview prep, tracker, national service checklist** | Students | Practice questions by field, an application tracker, a checklist | Free |
 | **AI writing help** | Students | Rewrites a bullet, a project description or a summary; fixes misheard voice input | Built, owner-only while quality is tested |
-| **Bulk certificate maker** | Event organisers, clubs, schools, training centres | Paste names, pick one of 23 designs **or upload their own certificate (a Canva PDF or a photo)**, drag a logo or the name into place, download a certificate for each person | Free up to 10 per batch; paid tiers planned |
+| **Bulk certificate maker** | Event organisers, clubs, schools, training centres | Paste names, pick one of 23 designs **or upload their own certificate (a Canva PDF or a photo)**, drag a logo or the name into place, download a certificate for each person | Free up to 15 per batch; paid tiers planned |
 
 ---
 
@@ -142,7 +142,7 @@ These are the designed models and the cost facts behind them. **No revenue figur
 **Revenue streams**
 
 1. **CV download, GH₵ 7 per CV (built, off).** Free to build and preview; pay once when downloading. One payment covers that CV, in PDF and Word and in all its versions, for 30 days, so fixing a typo costs nothing. Priced just under a local competitor's GH₵ 9.
-2. **Bulk certificates (free tier live, paid tiers planned).** Free up to 10 per batch. Proposed tiers, still to be tested with real organisers: about GH₵ 20 for up to 50, GH₵ 50 for up to 200, GH₵ 100 for up to 500. Organisers have budgets that students do not, and a printed certificate costs a few cedis, so a few pesewas each is an easy yes. The strongest planned paid features are ones that cannot be bypassed in the browser: a QR code on each certificate that opens a "this certificate is real" page, and a sign-up link so attendees add their own names.
+2. **Bulk certificates (free tier live, paid tiers planned).** Free up to 15 per batch. Proposed tiers, still to be tested with real organisers: about GH₵ 20 for up to 50, GH₵ 50 for up to 200, GH₵ 100 for up to 500. Organisers have budgets that students do not, and a printed certificate costs a few cedis, so a few pesewas each is an easy yes. The strongest planned paid features are ones that cannot be bypassed in the browser: a QR code on each certificate that opens a "this certificate is real" page, and a sign-up link so attendees add their own names.
 3. **Possible later:** club plans for organisations that issue certificates every month, recipient-pays experiments, and a Pro plan for AI help. These are ideas, not commitments.
 
 **Cost structure (very low by design)**
@@ -189,7 +189,7 @@ These are the designed models and the cost facts behind them. **No revenue figur
 ### 6.2 Known limits and risks (read these)
 
 - **Paywall strength.** PDFs are generated in the browser, so the download gate is enforced in the browser. A technically skilled person could bypass it (for example by printing the preview). For a GH₵ 7 product aimed at mostly non-technical students, this was judged acceptable at launch. Real enforcement would need server-side generation, which conflicts with the privacy promise (decision D2).
-- **The free certificate limit is also browser-side.** Someone can paste the next 10 names and download again. Real limits need accounts and server records, which the planned verification feature provides.
+- **The free certificate limit is also browser-side.** Someone can paste the next 15 names and download again. Real limits need accounts and server records, which the planned verification feature provides.
 - **No traction data in this document.** Read the admin dashboard for real numbers. Testimonials on the homepage are real students' words, but the wording and short headlines were written by the developer, and the students' consent to be quoted should be confirmed.
 - **Print-dialog downloads.** Saving a CV means passing through the browser's print dialog. Printing several in a row ("Download all" on the versions page) can be unreliable on phones; the page tells students to download one at a time there.
 - **Free AI tier terms.** Google may use free-tier inputs to improve its products. Students are told before first use. Moving to a paid Gemini tier removes this.

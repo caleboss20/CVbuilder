@@ -349,7 +349,7 @@ Before the first request the student sees a note (once per device): only the tex
 
 ## 15. The bulk certificate maker
 
-**Status: Live (free up to 10 per batch).** Files: `src/components/tools/certificate-maker.tsx`, `src/lib/certificates.ts`, `certificate-draw.ts`, `certificate-designs.ts`, `certificate-designs-more.ts`, `certificate-design-types.ts`, `certificate-names.ts`, `certificate-logo.ts`, `src/app/(marketing)/certificates/page.tsx`, `src/components/marketing/certificates-section.tsx`.
+**Status: Live (free up to 15 per batch).** Files: `src/components/tools/certificate-maker.tsx`, `src/lib/certificates.ts`, `certificate-draw.ts`, `certificate-designs.ts`, `certificate-designs-more.ts`, `certificate-design-types.ts`, `certificate-names.ts`, `certificate-logo.ts`, `src/app/(marketing)/certificates/page.tsx`, `src/components/marketing/certificates-section.tsx`.
 
 ### 15.1 The page, top to bottom
 
@@ -417,7 +417,7 @@ Many organisers already have a certificate (a Canva PDF, or a photo or scan) and
 
 ### 15.9 How charging will work for certificates (design, not yet built)
 
-**Today:** both modes share one free allowance, `siteConfig.certificates.freeBatch` (10). Beyond it, the page shows a notice and a WhatsApp link to ask for a bigger batch. The rule is enforced in the browser only.
+**Today:** both modes share one free allowance, `siteConfig.certificates.freeBatch` (15). Beyond it, the page shows a notice and a WhatsApp link to ask for a bigger batch. The rule is enforced in the browser only.
 
 **Planned when payments are live (reuses the CV payment system):**
 

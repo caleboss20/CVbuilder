@@ -38,7 +38,7 @@ export const siteConfig = {
    * messages all follow. `maxBatch` is the most any batch may hold at all.
    */
   certificates: {
-    freeBatch: Number(process.env.NEXT_PUBLIC_FREE_CERTIFICATES) || 10,
+    freeBatch: Number(process.env.NEXT_PUBLIC_FREE_CERTIFICATES) || 15,
     maxBatch: 500,
   },
   /** CV versions (the same CV in several looks, one for each company). `max` is the most one CV may have. */

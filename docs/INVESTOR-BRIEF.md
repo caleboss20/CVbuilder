@@ -24,7 +24,7 @@
 
 **For students (live):** a step-by-step CV builder with a live A4 preview and 38 templates; example CVs for 30 courses; an automatic recommendation of the right CV type; plain-rule coaching on every bullet; a keyword matcher against a pasted job advert; voice input; PDF and Word download; a CV checker that scores any CV out of 100 with specific fixes; 8 letter types in the formal Ghanaian layout with a drawn signature; a tool to sign any existing letter and a Text-to-PDF tool; interview preparation for 9 fields; an application tracker; a national service checklist; and **CV versions**, which produces the same CV in up to 10 looks (one per company), each as its own real-text PDF.
 
-**For organisers (live):** paste a list of names, choose from 23 original designs (wide and tall) or **upload their own certificate** (a Canva PDF or a photo), optionally add a logo anywhere on the page, and download a certificate for every person as a ZIP or one PDF to print. Free for up to 10 per batch.
+**For organisers (live):** paste a list of names, choose from 23 original designs (wide and tall) or **upload their own certificate** (a Canva PDF or a photo), optionally add a logo anywhere on the page, and download a certificate for every person as a ZIP or one PDF to print. Free for up to 15 per batch.
 
 **Built but switched off:** one-time payment (GH₵ 7 per CV) through Paystack with mobile money and cards; AI writing help (rewrite a bullet, tidy a project, write a summary, correct speech-recognition mistakes), restricted to the owner while quality is checked.
 
@@ -60,7 +60,7 @@
 | # | Stream | State | Price (designed) | Notes |
 |---|---|---|---|---|
 | 1 | **CV download** | Built, off | GH₵ 7 once per CV, 30 days of PDF, Word and all versions | Free to build and preview; pay only to download. Priced just under a local competitor's GH₵ 9 |
-| 2 | **Bulk certificates, paid batches** | Planned | Proposed: about GH₵ 20 up to 50, GH₵ 50 up to 200, GH₵ 100 up to 500 (to be tested) | Free up to 10 per batch applies to both built-in designs and uploaded certificates. Charging applies at the point of download beyond the free amount |
+| 2 | **Bulk certificates, paid batches** | Planned | Proposed: about GH₵ 20 up to 50, GH₵ 50 up to 200, GH₵ 100 up to 500 (to be tested) | Free up to 15 per batch applies to both built-in designs and uploaded certificates. Charging applies at the point of download beyond the free amount |
 | 3 | **Certificate extras** | Planned | To be set | QR verification, attendee sign-up link, WhatsApp delivery, "Made with CV11" footer removal |
 | 4 | **Club or organisation plans** | Idea | To be set | For groups that issue certificates every month |
 | 5 | **AI pro features** | Idea | To be set | Only if students ask for more than the free daily AI allowance |
