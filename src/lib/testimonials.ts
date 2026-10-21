@@ -28,6 +28,9 @@ export const testimonials: Testimonial[] = [
     quote:
       "I had projects but no idea how to put them on paper. The AI turned my rough notes into proper bullet points and I sent my CV for an internship the same night.",
     photo: "/images/testimonials/student-a.webp",
+    // Hidden for now: the quote credits the AI, which students cannot use yet. Re-confirm the wording with
+    // Frank (or remove `draft` when AI opens to everyone) before showing it again.
+    draft: true,
   },
   {
     name: "Wilhelmina Adjah",
