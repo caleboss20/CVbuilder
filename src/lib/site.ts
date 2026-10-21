@@ -40,6 +40,12 @@ export const siteConfig = {
   certificates: {
     freeBatch: Number(process.env.NEXT_PUBLIC_FREE_CERTIFICATES) || 15,
     maxBatch: 500,
+    /** Bigger batches, shown in the "too many names" notice. The organiser is unlocked by hand for now (a row in cert_grants). */
+    bigger: [
+      { upTo: 50, price: "GH₵ 20" },
+      { upTo: 200, price: "GH₵ 50" },
+      { upTo: 500, price: "GH₵ 100" },
+    ],
   },
   /** CV versions (the same CV in several looks, one for each company). `max` is the most one CV may have. */
   cvVersions: {

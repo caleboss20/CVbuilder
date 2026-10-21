@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { TextArea } from "@/components/builder/fields";
 import { SignaturePad } from "@/components/builder/signature-pad";
 import { SharePanel } from "@/components/tools/share-panel";
+import { useCertLimit } from "@/components/tools/use-cert-limit";
 import { FREE_BATCH, MAX_NAMES, SAMPLE_NAMES, fileNameFor, parseNames } from "@/lib/certificate-names";
 import {
   OWN_FONTS,
@@ -17,7 +18,7 @@ import {
   type OwnSignature,
 } from "@/lib/certificate-own";
 import { saveFile } from "@/lib/save-file";
-import { whatsappLink } from "@/lib/site";
+import { siteConfig, whatsappLink } from "@/lib/site";
 import { trackEvent } from "@/lib/track";
 
 const PLACEHOLDER_NAME = "Akosua Mensah";
@@ -89,8 +90,9 @@ export function OwnCertificateMaker() {
 
   const parsed = useMemo(() => parseNames(namesText), [namesText]);
   // Same rule as the built-in designs: a free batch holds the first FREE_BATCH names
-  const names = parsed.names.slice(0, FREE_BATCH);
-  const leftOut = Math.max(parsed.names.length - FREE_BATCH, 0);
+  const limit = useCertLimit();
+  const names = parsed.names.slice(0, limit);
+  const leftOut = Math.max(parsed.names.length - limit, 0);
   const biggerBatch = whatsappLink(`Hi CV11, I need to make ${parsed.names.length} certificates on my own design. How can I get a bigger batch?`);
   const index = Math.min(previewAt, Math.max(names.length - 1, 0));
   const previewName = names[index] ?? PLACEHOLDER_NAME;
@@ -330,8 +332,8 @@ export function OwnCertificateMaker() {
           {leftOut > 0 && (
             <div className="mt-4 rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-fg/80" role="status">
               <p>
-                The free version makes up to <b className="text-fg">{FREE_BATCH} certificates</b> at a time, on your own design too. You pasted {parsed.names.length}, so the{" "}
-                <b className="text-fg">first {FREE_BATCH}</b> will be made and {leftOut} will be left out.
+                The free version makes up to <b className="text-fg">{limit} certificates</b> at a time, on your own design too. You pasted {parsed.names.length}, so the{" "}
+                <b className="text-fg">first {limit}</b> will be made and {leftOut} will be left out.
               </p>
               <p className="mt-1.5 text-fg/65">
                 Download these first, then paste the rest. Or{" "}
@@ -342,7 +344,7 @@ export function OwnCertificateMaker() {
                 ) : (
                   "ask us about a bigger batch"
                 )}
-                .
+                . Prices: {siteConfig.certificates.bigger.map((tier) => `up to ${tier.upTo} for ${tier.price}`).join(", ")}.
               </p>
             </div>
           )}

@@ -6,7 +6,7 @@ import { QrCode } from "@/components/tools/qr-code";
 import { useUser } from "@/components/auth/use-user";
 import { authConfigured } from "@/lib/auth-config";
 import { claimUrl, createRegisterEvent, createSharedEvent, deleteSharedEvent, listSharedEvents, setReleased, type SharedEvent } from "@/lib/cert-share";
-import { FREE_BATCH } from "@/lib/certificate-names";
+import { useCertLimit } from "@/components/tools/use-cert-limit";
 import type { SharedDesign } from "@/lib/cert-share";
 
 const field = "mt-1.5 block h-11 w-full rounded-md bg-fg/5 px-3.5 text-[15px] text-fg ring-1 ring-fg/15 focus:outline-none focus:ring-2 focus:ring-brand-400";
@@ -19,6 +19,7 @@ const smallButton = "inline-flex h-9 items-center justify-center rounded-md px-3
  */
 export function SharePanel({ title, build, names }: { title: string; build: () => SharedDesign; names: string[] }) {
   const { user, loading } = useUser();
+  const limit = useCertLimit();
   // "list": the names above are used. "register": people add their own names, then the organiser releases the certificates.
   const [mode, setMode] = useState<"list" | "register">("list");
   const [code, setCode] = useState("");
@@ -48,7 +49,7 @@ export function SharePanel({ title, build, names }: { title: string; build: () =
       const slug =
         mode === "list"
           ? await createSharedEvent({ title: title.trim(), settings, code, names, days })
-          : await createRegisterEvent({ title: title.trim(), settings, code, days, cap: FREE_BATCH });
+          : await createRegisterEvent({ title: title.trim(), settings, code, days, cap: limit });
       setLink(claimUrl(slug));
       refresh();
     } catch (e) {
@@ -83,7 +84,7 @@ export function SharePanel({ title, build, names }: { title: string; build: () =
           <fieldset className="space-y-2 text-sm text-fg/80">
             <legend className="sr-only">How do the names get on the list?</legend>
             <label className="flex items-start gap-2"><input type="radio" name="share-mode" checked={mode === "list"} onChange={() => setMode("list")} className="mt-1" /><span>I have the names (the ones pasted above)</span></label>
-            <label className="flex items-start gap-2"><input type="radio" name="share-mode" checked={mode === "register"} onChange={() => setMode("register")} className="mt-1" /><span>Let people add their own names, then I release the certificates (up to {FREE_BATCH})</span></label>
+            <label className="flex items-start gap-2"><input type="radio" name="share-mode" checked={mode === "register"} onChange={() => setMode("register")} className="mt-1" /><span>Let people add their own names, then I release the certificates (up to {limit})</span></label>
           </fieldset>
           <label className="block text-sm font-medium text-fg/80">
             Event code (optional)

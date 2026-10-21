@@ -67,6 +67,44 @@ returns text language sql immutable as $$
   select lower(regexp_replace(btrim(coalesce(p, '')), '\s+', ' ', 'g'));
 $$;
 
+-- ------------------------------------------------------- how many names a person may share
+-- Everyone may share up to cert_settings.free_names people. Someone who has bought a bigger batch gets a
+-- row in cert_grants (added by the owner in the Supabase table editor, or later by a payment): their
+-- limit is then max_names until expires_at. Change the free number in the cert_settings table.
+create table if not exists public.cert_settings (
+  id boolean primary key default true check (id),    -- one row only
+  free_names integer not null default 15 check (free_names between 1 and 500)
+);
+insert into public.cert_settings (id) values (true) on conflict do nothing;
+alter table public.cert_settings enable row level security;
+drop policy if exists "owner manages cert settings" on public.cert_settings;
+create policy "owner manages cert settings" on public.cert_settings for all using (public.is_admin()) with check (public.is_admin());
+
+create table if not exists public.cert_grants (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  max_names integer not null check (max_names between 1 and 500),
+  expires_at timestamptz not null,
+  note text                                           -- for example "paid GH₵ 50 by MoMo, 12 Mar"
+);
+alter table public.cert_grants enable row level security;
+drop policy if exists "read own grant" on public.cert_grants;
+create policy "read own grant" on public.cert_grants for select using (user_id = auth.uid() or public.is_admin());
+drop policy if exists "owner manages grants" on public.cert_grants;
+create policy "owner manages grants" on public.cert_grants for all using (public.is_admin()) with check (public.is_admin());
+
+-- The most names the signed-in person (or a visitor, who gets the free number) may put in one event
+create or replace function public.cert_limit()
+returns integer
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select greatest(
+    (select free_names from public.cert_settings limit 1),
+    coalesce((select max_names from public.cert_grants where user_id = auth.uid() and expires_at > now()), 0));
+$$;
+
 -- ----------------------------------------------------------- create an event
 create or replace function public.cert_event_create(p_title text, p_settings jsonb, p_code text, p_names text[], p_days integer)
 returns text
@@ -82,7 +120,7 @@ declare
 begin
   if me is null then raise exception 'sign in first'; end if;
   if p_names is null or array_length(p_names, 1) is null then raise exception 'no names'; end if;
-  if array_length(p_names, 1) > 500 then raise exception 'too many names'; end if;
+  if array_length(p_names, 1) > public.cert_limit() then raise exception 'over limit'; end if;
   if length(p_settings::text) > 6000000 then raise exception 'design too large'; end if;
   if (select count(*) from public.cert_events where owner = me and expires_at > now()) >= 20 then
     raise exception 'too many active events';
@@ -186,7 +224,7 @@ begin
   insert into public.cert_events (owner, slug, title, settings, code, expires_at, mode, released, cap)
   values (me, new_slug, left(btrim(p_title), 120), p_settings, nullif(btrim(coalesce(p_code, '')), ''),
           now() + make_interval(days => greatest(1, least(coalesce(p_days, 90), 365))),
-          'register', false, greatest(1, least(coalesce(p_cap, 500), 500)));
+          'register', false, greatest(1, least(coalesce(p_cap, 500), public.cert_limit())));
   return new_slug;
 end;
 $$;
@@ -261,3 +299,4 @@ grant execute on function public.cert_register(text, text, text) to anon, authen
 grant execute on function public.cert_event_info(text) to anon, authenticated;
 grant execute on function public.cert_claim(text, text, text) to anon, authenticated;
 grant execute on function public.cert_verify(text) to anon, authenticated;
+grant execute on function public.cert_limit() to anon, authenticated;

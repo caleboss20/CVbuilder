@@ -38,6 +38,7 @@ export async function createSharedEvent(args: { title: string; settings: SharedD
   });
   if (error) {
     if (error.message.includes("too many active")) throw new Error("You already have 20 active shared events. Delete one first.");
+    if (error.message.includes("over limit")) throw new Error("That is more people than your plan allows. Ask us about a bigger batch.");
     throw new Error("We could not create the link. Please try again.");
   }
   return data as string;
