@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { QrCode } from "@/components/tools/qr-code";
 import { useUser } from "@/components/auth/use-user";
 import { authConfigured } from "@/lib/auth-config";
 import { claimUrl, createRegisterEvent, createSharedEvent, deleteSharedEvent, listSharedEvents, setReleased, type SharedEvent } from "@/lib/cert-share";
@@ -26,6 +27,8 @@ export function SharePanel({ settings, names }: { settings: CertSettings; names:
   const [error, setError] = useState("");
   const [link, setLink] = useState("");
   const [copied, setCopied] = useState(false);
+  // The link whose QR code is showing
+  const [qrFor, setQrFor] = useState("");
   const [events, setEvents] = useState<SharedEvent[]>([]);
 
   const refresh = useCallback(() => {
@@ -108,18 +111,20 @@ export function SharePanel({ settings, names }: { settings: CertSettings; names:
                   Share on WhatsApp
                 </a>
               </div>
+              <div className="mt-3"><QrCode url={link} label="get your certificate" /></div>
             </div>
           )}
           {events.length > 0 && (
             <ul className="space-y-2 border-t border-fg/10 pt-3">
               <li className="text-sm font-medium text-fg/80">Your shared links</li>
               {events.map((ev) => (
-                <li key={ev.id} className="flex items-center justify-between gap-3 text-sm">
+                <li key={ev.id} className="flex flex-wrap items-center justify-between gap-3 text-sm">
                   <span className="min-w-0 truncate text-fg/70">
                     {ev.title} · {ev.cert_recipients[0]?.count ?? 0} people{ev.mode === "register" ? (ev.released ? " · released" : " · collecting names") : ""} · until {new Date(ev.expires_at).toLocaleDateString("en-GB")}
                   </span>
                   <span className="flex shrink-0 gap-2">
                     <button type="button" onClick={() => copy(claimUrl(ev.slug))} className={smallButton}>Copy</button>
+                    <button type="button" onClick={() => setQrFor(qrFor === ev.id ? "" : ev.id)} className={smallButton}>QR</button>
                     {ev.mode === "register" && (
                       <button type="button" onClick={async () => { if (await setReleased(ev.id, !ev.released)) refresh(); }} className={smallButton}>
                         {ev.released ? "Reopen" : "Release"}
@@ -135,6 +140,7 @@ export function SharePanel({ settings, names }: { settings: CertSettings; names:
                       Delete
                     </button>
                   </span>
+                  {qrFor === ev.id && <div className="basis-full pt-2"><QrCode url={claimUrl(ev.slug)} label={ev.title} /></div>}
                 </li>
               ))}
             </ul>
