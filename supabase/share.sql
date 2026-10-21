@@ -130,6 +130,7 @@ declare
   ev public.cert_events;
   q text := public.cert_key(p_query);
   hits text[];
+  rid bigint;
 begin
   select * into ev from public.cert_events where slug = p_slug;
   if not found or ev.expires_at <= now() then return jsonb_build_object('status', 'gone'); end if;
@@ -159,7 +160,9 @@ begin
 
   if hits is null then return jsonb_build_object('status', 'none'); end if;
   if array_length(hits, 1) > 1 then return jsonb_build_object('status', 'many'); end if;
-  return jsonb_build_object('status', 'ok', 'name', hits[1], 'title', ev.title, 'settings', ev.settings);
+  select id into rid from public.cert_recipients where event_id = ev.id and name = hits[1] limit 1;
+  -- 'ref' goes into the certificate's QR code so it can be checked later
+  return jsonb_build_object('status', 'ok', 'name', hits[1], 'title', ev.title, 'settings', ev.settings, 'ref', ev.slug || '.' || rid);
 end;
 $$;
 
@@ -226,6 +229,27 @@ as $$
   update public.cert_events set released = p_released where id = p_id and owner = auth.uid();
 $$;
 
+-- ------------------------------------------------------------ check a certificate (the QR code)
+-- Anyone holding a certificate's reference can ask if it is real. The answer is only that one person's
+-- name, the event, who issued it and when. A deleted or expired event no longer verifies.
+create or replace function public.cert_verify(p_ref text)
+returns jsonb
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select coalesce(
+    (select jsonb_build_object('valid', true, 'name', r.name, 'title', e.title,
+                               'issuer', nullif(btrim(coalesce(e.settings->>'issuer', '')), ''), 'issued', e.created_at)
+       from public.cert_events e
+       join public.cert_recipients r on r.event_id = e.id
+      where e.slug = split_part(p_ref, '.', 1)
+        and r.id::text = split_part(p_ref, '.', 2)
+        and e.released and e.expires_at > now()),
+    jsonb_build_object('valid', false));
+$$;
+
 -- Who may call what: the claim functions are public; creating needs a signed-in person
 revoke all on function public.cert_event_create(text, jsonb, text, text[], integer) from public, anon;
 grant execute on function public.cert_event_create(text, jsonb, text, text[], integer) to authenticated;
@@ -236,3 +260,4 @@ grant execute on function public.cert_event_release(uuid, boolean) to authentica
 grant execute on function public.cert_register(text, text, text) to anon, authenticated;
 grant execute on function public.cert_event_info(text) to anon, authenticated;
 grant execute on function public.cert_claim(text, text, text) to anon, authenticated;
+grant execute on function public.cert_verify(text) to anon, authenticated;

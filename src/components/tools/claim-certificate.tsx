@@ -2,7 +2,8 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { claimCertificate, eventInfo, registerName, type ClaimResult, type RegisterStatus } from "@/lib/cert-share";
+import { claimCertificate, eventInfo, registerName, verifyUrl, type ClaimResult, type RegisterStatus } from "@/lib/cert-share";
+import { stampVerifyQr } from "@/lib/certificate-verify";
 import { buildOwnCombined, unpackOwnShare } from "@/lib/certificate-own";
 import { buildCombinedPdf } from "@/lib/certificates";
 import { fileNameFor } from "@/lib/certificate-names";
@@ -86,7 +87,9 @@ export function ClaimCertificate() {
         "own" in design
           ? await buildOwnCombined(unpackOwnShare(design), [result.name], design.place, undefined, design.signatures)
           : await buildCombinedPdf(design, [result.name]);
-      setFound({ name: result.name, bytes, preview: (await renderPages(bytes))[0] });
+      // A small QR code in the corner lets anyone check the certificate is real
+      const stamped = await stampVerifyQr(bytes, verifyUrl(result.ref));
+      setFound({ name: result.name, bytes: stamped, preview: (await renderPages(stamped))[0] });
     } catch {
       setMessage("Something went wrong. Please try again.");
     } finally {

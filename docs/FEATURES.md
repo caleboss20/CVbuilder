@@ -459,3 +459,9 @@ Rules: names are never sent to the public (the `cert_claim()` function returns o
 **Shared events for uploaded certificates (15.10c).** "Use my own certificate" now has the same share box. The uploaded PDF or photo (at most 3.5 MB, `MAX_SHARE_BYTES` in `certificate-own.ts`), the name spot and the signatures are packed as an `OwnShare` (the file as base64) inside the event's `settings`, so no file storage is needed; `share.sql` raises the design size limit to 6 MB. The claim page spots an `own` design and writes the person's name on it in their browser. Bigger files must be shrunk first or downloaded instead.
 
 **Marketing wording about AI.** While `AI_ACCESS` is `admin` (students cannot use the AI yet), the public pages do not promise it: they talk about the rule-based writing coach, and the homepage demo is labelled "coming soon" (`site.ts`, `faqs.ts`, `hero.tsx`, `final-cta.tsx`, `footer.tsx`, `how-it-works.tsx`, `problems.tsx`, `ai-demo.tsx`, `ai-demo-player.tsx`). When `AI_ACCESS=everyone` is switched on, restore the AI wording in those files (see git history of commit "Describe AI as coming soon").
+
+### 15.11 Verify a certificate (QR)
+
+**Status: Built, needs `supabase/share.sql` re-run (adds `cert_verify()` and a `ref` in `cert_claim()`).** Files: `src/lib/certificate-verify.ts` (stamps a small QR on the PDF), `src/components/tools/verify-certificate.tsx`, `src/app/(marketing)/verify/page.tsx`, `cert-share.ts` (`verifyUrl`, `verifyCertificate`).
+
+A certificate downloaded from a shared link carries a "Scan to verify" QR (bottom-right) that opens `/verify?c=<slug>.<recipient id>`. The page asks `cert_verify()` and shows the person's name, the event, the issuer (the design's "issuer" text, if any) and the date. Deleting the event, letting it expire, or reopening registration makes it stop verifying. Certificates downloaded straight from the maker (not through a link) have no QR, because the server never saw them.

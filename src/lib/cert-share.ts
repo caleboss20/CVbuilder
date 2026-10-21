@@ -18,7 +18,7 @@ export type SharedEvent = { id: string; slug: string; title: string; code: strin
 
 /** What a person gets back when they ask for their certificate. */
 export type ClaimResult =
-  | { status: "ok"; name: string; title: string; settings: SharedDesign }
+  | { status: "ok"; name: string; title: string; settings: SharedDesign; ref: string }
   | { status: "none" | "many" | "code" | "busy" | "gone" | "wait" };
 
 /** The public address people open to claim a certificate. */
@@ -114,4 +114,17 @@ export async function setReleased(id: string, released: boolean): Promise<boolea
   if (!supabase) return false;
   const { error } = await supabase.rpc("cert_event_release", { p_id: id, p_released: released });
   return !error;
+}
+
+/** The address a certificate's QR code opens. `ref` comes from a successful claim. */
+export const verifyUrl = (ref: string) => `${window.location.origin}/verify?c=${encodeURIComponent(ref)}`;
+
+export type Verified = { valid: true; name: string; title: string; issuer: string | null; issued: string } | { valid: false };
+
+/** Asks whether a certificate reference belongs to a real, current certificate. */
+export async function verifyCertificate(ref: string): Promise<Verified | null> {
+  const supabase = await loadSupabase();
+  if (!supabase) return null;
+  const { data, error } = await supabase.rpc("cert_verify", { p_ref: ref });
+  return error || !data ? null : (data as Verified);
 }
