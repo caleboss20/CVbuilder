@@ -26,6 +26,9 @@ export const OWN_FONTS: { id: OwnFont; label: string; family: string; file: stri
 /** Where and how a name is written. x, y and w are fractions of the page; size is in PDF points. */
 export type NamePlace = { x: number; y: number; w: number; size: number; color: string; font: OwnFont };
 
+/** A signature to place on the organiser's own design. x and y are the centre, w the width, as fractions of the page. */
+export type OwnSignature = { dataUrl: string; x: number; y: number; w: number };
+
 export const defaultNamePlace = (): NamePlace => ({ x: 0.5, y: 0.45, w: 0.7, size: 56, color: "#1f2937", font: "script" });
 
 /** An uploaded certificate, ready to have names written on it. */
@@ -118,7 +121,22 @@ async function embedDesign(doc: PDFDocument, design: OwnDesign) {
 const BASELINE_SHARE = 0.3;
 
 /** Writes one name onto a new page: the design first, then the name, as large as fits its width. */
-function writePage(doc: PDFDocument, fonts: Fonts, drawDesign: Awaited<ReturnType<typeof embedDesign>>, design: OwnDesign, name: string, place: NamePlace) {
+type EmbeddedSignature = { image: Awaited<ReturnType<PDFDocument["embedPng"]>>; place: OwnSignature };
+
+/** Puts each signature image into the document once, so every page can reuse it. */
+async function embedSignatures(doc: PDFDocument, signatures: OwnSignature[]): Promise<EmbeddedSignature[]> {
+  return Promise.all(signatures.map(async (place) => ({ image: await doc.embedPng(dataUrlBytes(place.dataUrl)), place })));
+}
+
+function writePage(
+  doc: PDFDocument,
+  fonts: Fonts,
+  drawDesign: Awaited<ReturnType<typeof embedDesign>>,
+  design: OwnDesign,
+  name: string,
+  place: NamePlace,
+  signatures: EmbeddedSignature[],
+) {
   const page = doc.addPage([design.width, design.height]);
   drawDesign(page);
 
@@ -133,18 +151,32 @@ function writePage(doc: PDFDocument, fonts: Fonts, drawDesign: Awaited<ReturnTyp
   const x = place.x * design.width - font.widthOfTextAtSize(shown, size) / 2;
   const baselineFromTop = place.y * design.height + size * BASELINE_SHARE;
   page.drawText(shown, { x, y: design.height - baselineFromTop, size, font, color: hex(place.color) });
+
+  // Signatures, centred where the organiser put them
+  for (const { image, place: at } of signatures) {
+    const width = at.w * design.width;
+    const height = (width * image.height) / image.width;
+    page.drawImage(image, { x: at.x * design.width - width / 2, y: design.height - (at.y * design.height + height / 2), width, height });
+  }
 }
 
 const breathe = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 /** One PDF with a page per name, all sharing one copy of the design. Best for printing. */
-export async function buildOwnCombined(design: OwnDesign, names: string[], place: NamePlace, onProgress?: (done: number) => void): Promise<Uint8Array> {
+export async function buildOwnCombined(
+  design: OwnDesign,
+  names: string[],
+  place: NamePlace,
+  onProgress?: (done: number) => void,
+  signatures: OwnSignature[] = [],
+): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   doc.setTitle("Certificates");
   const fonts = await embedFonts(doc, names.join(" "));
   const drawDesign = await embedDesign(doc, design);
+  const sigs = await embedSignatures(doc, signatures);
   for (let i = 0; i < names.length; i++) {
-    writePage(doc, fonts, drawDesign, design, names[i], place);
+    writePage(doc, fonts, drawDesign, design, names[i], place, sigs);
     onProgress?.(i + 1);
     if (i % 10 === 9) await breathe();
   }
@@ -157,6 +189,7 @@ export async function buildOwnSeparate(
   names: string[],
   place: NamePlace,
   onProgress?: (done: number) => void,
+  signatures: OwnSignature[] = [],
 ): Promise<{ name: string; bytes: Uint8Array }[]> {
   const files: { name: string; bytes: Uint8Array }[] = [];
   for (let i = 0; i < names.length; i++) {
@@ -164,7 +197,7 @@ export async function buildOwnSeparate(
     doc.setTitle(`Certificate for ${names[i]}`);
     const fonts = await embedFonts(doc, names[i]);
     const drawDesign = await embedDesign(doc, design);
-    writePage(doc, fonts, drawDesign, design, names[i], place);
+    writePage(doc, fonts, drawDesign, design, names[i], place, await embedSignatures(doc, signatures));
     files.push({ name: names[i], bytes: await doc.save() });
     onProgress?.(i + 1);
     await breathe();

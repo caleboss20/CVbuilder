@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TextArea } from "@/components/builder/fields";
+import { SignaturePad } from "@/components/builder/signature-pad";
 import { FREE_BATCH, MAX_NAMES, SAMPLE_NAMES, fileNameFor, parseNames } from "@/lib/certificate-names";
 import {
   OWN_FONTS,
@@ -11,6 +12,7 @@ import {
   readOwnDesign,
   type NamePlace,
   type OwnDesign,
+  type OwnSignature,
 } from "@/lib/certificate-own";
 import { saveFile } from "@/lib/save-file";
 import { whatsappLink } from "@/lib/site";
@@ -71,6 +73,8 @@ function useWidth(ref: React.RefObject<HTMLElement | null>, watch: unknown): num
 export function OwnCertificateMaker() {
   const [design, setDesign] = useState<OwnDesign | null>(null);
   const [place, setPlace] = useState<NamePlace>(defaultNamePlace);
+  // Up to two signatures the organiser drew or uploaded, each placed by dragging
+  const [sigs, setSigs] = useState<(OwnSignature | null)[]>([null, null]);
   const [namesText, setNamesText] = useState("");
   const [previewAt, setPreviewAt] = useState(0);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
@@ -109,13 +113,13 @@ export function OwnCertificateMaker() {
   const move = (patch: Partial<NamePlace>) =>
     setPlace((p) => ({ ...p, ...patch, x: clamp(patch.x ?? p.x, 0.02, 0.98), y: clamp(patch.y ?? p.y, 0.02, 0.98) }));
 
-  /** Drags the name with a finger or mouse; it follows the pointer until it is let go. */
-  function dragName(e: React.PointerEvent<HTMLDivElement>) {
+  /** Starts a drag with a finger or mouse: `apply` is called with the new position until the pointer is let go. */
+  function startDrag(e: React.PointerEvent<HTMLDivElement>, from: { x: number; y: number }, apply: (x: number, y: number) => void) {
     const rect = box.current?.getBoundingClientRect();
     if (!rect) return;
     e.preventDefault();
-    const start = { px: e.clientX, py: e.clientY, x: place.x, y: place.y };
-    const onMove = (ev: PointerEvent) => move({ x: start.x + (ev.clientX - start.px) / rect.width, y: start.y + (ev.clientY - start.py) / rect.height });
+    const start = { px: e.clientX, py: e.clientY, x: from.x, y: from.y };
+    const onMove = (ev: PointerEvent) => apply(start.x + (ev.clientX - start.px) / rect.width, start.y + (ev.clientY - start.py) / rect.height);
     const stop = () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", stop);
@@ -125,6 +129,20 @@ export function OwnCertificateMaker() {
     window.addEventListener("pointerup", stop);
     window.addEventListener("pointercancel", stop);
   }
+
+  const dragName = (e: React.PointerEvent<HTMLDivElement>) => startDrag(e, place, (x, y) => move({ x, y }));
+
+  /** Sets or removes one signature. A new one starts near the bottom, on the left or the right. */
+  function setSignature(index: number, dataUrl: string) {
+    setSigs((list) =>
+      list.map((s, i) => (i !== index ? s : dataUrl ? { dataUrl, x: s?.x ?? (index === 0 ? 0.3 : 0.7), y: s?.y ?? 0.8, w: s?.w ?? 0.18 } : null)),
+    );
+  }
+
+  const moveSignature = (index: number, patch: Partial<OwnSignature>) =>
+    setSigs((list) =>
+      list.map((s, i) => (i === index && s ? { ...s, ...patch, x: clamp(patch.x ?? s.x, 0.02, 0.98), y: clamp(patch.y ?? s.y, 0.02, 0.98) } : s)),
+    );
 
   function nudgeName(e: React.KeyboardEvent<HTMLDivElement>) {
     const step = e.shiftKey ? 0.05 : 0.01;
@@ -152,6 +170,7 @@ export function OwnCertificateMaker() {
   }
 
   const ready = Boolean(design) && names.length > 0 && !progress;
+  const placedSigs = sigs.filter((s): s is OwnSignature => s !== null);
 
   async function download(kind: "zip" | "pdf") {
     if (!design) return;
@@ -160,11 +179,11 @@ export function OwnCertificateMaker() {
     const onProgress = (done: number) => setProgress({ done, total: names.length });
     try {
       if (names.length === 1) {
-        saveFile(await buildOwnCombined(design, names, place), `${fileNameFor(names[0], new Set())}.pdf`, "application/pdf");
+        saveFile(await buildOwnCombined(design, names, place, undefined, placedSigs), `${fileNameFor(names[0], new Set())}.pdf`, "application/pdf");
       } else if (kind === "pdf") {
-        saveFile(await buildOwnCombined(design, names, place, onProgress), "Certificates.pdf", "application/pdf");
+        saveFile(await buildOwnCombined(design, names, place, onProgress, placedSigs), "Certificates.pdf", "application/pdf");
       } else {
-        const files = await buildOwnSeparate(design, names, place, onProgress);
+        const files = await buildOwnSeparate(design, names, place, onProgress, placedSigs);
         const { zipSync } = await import("fflate");
         const used = new Set<string>();
         const entries: Record<string, Uint8Array> = {};
@@ -264,8 +283,27 @@ export function OwnCertificateMaker() {
           )}
         </section>
 
+        <section className={`${section} space-y-3`}>
+          <h2 className={heading}>3. Signatures (optional)</h2>
+          <p className="text-sm text-fg/60">If your certificate has blank signature lines, sign here and drag each signature onto its line on the preview.</p>
+          {[0, 1].map((i) => (
+            <details key={i} className="rounded-lg border border-fg/10 p-4">
+              <summary className="cursor-pointer text-sm font-medium text-fg/80">{i === 0 ? "Add the first signature" : "Add the second signature"}</summary>
+              <div className="mt-4 space-y-3">
+                <SignaturePad value={sigs[i]?.dataUrl ?? ""} onChange={(data) => setSignature(i, data)} note="Shown on every certificate in this batch. Drag it on the preview." />
+                {sigs[i] && (
+                  <label className="block text-sm font-medium text-fg/80">
+                    Size
+                    <input type="range" min={6} max={40} value={Math.round((sigs[i]?.w ?? 0.18) * 100)} onChange={(e) => moveSignature(i, { w: Number(e.target.value) / 100 })} className="mt-1.5 block w-full" />
+                  </label>
+                )}
+              </div>
+            </details>
+          ))}
+        </section>
+
         <section className={section}>
-          <h2 className={heading}>3. Add the names</h2>
+          <h2 className={heading}>4. Add the names</h2>
           <p className="mt-1 text-sm text-fg/60">Paste a list, one name per line. A column copied from Excel, Google Sheets or a WhatsApp list works.</p>
           <div className="mt-4">
             <TextArea
@@ -337,6 +375,29 @@ export function OwnCertificateMaker() {
                 >
                   {shown}
                 </div>
+              )}
+              {sigs.map((s, i) =>
+                s ? (
+                  <div
+                    key={i}
+                    tabIndex={0}
+                    role="group"
+                    aria-label={`Signature ${i + 1}. Drag it to move it, or use the arrow keys.`}
+                    onPointerDown={(e) => startDrag(e, s, (x, y) => moveSignature(i, { x, y }))}
+                    onKeyDown={(e) => {
+                      const step = e.shiftKey ? 0.05 : 0.01;
+                      const keys: Record<string, Partial<OwnSignature>> = { ArrowLeft: { x: s.x - step }, ArrowRight: { x: s.x + step }, ArrowUp: { y: s.y - step }, ArrowDown: { y: s.y + step } };
+                      if (!keys[e.key]) return;
+                      e.preventDefault();
+                      moveSignature(i, keys[e.key]);
+                    }}
+                    style={{ left: `${s.x * 100}%`, top: `${s.y * 100}%`, width: `${s.w * 100}%`, touchAction: "none" }}
+                    className="absolute -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-sm outline-1 outline-dashed outline-brand-400 active:cursor-grabbing"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element -- the organiser's own signature */}
+                    <img src={s.dataUrl} alt="" draggable={false} className="pointer-events-none block w-full select-none" />
+                  </div>
+                ) : null,
               )}
             </div>
           ) : (
