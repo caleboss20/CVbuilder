@@ -30,7 +30,7 @@ export async function askAi(kind: AiKind, body: Record<string, string>, token: s
     if (!data.improved) return { ok: false, message: "No safe suggestion this time. Try adding a little more detail." };
     return { ok: true, suggestion: { improved: data.improved, why: data.why ?? "", remaining: data.remaining } };
   } catch {
-    return { ok: false, message: "Could not reach the server. Check your internet." };
+    return { ok: false, message: "Could not reach CV11. Check your internet." };
   }
 }
 
@@ -53,6 +53,6 @@ export async function askTranscriptCheck(body: Record<string, string>, token: st
     if (!res.ok) return { ok: false, message: data.error ?? "The AI could not help just now." };
     return { ok: true, corrected: data.corrected ?? body.transcript, changes: data.changes ?? [] };
   } catch {
-    return { ok: false, message: "Could not reach the server. Check your internet." };
+    return { ok: false, message: "Could not reach CV11. Check your internet." };
   }
 }

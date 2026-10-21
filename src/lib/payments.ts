@@ -40,7 +40,7 @@ export async function startCheckout(cvId: string, token: string): Promise<{ url:
     const data = (await res.json()) as { url?: string; error?: string };
     return data.url ? { url: data.url } : { error: data.error ?? "Could not start the payment." };
   } catch {
-    return { error: "Could not reach the server. Check your internet." };
+    return { error: "Could not reach CV11. Check your internet." };
   }
 }
 

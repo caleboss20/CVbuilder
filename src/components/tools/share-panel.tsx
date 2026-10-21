@@ -101,7 +101,7 @@ export function SharePanel({ title, build, names }: { title: string; build: () =
           <button type="button" onClick={create} disabled={busy || (mode === "list" && names.length === 0)} className={`${smallButton} h-11 w-full bg-brand-600 text-white ring-brand-300/60 hover:bg-brand-500 disabled:opacity-50`}>
             {mode === "register" ? (busy ? "Making the link…" : "Make a sign-up link") : names.length === 0 ? "Add names first" : busy ? "Making the link…" : `Make a link for ${names.length} ${names.length === 1 ? "person" : "people"}`}
           </button>
-          <p className="text-xs text-fg/45">The names are kept on our server so people can find themselves. You can delete the link any time.</p>
+          <p className="text-xs text-fg/45">CV11 keeps these names safe so people can find themselves. You can delete the link any time.</p>
           {error && <p className="text-sm text-amber-300" role="alert">{error}</p>}
           {link && (
             <div className="rounded-lg bg-fg/5 p-3">

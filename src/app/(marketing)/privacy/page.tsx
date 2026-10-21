@@ -36,8 +36,8 @@ export default function PrivacyPage() {
 
       <h2>Files you upload</h2>
       <p>
-        When you upload a PDF or Word file to import a CV or to check it, the file is read by your browser. It is not uploaded to our
-        servers.
+        When you upload a PDF or Word file to import a CV or to check it, the file is read by your browser. It is never uploaded
+        to CV11.
       </p>
 
       <h2>Voice typing</h2>
@@ -51,7 +51,7 @@ export default function PrivacyPage() {
       <p>
         Some tools have an optional &quot;Improve with AI&quot; or &quot;Check what we heard&quot; button. It works only when you tap it, and it needs a CV11 account so we can
         count your free daily tries. When you tap it, <strong>only the text in that box</strong>, such as one bullet point, a project
-        description, your summary or what you said in the voice box, plus the job title, course or skills listed next to it, is sent through our server to Google&apos;s
+        description, your summary or what you said in the voice box, plus the job title, course or skills listed next to it, is sent securely through CV11 to Google&apos;s
         Gemini AI, which writes the suggestion. We do not send your name, phone number, email address or the rest of your CV, and we
         do not store the text or the suggestion.
       </p>

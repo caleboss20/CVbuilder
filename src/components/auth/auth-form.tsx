@@ -40,7 +40,7 @@ function friendly(message: string): string {
   if (m.includes("already registered") || m.includes("already been registered")) return "That email already has an account. Try logging in instead.";
   if (m.includes("email not confirmed")) return "Please confirm your email first. We sent you a link.";
   if (m.includes("rate limit") || m.includes("too many")) return "Too many tries. Please wait a few minutes and try again.";
-  if (m.includes("failed to fetch") || m.includes("network")) return "We could not reach the server. Check your internet and try again.";
+  if (m.includes("failed to fetch") || m.includes("network")) return "We could not reach CV11. Check your internet and try again.";
   if (m.includes("password should") || m.includes("weak password")) return "Your password is too weak. Use at least 8 characters.";
   // Show Supabase's own words, so an unexpected problem can be fixed instead of guessed at
   return message ? `Something went wrong: ${message}` : "Something went wrong. Please try again.";
