@@ -51,6 +51,7 @@ export async function listSharedEvents(): Promise<SharedEvent[]> {
   const { data } = await supabase
     .from("cert_events")
     .select("id, slug, title, code, mode, released, expires_at, cert_recipients(count)")
+    .eq("verify_only", false)
     .order("created_at", { ascending: false });
   return (data as SharedEvent[] | null) ?? [];
 }
@@ -128,4 +129,20 @@ export async function verifyCertificate(ref: string): Promise<Verified | null> {
   if (!supabase) return null;
   const { data, error } = await supabase.rpc("cert_verify", { p_ref: ref });
   return error || !data ? null : (data as Verified);
+}
+
+/**
+ * Records a batch with CV11 so each certificate can carry a verify QR. Returns each name's reference.
+ * Throws an Error with a message that is safe to show.
+ */
+export async function recordForVerify(args: { title: string; issuer: string; names: string[] }): Promise<Map<string, string>> {
+  const supabase = await loadSupabase();
+  if (!supabase) throw new Error("The verify QR is not available right now.");
+  const { data, error } = await supabase.rpc("cert_event_record", { p_title: args.title, p_issuer: args.issuer, p_names: args.names });
+  if (error || !Array.isArray(data)) {
+    if (error?.message.includes("over limit")) throw new Error("That is more people than your plan allows. Ask us about a bigger batch.");
+    if (error?.message.includes("too many today")) throw new Error("You have added the verify QR to many batches today. Please try again tomorrow.");
+    throw new Error("We could not add the verify QR. Please try again.");
+  }
+  return new Map((data as { name: string; ref: string }[]).map((r) => [r.name, r.ref]));
 }

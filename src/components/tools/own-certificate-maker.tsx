@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { TextArea } from "@/components/builder/fields";
 import { SignaturePad } from "@/components/builder/signature-pad";
 import { SharePanel } from "@/components/tools/share-panel";
+import { useVerifyOption, verifyMessage } from "@/components/tools/verify-option";
 import { useCertLimit } from "@/components/tools/use-cert-limit";
 import { FREE_BATCH, MAX_NAMES, SAMPLE_NAMES, fileNameFor, parseNames } from "@/lib/certificate-names";
 import {
@@ -93,6 +94,7 @@ export function OwnCertificateMaker() {
   const limit = useCertLimit();
   const names = parsed.names.slice(0, limit);
   const leftOut = Math.max(parsed.names.length - limit, 0);
+  const verify = useVerifyOption({ title: "Certificates", issuer: "", names });
   const biggerBatch = whatsappLink(`Hi CV11, I need to make ${parsed.names.length} certificates on my own design. How can I get a bigger batch?`);
   const index = Math.min(previewAt, Math.max(names.length - 1, 0));
   const previewName = names[index] ?? PLACEHOLDER_NAME;
@@ -182,21 +184,22 @@ export function OwnCertificateMaker() {
     setProgress({ done: 0, total: names.length });
     const onProgress = (done: number) => setProgress({ done, total: names.length });
     try {
+      const stamp = await verify.prepare();
       if (names.length === 1) {
-        saveFile(await buildOwnCombined(design, names, place, undefined, placedSigs), `${fileNameFor(names[0], new Set())}.pdf`, "application/pdf");
+        saveFile(await stamp(await buildOwnCombined(design, names, place, undefined, placedSigs), names), `${fileNameFor(names[0], new Set())}.pdf`, "application/pdf");
       } else if (kind === "pdf") {
-        saveFile(await buildOwnCombined(design, names, place, onProgress, placedSigs), "Certificates.pdf", "application/pdf");
+        saveFile(await stamp(await buildOwnCombined(design, names, place, onProgress, placedSigs), names), "Certificates.pdf", "application/pdf");
       } else {
         const files = await buildOwnSeparate(design, names, place, onProgress, placedSigs);
         const { zipSync } = await import("fflate");
         const used = new Set<string>();
         const entries: Record<string, Uint8Array> = {};
-        for (const file of files) entries[`${fileNameFor(file.name, used)}.pdf`] = file.bytes;
+        for (const file of files) entries[`${fileNameFor(file.name, used)}.pdf`] = await stamp(file.bytes, [file.name]);
         saveFile(zipSync(entries, { level: 0 }), "Certificates.zip", "application/zip");
       }
       trackEvent("certificates_made", { count: names.length, design: "own" });
-    } catch {
-      setError("Something went wrong while making the files. Please try again, or try fewer names.");
+    } catch (err) {
+      setError(verifyMessage(err) ?? "Something went wrong while making the files. Please try again, or try fewer names.");
     }
     setProgress(null);
   }
@@ -423,6 +426,7 @@ export function OwnCertificateMaker() {
         </div>
 
         <div className="mt-4 space-y-2.5">
+          {verify.node}
           <button type="button" onClick={() => download("zip")} disabled={!ready} className={primaryButton}>
             {!design ? "Upload your certificate first" : names.length === 0 ? "Add names to download" : names.length === 1 ? "Download the certificate (PDF)" : `Download ${names.length} certificates (ZIP)`}
           </button>

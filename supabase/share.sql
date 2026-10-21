@@ -31,6 +31,9 @@ create table if not exists public.cert_events (
 alter table public.cert_events add column if not exists mode text not null default 'list' check (mode in ('list', 'register'));
 alter table public.cert_events add column if not exists released boolean not null default true;
 alter table public.cert_events add column if not exists cap integer not null default 500 check (cap between 1 and 500);
+-- true for a batch recorded only so its certificates can carry a verify QR: it has no design, is never
+-- shared by link and does not count towards the 20 shared events
+alter table public.cert_events add column if not exists verify_only boolean not null default false;
 create index if not exists cert_events_owner on public.cert_events (owner);
 
 create table if not exists public.cert_recipients (
@@ -122,7 +125,7 @@ begin
   if p_names is null or array_length(p_names, 1) is null then raise exception 'no names'; end if;
   if array_length(p_names, 1) > public.cert_limit() then raise exception 'over limit'; end if;
   if length(p_settings::text) > 6000000 then raise exception 'design too large'; end if;
-  if (select count(*) from public.cert_events where owner = me and expires_at > now()) >= 20 then
+  if (select count(*) from public.cert_events where owner = me and expires_at > now() and not verify_only) >= 20 then
     raise exception 'too many active events';
   end if;
 
@@ -151,7 +154,7 @@ stable
 as $$
   select coalesce(
     (select jsonb_build_object('title', title, 'needsCode', code is not null, 'registering', mode = 'register' and not released)
-       from public.cert_events where slug = p_slug and expires_at > now()),
+       from public.cert_events where slug = p_slug and expires_at > now() and not verify_only),
     jsonb_build_object('gone', true));
 $$;
 
@@ -171,7 +174,7 @@ declare
   rid bigint;
 begin
   select * into ev from public.cert_events where slug = p_slug;
-  if not found or ev.expires_at <= now() then return jsonb_build_object('status', 'gone'); end if;
+  if not found or ev.expires_at <= now() or ev.verify_only then return jsonb_build_object('status', 'gone'); end if;
 
   -- Slow down guessing: at most 40 lookups a minute per event
   delete from public.cert_lookups where at < now() - interval '1 hour';
@@ -217,7 +220,7 @@ declare
 begin
   if me is null then raise exception 'sign in first'; end if;
   if length(p_settings::text) > 6000000 then raise exception 'design too large'; end if;
-  if (select count(*) from public.cert_events where owner = me and expires_at > now()) >= 20 then
+  if (select count(*) from public.cert_events where owner = me and expires_at > now() and not verify_only) >= 20 then
     raise exception 'too many active events';
   end if;
   new_slug := substr(replace(gen_random_uuid()::text, '-', ''), 1, 10);
@@ -267,6 +270,47 @@ as $$
   update public.cert_events set released = p_released where id = p_id and owner = auth.uid();
 $$;
 
+-- ------------------------------------------- record a batch so its certificates can carry a verify QR
+-- Called by a signed-in organiser who ticks "Add a verify QR" on a normal download. Returns, for every
+-- name, the reference to put in that certificate's QR code: [{ name, ref }, ...]. It stores no design.
+create or replace function public.cert_event_record(p_title text, p_issuer text, p_names text[])
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  me uuid := auth.uid();
+  new_id uuid;
+  new_slug text;
+  n text;
+  rid bigint;
+  refs jsonb := '[]'::jsonb;
+begin
+  if me is null then raise exception 'sign in first'; end if;
+  if p_names is null or array_length(p_names, 1) is null then raise exception 'no names'; end if;
+  if array_length(p_names, 1) > public.cert_limit() then raise exception 'over limit'; end if;
+  if (select count(*) from public.cert_events where owner = me and verify_only and created_at > now() - interval '1 day') >= 100 then
+    raise exception 'too many today';
+  end if;
+
+  new_slug := substr(replace(gen_random_uuid()::text, '-', ''), 1, 10);
+  insert into public.cert_events (owner, slug, title, settings, expires_at, released, verify_only)
+  values (me, new_slug, left(btrim(p_title), 120), jsonb_build_object('issuer', nullif(btrim(coalesce(p_issuer, '')), '')),
+          now() + interval '3 years', true, true)
+  returning id into new_id;
+
+  foreach n in array p_names loop
+    if btrim(n) <> '' then
+      insert into public.cert_recipients (event_id, name, name_key) values (new_id, left(btrim(n), 120), public.cert_key(n))
+      returning id into rid;
+      refs := refs || jsonb_build_array(jsonb_build_object('name', left(btrim(n), 120), 'ref', new_slug || '.' || rid));
+    end if;
+  end loop;
+  return refs;
+end;
+$$;
+
 -- ------------------------------------------------------------ check a certificate (the QR code)
 -- Anyone holding a certificate's reference can ask if it is real. The answer is only that one person's
 -- name, the event, who issued it and when. A deleted or expired event no longer verifies.
@@ -300,3 +344,5 @@ grant execute on function public.cert_event_info(text) to anon, authenticated;
 grant execute on function public.cert_claim(text, text, text) to anon, authenticated;
 grant execute on function public.cert_verify(text) to anon, authenticated;
 grant execute on function public.cert_limit() to anon, authenticated;
+revoke all on function public.cert_event_record(text, text, text[]) from public, anon;
+grant execute on function public.cert_event_record(text, text, text[]) to authenticated;

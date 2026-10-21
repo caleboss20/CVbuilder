@@ -5,6 +5,7 @@ import { SharePanel } from "@/components/tools/share-panel";
 import { Field, TextArea } from "@/components/builder/fields";
 import { SignaturePad } from "@/components/builder/signature-pad";
 import { readLogo } from "@/lib/certificate-logo";
+import { useVerifyOption, verifyMessage } from "@/components/tools/verify-option";
 import { useCertLimit } from "@/components/tools/use-cert-limit";
 import { FREE_BATCH, MAX_NAMES, SAMPLE_NAMES, fileNameFor, parseNames } from "@/lib/certificate-names";
 import {
@@ -74,6 +75,7 @@ export function CertificateMaker() {
   const limit = useCertLimit();
   const names = parsed.names.slice(0, limit);
   const leftOut = Math.max(parsed.names.length - limit, 0);
+  const verify = useVerifyOption({ title: settings.event, issuer: settings.issuer, names });
   const biggerBatch = whatsappLink(`Hi CV11, I need to make ${parsed.names.length} certificates at once. How can I get a bigger batch?`);
   const set = (patch: Partial<CertSettings>) => setSettings((s) => ({ ...s, ...patch }));
 
@@ -190,25 +192,27 @@ export function CertificateMaker() {
     // A single certificate is just a PDF named after the person, not a ZIP holding one file
     if (names.length === 1) {
       try {
-        save(await buildCombinedPdf(settings, names), `${fileNameFor(names[0], new Set())}.pdf`, "application/pdf");
+        const stamp = await verify.prepare();
+        save(await stamp(await buildCombinedPdf(settings, names), names), `${fileNameFor(names[0], new Set())}.pdf`, "application/pdf");
         trackEvent("certificates_made", { count: 1, design: settings.design });
-      } catch {
-        setError("Something went wrong while making the PDF. Please try again.");
+      } catch (err) {
+        setError(verifyMessage(err) ?? "Something went wrong while making the PDF. Please try again.");
       }
       return;
     }
     setProgress({ done: 0, total: names.length, what: "Making certificates" });
     try {
+      const stamp = await verify.prepare();
       const files = await buildSeparatePdfs(settings, names, (done) => setProgress({ done, total: names.length, what: "Making certificates" }));
       const { zipSync } = await import("fflate");
       const used = new Set<string>();
       const entries: Record<string, Uint8Array> = {};
-      for (const file of files) entries[`${fileNameFor(file.name, used)}.pdf`] = file.bytes;
+      for (const file of files) entries[`${fileNameFor(file.name, used)}.pdf`] = await stamp(file.bytes, [file.name]);
       // PDFs are already compressed, so storing them uncompressed is faster
       save(zipSync(entries, { level: 0 }), `${base}.zip`, "application/zip");
       trackEvent("certificates_made", { count: names.length, design: settings.design });
-    } catch {
-      setError("Something went wrong while making the files. Please try again, or try fewer names.");
+    } catch (err) {
+      setError(verifyMessage(err) ?? "Something went wrong while making the files. Please try again, or try fewer names.");
     }
     setProgress(null);
   }
@@ -217,11 +221,12 @@ export function CertificateMaker() {
     setError("");
     setProgress({ done: 0, total: names.length, what: "Making the PDF" });
     try {
-      const bytes = await buildCombinedPdf(settings, names, (done) => setProgress({ done, total: names.length, what: "Making the PDF" }));
+      const stamp = await verify.prepare();
+      const bytes = await stamp(await buildCombinedPdf(settings, names, (done) => setProgress({ done, total: names.length, what: "Making the PDF" })), names);
       save(bytes, `${base}.pdf`, "application/pdf");
       trackEvent("certificates_made", { count: names.length, design: settings.design });
-    } catch {
-      setError("Something went wrong while making the PDF. Please try again, or try fewer names.");
+    } catch (err) {
+      setError(verifyMessage(err) ?? "Something went wrong while making the PDF. Please try again, or try fewer names.");
     }
     setProgress(null);
   }
@@ -485,6 +490,7 @@ export function CertificateMaker() {
         </div>
 
         <div className="mt-4 space-y-2.5">
+          {verify.node}
           <button type="button" onClick={downloadZip} disabled={!ready} className={primaryButton}>
             {names.length === 0 ? "Add names to download" : names.length === 1 ? "Download the certificate (PDF)" : `Download ${names.length} certificates (ZIP)`}
           </button>
