@@ -9,7 +9,8 @@ import { InView } from "./in-view";
 const perks = [
   "Templates that pass hiring software",
   "Writing tips to make your wording stronger",
-  "Free PDF download with no watermark",
+  // Follows the payments switch, like every other price claim on the site
+  siteConfig.download.enabled ? `${siteConfig.download.price} per CV, no watermark` : "Free PDF download with no watermark",
 ];
 
 // Three different designs so the stack shows real variety
