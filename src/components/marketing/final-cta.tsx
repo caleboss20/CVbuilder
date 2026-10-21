@@ -8,7 +8,7 @@ import { InView } from "./in-view";
 
 const perks = [
   "Templates that pass hiring software",
-  "AI help to make your wording stronger",
+  "Writing tips to make your wording stronger",
   "Free PDF download with no watermark",
 ];
 

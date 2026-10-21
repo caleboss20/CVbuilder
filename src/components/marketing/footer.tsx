@@ -58,7 +58,7 @@ export function Footer() {
           <Logo />
           <p className="mt-5 text-sm leading-relaxed text-fg/55">
             {siteConfig.name} helps students and fresh graduates in Ghana build professional CVs, with
-            clean templates, real examples for many courses and AI help with the wording.
+            clean templates, real examples for many courses and writing tips for the wording.
           </p>
           <ButtonLink href="/builder" className="mt-6">
             Create my CV

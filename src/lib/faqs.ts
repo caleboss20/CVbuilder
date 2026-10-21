@@ -7,7 +7,7 @@ const { enabled: paid, price, days } = siteConfig.download;
 export const faqs: Faq[] = [
   {
     q: "What is CV11 and how does it work?",
-    a: "CV11 is a free CV builder made for students and fresh graduates in Ghana. Pick a template, answer simple questions about your course, projects and activities, let the AI tidy up your wording, then download a clean PDF. Most students finish their first CV in one sitting.",
+    a: "CV11 is a free CV builder made for students and fresh graduates in Ghana. Pick a template, answer simple questions about your course, projects and activities, use the writing coach to tidy up your wording, then download a clean PDF. Most students finish their first CV in one sitting.",
   },
   {
     q: paid ? "How much does CV11 cost?" : "Is CV11 really free for students?",
@@ -38,8 +38,8 @@ export const faqs: Faq[] = [
     a: "Yes. The free CV checker lets you upload a PDF or Word CV, add the job you want and pick your industry. You get a score out of 100 and clear steps to improve it. Your file is read in your browser and is never uploaded.",
   },
   {
-    q: "Can the AI write my whole CV for me?",
-    a: "It helps, but you stay in charge. Type what you did in your own words and the AI suggests a stronger, clearer line. Always check that every suggestion is true for you, because recruiters will ask about it in the interview.",
+    q: "Can AI write my whole CV for me?",
+    a: "AI suggestions are being tested and are coming to students soon. Today the writing coach points out weak lines as you type, and you stay in charge. Whatever tool you use, check that every line is true for you, because recruiters will ask about it in the interview.",
   },
   {
     q: "Should I add a photo to my CV?",

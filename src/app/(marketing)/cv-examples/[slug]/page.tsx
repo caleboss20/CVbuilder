@@ -117,7 +117,7 @@ export default async function CvExamplePage({ params }: PageProps<"/cv-examples/
             <div className="rounded-xl border border-brand-400/30 bg-linear-to-b from-brand-600/25 to-ink-900 p-6">
               <h2 className="text-lg font-medium text-fg">Make yours in minutes</h2>
               <p className="mt-2 text-sm text-fg/65">
-                Start from this example, swap in your own details and let the AI polish your wording.
+                Start from this example, swap in your own details and polish your wording.
               </p>
               <ButtonLink href="/builder" className="mt-5 w-full">
                 Use this example

@@ -15,7 +15,7 @@ export function AiDemo() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           id="ai-demo-heading"
-          eyebrow="AI writing assistant"
+          eyebrow="AI writing assistant (coming soon)"
           title={
             <>
               Type it <em>your way</em>. Get it <em>recruiter-ready</em>.

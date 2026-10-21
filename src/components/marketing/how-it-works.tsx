@@ -16,7 +16,7 @@ const steps: { title: string; body: string; visual: ReactNode }[] = [
   },
   {
     title: "Fill in your details",
-    body: "Answer simple questions about your course, projects and activities. Stuck on what to say? The AI suggests stronger lines as you type.",
+    body: "Answer simple questions about your course, projects and activities. Stuck on what to say? The writing coach points out weak lines as you type.",
     visual: <FillDetailsVisual />,
   },
   {

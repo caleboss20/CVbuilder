@@ -102,8 +102,8 @@ export function Hero() {
         </h1>
 
         <p className="animate-fade-up mx-auto mt-6 max-w-xl text-base text-fg/65 [animation-delay:160ms] sm:text-lg">
-          The free CV builder made for students. Pick a template, let AI help
-          with your wording and download a professional PDF in minutes.
+          The free CV builder made for students. Pick a template, get
+          help with your wording and download a professional PDF in minutes.
         </p>
 
         <div className="animate-fade-up relative z-10 mt-9 flex flex-col items-center justify-center gap-3 [animation-delay:240ms] sm:flex-row">

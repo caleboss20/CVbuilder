@@ -21,8 +21,8 @@ const problems: {
   {
     title: "Weak wording",
     problem: "“I helped with stuff” won’t impress a recruiter. But what else do you write?",
-    fixTitle: "AI writes it stronger",
-    fix: "Write it the way you’d say it. Our AI turns it into strong bullet points recruiters actually read.",
+    fixTitle: "The coach makes it stronger",
+    fix: "Write it the way you’d say it. Our writing coach shows you how to turn it into strong bullet points recruiters actually read.",
     icon: (
       <path d="M4 20h4L19 9l-4-4L4 16zM13 7l4 4" />
     ),

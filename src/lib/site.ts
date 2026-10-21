@@ -3,7 +3,7 @@ export const siteConfig = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://cv11.com",
   title: "Free CV Builder for Students & Graduates | CV11",
   description:
-    "Create a professional, ATS-friendly CV in minutes. CV11 is the free CV builder for students and graduates, with modern templates, AI writing help and instant PDF downloads.",
+    "Create a professional, ATS-friendly CV in minutes. CV11 is the free CV builder for students and graduates, with modern templates, a writing coach, a CV checker and instant PDF downloads.",
   keywords: [
     "CV builder",
     "free CV maker",

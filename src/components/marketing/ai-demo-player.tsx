@@ -241,7 +241,7 @@ export function AiDemoPlayer() {
         </div>
 
         <p className="mt-5 border-t border-fg/10 pt-4 text-xs text-fg/35">
-          Demo uses sample suggestions. The full AI assistant works inside the builder.
+          Demo uses sample suggestions. The AI assistant is being tested and will open to students soon.
         </p>
       </div>
 
