@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { claimCertificate, eventInfo, type ClaimResult } from "@/lib/cert-share";
+import { claimCertificate, eventInfo, registerName, type ClaimResult, type RegisterStatus } from "@/lib/cert-share";
 import { buildCombinedPdf, previewCertificate } from "@/lib/certificates";
 import { fileNameFor } from "@/lib/certificate-names";
 import { saveFile } from "@/lib/save-file";
@@ -19,6 +19,17 @@ const MESSAGES: Record<Exclude<ClaimResult["status"], "ok">, string> = {
   code: "That event code is not right. Ask the organiser for it.",
   busy: "Too many tries just now. Please wait a minute and try again.",
   gone: "This link has expired or was removed. Ask the organiser for a new one.",
+  wait: "The organiser has not released the certificates yet. Please come back to this link later.",
+};
+
+/** What to tell a person after they try to add their name. */
+const REGISTER_MESSAGES: Record<Exclude<RegisterStatus, "registered">, string> = {
+  full: "This event is full, so your name could not be added. Tell the organiser.",
+  closed: "Names are no longer being collected. Reload this page to get your certificate.",
+  code: MESSAGES.code,
+  busy: MESSAGES.busy,
+  short: "Please type your full name.",
+  gone: MESSAGES.gone,
 };
 
 /**
@@ -29,11 +40,12 @@ const MESSAGES: Record<Exclude<ClaimResult["status"], "ok">, string> = {
 export function ClaimCertificate() {
   const slug = useSearchParams().get("e") ?? "";
   // undefined while loading, null when the link is no good
-  const [info, setInfo] = useState<{ title: string; needsCode: boolean } | null | undefined>(undefined);
+  const [info, setInfo] = useState<{ title: string; needsCode: boolean; registering: boolean } | null | undefined>(undefined);
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [registeredAs, setRegisteredAs] = useState("");
   const [found, setFound] = useState<{ name: string; settings: Extract<ClaimResult, { status: "ok" }>["settings"]; preview: PreviewPage } | null>(null);
 
   useEffect(() => {
@@ -45,6 +57,16 @@ export function ClaimCertificate() {
       cancelled = true;
     };
   }, [slug]);
+
+  async function register(e: React.FormEvent) {
+    e.preventDefault();
+    setMessage("");
+    setBusy(true);
+    const result = await registerName(slug, name, code);
+    setBusy(false);
+    if (result === "registered") setRegisteredAs(name.trim());
+    else setMessage(REGISTER_MESSAGES[result]);
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -72,6 +94,38 @@ export function ClaimCertificate() {
 
   if (info === undefined) return <p className="text-center text-fg/60">Loading…</p>;
   if (info === null) return <p className="text-center text-fg/70">{MESSAGES.gone}</p>;
+
+  // While the organiser is still collecting names, the page is a sign-up, not a download
+  if (info.registering) {
+    return (
+      <div className="mx-auto max-w-xl">
+        <p className="text-center text-sm text-fg/60">{info.title}</p>
+        {registeredAs ? (
+          <p className="mt-4 rounded-xl border border-fg/10 bg-fg/[0.03] p-5 text-center text-fg/80" role="status">
+            Thank you, {registeredAs}. Your name is on the list. When the organiser releases the certificates, open this same link to download yours.
+          </p>
+        ) : (
+          <form onSubmit={register} className="mt-4 space-y-4 rounded-xl border border-fg/10 bg-fg/[0.03] p-5 sm:p-6">
+            <p className="text-sm text-fg/70">Type your name exactly as you want it on your certificate.</p>
+            <label className="block text-sm font-medium text-fg/80">
+              Your full name
+              <input value={name} onChange={(e) => setName(e.target.value)} className={input} placeholder="e.g. Akosua Mensah" autoComplete="name" required />
+            </label>
+            {info.needsCode && (
+              <label className="block text-sm font-medium text-fg/80">
+                Event code (from the organiser)
+                <input value={code} onChange={(e) => setCode(e.target.value)} className={input} autoComplete="off" required />
+              </label>
+            )}
+            <button type="submit" disabled={busy} className={button}>
+              {busy ? "Adding…" : "Add my name"}
+            </button>
+            {message && <p className="text-sm text-amber-300" role="alert">{message}</p>}
+          </form>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-xl">

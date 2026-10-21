@@ -10,6 +10,9 @@
 --   * cert_event_create() the organiser (signed in) creates an event with its names in one step
 --   * cert_event_info()   the claim page asks for the event title and whether it needs a code
 --   * cert_claim()        a person asks for their own certificate: by name, plus the code if one is set
+--   * cert_event_open()   an event where people ADD THEIR OWN names (registration), released by the organiser
+--   * cert_register()     a person adds their own name while registration is open
+--   * cert_event_release() the organiser opens the certificates for download
 -- Events expire (90 days by default) and the organiser can delete one at any time.
 
 -- ---------------------------------------------------------------- tables
@@ -23,6 +26,11 @@ create table if not exists public.cert_events (
   created_at timestamptz not null default now(),
   expires_at timestamptz not null
 );
+-- 'list': the organiser pasted the names. 'register': people add their own names, then the organiser
+-- releases the certificates (released = true). cap is the most names the event may hold.
+alter table public.cert_events add column if not exists mode text not null default 'list' check (mode in ('list', 'register'));
+alter table public.cert_events add column if not exists released boolean not null default true;
+alter table public.cert_events add column if not exists cap integer not null default 500 check (cap between 1 and 500);
 create index if not exists cert_events_owner on public.cert_events (owner);
 
 create table if not exists public.cert_recipients (
@@ -104,7 +112,7 @@ set search_path = public
 stable
 as $$
   select coalesce(
-    (select jsonb_build_object('title', title, 'needsCode', code is not null)
+    (select jsonb_build_object('title', title, 'needsCode', code is not null, 'registering', mode = 'register' and not released)
        from public.cert_events where slug = p_slug and expires_at > now()),
     jsonb_build_object('gone', true));
 $$;
@@ -136,6 +144,7 @@ begin
   if ev.code is not null and lower(btrim(coalesce(p_code, ''))) <> lower(ev.code) then
     return jsonb_build_object('status', 'code');
   end if;
+  if not ev.released then return jsonb_build_object('status', 'wait'); end if;
   if char_length(q) < 3 then return jsonb_build_object('status', 'none'); end if;
 
   -- An exact match wins; otherwise every word typed must start a word of the name
@@ -154,8 +163,76 @@ begin
 end;
 $$;
 
+-- ------------------------------------------------ an event where people add their own names
+create or replace function public.cert_event_open(p_title text, p_settings jsonb, p_code text, p_days integer, p_cap integer)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $
+declare
+  me uuid := auth.uid();
+  new_slug text;
+begin
+  if me is null then raise exception 'sign in first'; end if;
+  if length(p_settings::text) > 900000 then raise exception 'design too large'; end if;
+  if (select count(*) from public.cert_events where owner = me and expires_at > now()) >= 20 then
+    raise exception 'too many active events';
+  end if;
+  new_slug := substr(replace(gen_random_uuid()::text, '-', ''), 1, 10);
+  insert into public.cert_events (owner, slug, title, settings, code, expires_at, mode, released, cap)
+  values (me, new_slug, left(btrim(p_title), 120), p_settings, nullif(btrim(coalesce(p_code, '')), ''),
+          now() + make_interval(days => greatest(1, least(coalesce(p_days, 90), 365))),
+          'register', false, greatest(1, least(coalesce(p_cap, 500), 500)));
+  return new_slug;
+end;
+$;
+
+-- A person adds their own name while registration is open.
+-- Returns 'registered' | 'full' | 'closed' | 'code' | 'busy' | 'short' | 'gone'
+create or replace function public.cert_register(p_slug text, p_name text, p_code text)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $
+declare
+  ev public.cert_events;
+  clean text := left(regexp_replace(btrim(coalesce(p_name, '')), '\s+', ' ', 'g'), 120);
+begin
+  select * into ev from public.cert_events where slug = p_slug;
+  if not found or ev.expires_at <= now() then return 'gone'; end if;
+  if ev.mode <> 'register' or ev.released then return 'closed'; end if;
+  delete from public.cert_lookups where at < now() - interval '1 hour';
+  if (select count(*) from public.cert_lookups where event_id = ev.id and at > now() - interval '1 minute') >= 40 then return 'busy'; end if;
+  insert into public.cert_lookups (event_id) values (ev.id);
+  if ev.code is not null and lower(btrim(coalesce(p_code, ''))) <> lower(ev.code) then return 'code'; end if;
+  if char_length(clean) < 3 then return 'short'; end if;
+  -- Registering twice is harmless
+  if exists (select 1 from public.cert_recipients where event_id = ev.id and name_key = public.cert_key(clean)) then return 'registered'; end if;
+  if (select count(*) from public.cert_recipients where event_id = ev.id) >= ev.cap then return 'full'; end if;
+  insert into public.cert_recipients (event_id, name, name_key) values (ev.id, clean, public.cert_key(clean));
+  return 'registered';
+end;
+$;
+
+-- The organiser opens (or closes again) the certificates for download
+create or replace function public.cert_event_release(p_id uuid, p_released boolean)
+returns void
+language sql
+security definer
+set search_path = public
+as $
+  update public.cert_events set released = p_released where id = p_id and owner = auth.uid();
+$;
+
 -- Who may call what: the claim functions are public; creating needs a signed-in person
 revoke all on function public.cert_event_create(text, jsonb, text, text[], integer) from public, anon;
 grant execute on function public.cert_event_create(text, jsonb, text, text[], integer) to authenticated;
+revoke all on function public.cert_event_open(text, jsonb, text, integer, integer) from public, anon;
+grant execute on function public.cert_event_open(text, jsonb, text, integer, integer) to authenticated;
+revoke all on function public.cert_event_release(uuid, boolean) from public, anon;
+grant execute on function public.cert_event_release(uuid, boolean) to authenticated;
+grant execute on function public.cert_register(text, text, text) to anon, authenticated;
 grant execute on function public.cert_event_info(text) to anon, authenticated;
 grant execute on function public.cert_claim(text, text, text) to anon, authenticated;
