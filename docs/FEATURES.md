@@ -356,7 +356,7 @@ Before the first request the student sees a note (once per device): only the tex
 1. **Choose a template**: a gallery of all 23 designs (thumbnails are drawn once, each in its own colours, one after another), then a colour row (Navy, Emerald, Burgundy, Royal blue, Purple, Black).
 2. **Add the names**: paste a list; a live count and notes ("fixed capital letters on 12 · removed 3 repeated"); a *Try it with sample Ghanaian names* button.
 3. **What it says**: kind of certificate, event, date (defaults to today, set after load so the prerendered page never depends on the clock), organised by, the sentence under the name, and the line under CERTIFICATE.
-4. **Who signs**: up to two signers (name and title) and an optional drawn signature for the first.
+4. **Who signs**: up to two signers (name and title), each with their own optional drawn or uploaded signature pad. A second signer appears on the certificate once they have a name or a signature.
 5. **Your logo (optional)**: choose a picture, drag it on the preview, resize with a slider, or put it back.
 
 A live preview sticks beside the form (or below on a phone), with arrows to step through the names, and the download buttons.

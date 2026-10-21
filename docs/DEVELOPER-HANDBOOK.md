@@ -168,7 +168,8 @@ The charged amount is `pay_settings.price_pesewas` (700 = GH₵ 7) and the windo
   subtitle; intro; body: string;          // body has {event} {date} {issuer}
   event; date; issuer: string;
   signer1; signer2: { name; title };
-  signature: string;                      // PNG data URL or ""
+  signature: string;                      // first signer's signature, PNG data URL or ""
+  signature2: string;                     // second signer's signature
   logo: string;                           // PNG data URL or ""
   logoPlace?: { x; y; w };                // fractions of the page: centre x, centre y, width
 }

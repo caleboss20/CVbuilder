@@ -359,9 +359,20 @@ export function CertificateMaker() {
             <Field label="Their title" value={settings.signer2.title} onChange={(title) => set({ signer2: { ...settings.signer2, title } })} placeholder="President" />
           </div>
           <details className="rounded-lg border border-fg/10 p-4">
-            <summary className="cursor-pointer text-sm font-medium text-fg/80">Add the first signer&apos;s signature (optional)</summary>
+            <summary className="cursor-pointer text-sm font-medium text-fg/80">
+              Add {settings.signer1.name.trim() || "the first signer"}&apos;s signature (optional)
+            </summary>
             <div className="mt-4">
-              <SignaturePad value={settings.signature} onChange={(signature) => set({ signature })} />
+              <SignaturePad value={settings.signature} onChange={(signature) => set({ signature })} note="Shown above their name on every certificate in this batch." />
+            </div>
+          </details>
+          {/* Each signer has their own pad, so two people can sign the same certificate */}
+          <details className="rounded-lg border border-fg/10 p-4">
+            <summary className="cursor-pointer text-sm font-medium text-fg/80">
+              Add {settings.signer2.name.trim() || "the second signer"}&apos;s signature (optional)
+            </summary>
+            <div className="mt-4">
+              <SignaturePad value={settings.signature2} onChange={(signature2) => set({ signature2 })} note="Shown above their name on every certificate in this batch." />
             </div>
           </details>
         </section>

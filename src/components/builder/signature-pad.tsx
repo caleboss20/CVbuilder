@@ -119,7 +119,16 @@ const buttonClass =
  * clear, so they can pause and carry on), or upload a photo of their signature. Nothing is saved
  * until they press "Use this signature". `onChange` receives a cropped PNG data URL, or "" if removed.
  */
-export function SignaturePad({ value, onChange }: { value: string; onChange: (dataUrl: string) => void }) {
+export function SignaturePad({
+  value,
+  onChange,
+  note = "Saved on this device and shown above your name on every letter.",
+}: {
+  value: string;
+  onChange: (dataUrl: string) => void;
+  /** The small line under the pad, for places where "on every letter" is not what happens. */
+  note?: string;
+}) {
   const [mode, setMode] = useState<"draw" | "upload">("draw");
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [undone, setUndone] = useState<Stroke[]>([]);
@@ -247,7 +256,7 @@ export function SignaturePad({ value, onChange }: { value: string; onChange: (da
             </button>
           </div>
         </div>
-        <p className="mt-1.5 text-xs text-fg/45">Saved on this device and shown above your name on every letter.</p>
+        <p className="mt-1.5 text-xs text-fg/45">{note}</p>
       </fieldset>
     );
   }

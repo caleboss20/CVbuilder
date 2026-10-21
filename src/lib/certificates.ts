@@ -37,6 +37,8 @@ export type CertSettings = {
   signer2: Signer;
   /** The first signer's signature as a PNG data URL, or "". */
   signature: string;
+  /** The second signer's signature as a PNG data URL, or "". */
+  signature2: string;
   /** The organiser's logo as a PNG data URL, or "". */
   logo: string;
   /**
@@ -106,6 +108,7 @@ export function defaultSettings(): CertSettings {
     signer1: { name: "", title: "" },
     signer2: { name: "", title: "" },
     signature: "",
+    signature2: "",
     logo: "",
   };
 }
@@ -216,11 +219,12 @@ export function dataUrlBytes(dataUrl: string): Uint8Array {
 }
 
 type EmbeddedImage = Awaited<ReturnType<PDFDocument["embedPng"]>>;
-type Images = { signature: EmbeddedImage | null; logo: EmbeddedImage | null };
+type Images = { signature: EmbeddedImage | null; signature2: EmbeddedImage | null; logo: EmbeddedImage | null };
 
 async function embedImages(doc: PDFDocument, settings: CertSettings): Promise<Images> {
   return {
     signature: settings.signature ? await doc.embedPng(dataUrlBytes(settings.signature)) : null,
+    signature2: settings.signature2 ? await doc.embedPng(dataUrlBytes(settings.signature2)) : null,
     logo: settings.logo ? await doc.embedPng(dataUrlBytes(settings.logo)) : null,
   };
 }
@@ -279,14 +283,16 @@ function drawCertificate(doc: PDFDocument, fonts: Fonts, settings: CertSettings,
     .forEach((text, i) => drawCentred(page, text, bodyFont, 13.5, L.cx, L.body + i * 20, L.ink));
 
   // Signers
-  const signers = [settings.signer1, settings.signer2].filter((s, i) => i === 0 || s.name.trim());
+  const signers = [settings.signer1, settings.signer2].filter((s, i) => i === 0 || s.name.trim() || (i === 1 && settings.signature2));
+  const signatures = [images.signature, images.signature2];
   const centres = L.slots(signers.length > 1);
   signers.forEach((signer, i) => {
     const c = centres[i];
     line(page, [c - 78, L.sig], [c + 78, L.sig], 1, L.ink);
-    if (i === 0 && images.signature) {
-      const scale = Math.min(140 / images.signature.width, 50 / images.signature.height);
-      page.drawImage(images.signature, { x: c - (images.signature.width * scale) / 2, y: Y(L.sig - 4), width: images.signature.width * scale, height: images.signature.height * scale });
+    const signature = signatures[i];
+    if (signature) {
+      const scale = Math.min(140 / signature.width, 50 / signature.height);
+      page.drawImage(signature, { x: c - (signature.width * scale) / 2, y: Y(L.sig - 4), width: signature.width * scale, height: signature.height * scale });
     }
     const signerName = signer.name.trim();
     const signerTitle = signer.title.trim();
