@@ -169,7 +169,7 @@ returns text
 language plpgsql
 security definer
 set search_path = public
-as $
+as $$
 declare
   me uuid := auth.uid();
   new_slug text;
@@ -186,7 +186,7 @@ begin
           'register', false, greatest(1, least(coalesce(p_cap, 500), 500)));
   return new_slug;
 end;
-$;
+$$;
 
 -- A person adds their own name while registration is open.
 -- Returns 'registered' | 'full' | 'closed' | 'code' | 'busy' | 'short' | 'gone'
@@ -195,7 +195,7 @@ returns text
 language plpgsql
 security definer
 set search_path = public
-as $
+as $$
 declare
   ev public.cert_events;
   clean text := left(regexp_replace(btrim(coalesce(p_name, '')), '\s+', ' ', 'g'), 120);
@@ -214,7 +214,7 @@ begin
   insert into public.cert_recipients (event_id, name, name_key) values (ev.id, clean, public.cert_key(clean));
   return 'registered';
 end;
-$;
+$$;
 
 -- The organiser opens (or closes again) the certificates for download
 create or replace function public.cert_event_release(p_id uuid, p_released boolean)
@@ -222,9 +222,9 @@ returns void
 language sql
 security definer
 set search_path = public
-as $
+as $$
   update public.cert_events set released = p_released where id = p_id and owner = auth.uid();
-$;
+$$;
 
 -- Who may call what: the claim functions are public; creating needs a signed-in person
 revoke all on function public.cert_event_create(text, jsonb, text, text[], integer) from public, anon;
