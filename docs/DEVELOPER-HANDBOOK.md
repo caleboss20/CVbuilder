@@ -116,7 +116,7 @@ Model: set `GEMINI_MODEL` (the default is in `src/server/ai/config.ts`). **Check
 
 ### 2.12 Change prices
 
-The charged amount is `pay_settings.price_pesewas` (700 = GH₵ 7) and the window is `valid_days`. Update `siteConfig.download.price` and `days` so the words match. Existing paid rows keep what they paid.
+The charged amount is `pay_settings.price_pesewas` (500 = GH₵ 5) and the window is `valid_days`. Update `siteConfig.download.price` and `days` so the words match. Existing paid rows keep what they paid.
 
 ---
 

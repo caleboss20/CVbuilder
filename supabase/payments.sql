@@ -1,4 +1,4 @@
--- Payments for CV11: GH₵ 7 unlocks downloading one CV for 30 days.
+-- Payments for CV11: GH₵ 5 unlocks downloading one CV for 30 days.
 -- Run this once in Supabase: SQL Editor > New query > paste > Run. It is safe to run again.
 --
 -- The app only ever uses the public anon key, never the service-role key, so the rules live here:
@@ -15,7 +15,7 @@
 -- ---------------------------------------------------------------- settings
 create table if not exists public.pay_settings (
   id boolean primary key default true check (id),              -- one row only
-  price_pesewas integer not null default 700,                  -- 700 pesewas = GH₵ 7
+  price_pesewas integer not null default 500,                  -- 500 pesewas = GH₵ 5
   valid_days integer not null default 30,                      -- how long one payment keeps downloads open
   confirm_secret text not null default replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', '')
 );

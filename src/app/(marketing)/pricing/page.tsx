@@ -7,7 +7,7 @@ import { templates } from "@/lib/templates";
 const { enabled: paid, price, days } = siteConfig.download;
 
 export const metadata: Metadata = {
-  title: paid ? "Pricing: Free to Build, GH₵ 7 to Download" : "Pricing: Free CV Builder for Students",
+  title: paid ? "Pricing: Free to Build, GH₵ 5 to Download" : "Pricing: Free CV Builder for Students",
   description: paid
     ? `Building your CV, the templates, the CV checker and the letters are free. Downloading a finished CV is ${price}, paid once with mobile money or a card, with no subscription.`
     : "CV11 is free for students: the CV builder, templates, PDF downloads, letters and more.",

@@ -5,10 +5,11 @@ import { AuthForm } from "@/components/auth/auth-form";
 import { useUser } from "@/components/auth/use-user";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { fetchAdminStats, type AdminError, type AdminStats, type DailyPoint } from "@/lib/admin-stats";
+import { fetchAdminOverview, fetchAdminStats, type AdminError, type AdminOverview, type AdminStats, type DailyPoint } from "@/lib/admin-stats";
 import { authConfigured } from "@/lib/auth-config";
 import { getSupabase } from "@/lib/supabase";
 import { AreaChart, shortDate } from "./area-chart";
+import { OverviewPanels } from "./overview-panels";
 
 const RANGES = [
   { days: 7, label: "7 days" },
@@ -48,6 +49,9 @@ export function AdminDashboard() {
   const [days, setDays] = useState<number>(30);
   const [series, setSeries] = useState<(typeof SERIES)[number]["key"]>("people");
   const [stats, setStats] = useState<AdminStats | null>(null);
+  // Money, certificates and the rest; missing when supabase/admin-more.sql has not been run
+  const [overview, setOverview] = useState<AdminOverview | null>(null);
+  const [overviewMissing, setOverviewMissing] = useState(false);
   const [error, setError] = useState<AdminError | null>(null);
   // The technical reason, shown so a failure can be fixed instead of guessed at
   const [detail, setDetail] = useState("");
@@ -56,7 +60,9 @@ export function AdminDashboard() {
   const load = useCallback(
     async (period: number) => {
       setBusy(true);
-      const result = await fetchAdminStats(period, token);
+      const [result, more] = await Promise.all([fetchAdminStats(period, token), fetchAdminOverview(period, token)]);
+      if ("overview" in more) setOverview(more.overview);
+      setOverviewMissing("missing" in more && more.missing);
       if ("stats" in result) {
         setStats(result.stats);
         setError(null);
@@ -109,7 +115,13 @@ export function AdminDashboard() {
         <span className="mt-3 block break-words font-mono text-xs text-afg/50">{detail || "no details"}</span>
       </Notice>
     );
-  else if (stats) body = <Panels stats={stats} series={series} onSeries={setSeries} />;
+  else if (stats)
+    body = (
+      <>
+        <Panels stats={stats} series={series} onSeries={setSeries} />
+        <OverviewPanels overview={overview} missing={overviewMissing} />
+      </>
+    );
 
   return (
     <div className="min-h-screen bg-abg text-afg">

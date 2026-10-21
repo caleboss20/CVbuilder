@@ -29,7 +29,7 @@ export const siteConfig = {
    */
   download: {
     enabled: process.env.NEXT_PUBLIC_PAYMENTS_ENABLED === "true",
-    price: "GH₵ 7",
+    price: "GH₵ 5",
     days: 30,
   },
   /**

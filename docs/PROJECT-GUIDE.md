@@ -127,7 +127,7 @@ Free batches are limited to the first **10** names (a setting in `src/lib/site.t
 
 ### 3.9 Payments (Built, off)
 
-Sign up, then pay GH₵ 7 through Paystack (mobile money or card), then download. One payment unlocks one CV (and all its versions) for 30 days. The price and rules live in the database. Our server asks Paystack directly whether the money arrived before unlocking anything. Nothing is charged and no wording on the site changes until a single switch is turned on (see 13).
+Sign up, then pay GH₵ 5 through Paystack (mobile money or card), then download. One payment unlocks one CV (and all its versions) for 30 days. The price and rules live in the database. Our server asks Paystack directly whether the money arrived before unlocking anything. Nothing is charged and no wording on the site changes until a single switch is turned on (see 13).
 
 ### 3.10 Owner tools (Live)
 
@@ -141,7 +141,7 @@ These are the designed models and the cost facts behind them. **No revenue figur
 
 **Revenue streams**
 
-1. **CV download, GH₵ 7 per CV (built, off).** Free to build and preview; pay once when downloading. One payment covers that CV, in PDF and Word and in all its versions, for 30 days, so fixing a typo costs nothing. Priced just under a local competitor's GH₵ 9.
+1. **CV download, GH₵ 5 per CV (built, off).** Free to build and preview; pay once when downloading. One payment covers that CV, in PDF and Word and in all its versions, for 30 days, so fixing a typo costs nothing. Priced just under a local competitor's GH₵ 9.
 2. **Bulk certificates (free tier live, paid tiers planned).** Free up to 15 per batch. Proposed tiers, still to be tested with real organisers: about GH₵ 20 for up to 50, GH₵ 50 for up to 200, GH₵ 100 for up to 500. Organisers have budgets that students do not, and a printed certificate costs a few cedis, so a few pesewas each is an easy yes. The strongest planned paid features are ones that cannot be bypassed in the browser: a QR code on each certificate that opens a "this certificate is real" page, and a sign-up link so attendees add their own names.
 3. **Possible later:** club plans for organisations that issue certificates every month, recipient-pays experiments, and a Pro plan for AI help. These are ideas, not commitments.
 
@@ -149,10 +149,10 @@ These are the designed models and the cost facts behind them. **No revenue figur
 
 - **Hosting:** Vercel. **Database and sign-in:** Supabase. Both have free tiers that cover early use.
 - **PDF and Word generation run on the student's device**, so there is no per-file server cost.
-- **Payments:** Paystack charges about 1.95% per transaction in Ghana (a GH₵ 7 payment leaves about GH₵ 6.86).
+- **Payments:** Paystack charges about 1.95% per transaction in Ghana (a GH₵ 5 payment leaves about GH₵ 4.90).
 - **AI:** Google's Gemini free tier. The chosen model (Flash-Lite) allows about 500 requests a day and 15 a minute at no cost; the free tier may use submitted text to improve Google products, which is why consent is asked. If the free limits are outgrown, paid use is estimated at well under a cent per rewrite. A request limit in the database keeps spend predictable either way.
 
-**Break-even intuition.** With near-zero fixed costs, the business is limited by acquisition, not by cost of service. Whether students will pay GH₵ 7 is the key unknown. The plan is to launch, measure how many reach the pay screen and how many finish, and adjust the price (it is one value in the database).
+**Break-even intuition.** With near-zero fixed costs, the business is limited by acquisition, not by cost of service. Whether students will pay GH₵ 5 is the key unknown. The plan is to launch, measure how many reach the pay screen and how many finish, and adjust the price (it is one value in the database).
 
 ---
 
@@ -181,14 +181,14 @@ These are the designed models and the cost facts behind them. **No revenue figur
 | Admin analytics and AI lab | Live (owner only) | |
 | Bulk certificates (23 designs, logo, upload-your-own, ZIP, free 10 per batch) | Live | Charging beyond the free amount is designed but not built (`FEATURES.md` 15.9) |
 | AI writing help and voice clean-up | Built, owner-only | Needs `supabase/ai.sql` run, a Gemini key, and `AI_ACCESS=everyone` to open |
-| Payments (Paystack, GH₵ 7 per CV) | Built, off | Needs Paystack keys, `supabase/payments.sql`, and `NEXT_PUBLIC_PAYMENTS_ENABLED=true`. Not tested with real money |
+| Payments (Paystack, GH₵ 5 per CV) | Built, off | Needs Paystack keys, `supabase/payments.sql`, and `NEXT_PUBLIC_PAYMENTS_ENABLED=true`. Not tested with real money |
 | Certificate QR verification page | Planned | Needs a database table and a public page |
 | Paid certificate batches | Planned | Reuses the payment system; needs Paystack first |
 | Logo upload on CVs, Pro AI plan, Google sign-in | Not started | |
 
 ### 6.2 Known limits and risks (read these)
 
-- **Paywall strength.** PDFs are generated in the browser, so the download gate is enforced in the browser. A technically skilled person could bypass it (for example by printing the preview). For a GH₵ 7 product aimed at mostly non-technical students, this was judged acceptable at launch. Real enforcement would need server-side generation, which conflicts with the privacy promise (decision D2).
+- **Paywall strength.** PDFs are generated in the browser, so the download gate is enforced in the browser. A technically skilled person could bypass it (for example by printing the preview). For a GH₵ 5 product aimed at mostly non-technical students, this was judged acceptable at launch. Real enforcement would need server-side generation, which conflicts with the privacy promise (decision D2).
 - **The free certificate limit is also browser-side.** Someone can paste the next 15 names and download again. Real limits need accounts and server records, which the planned verification feature provides.
 - **No traction data in this document.** Read the admin dashboard for real numbers. Testimonials on the homepage are real students' words, but the wording and short headlines were written by the developer, and the students' consent to be quoted should be confirmed.
 - **Print-dialog downloads.** Saving a CV means passing through the browser's print dialog. Printing several in a row ("Download all" on the versions page) can be unreliable on phones; the page tells students to download one at a time there.
@@ -518,7 +518,7 @@ Every read and write is wrapped in try/catch, because private windows and blocke
 ### 12.2 Paying to download (built, off)
 
 1. Student taps Download. `useDownloadGate` checks the switch. With payments on: not signed in leads to `/signup`, remembering where to return (`cv11-resume-v1`); signed in leads to a database check `cv_access(cvId)`.
-2. If unpaid, a dialog offers **Pay GH₵ 7**. The browser calls `POST /api/pay/start` with the access token.
+2. If unpaid, a dialog offers **Pay GH₵ 5**. The browser calls `POST /api/pay/start` with the access token.
 3. The server (a) checks the token, (b) calls `payment_start` as that user, so **the database decides the price** and creates a pending row, (c) asks Paystack to initialise a transaction in GHS and returns the checkout URL.
 4. Paystack takes mobile money or card, then sends the student to `/pay/return`.
 5. `/pay/return` calls `POST /api/pay/verify`. The server asks **Paystack directly** for the transaction and, if it succeeded in GHS for the right reference, calls `payment_confirm` with the server-only secret. The row becomes `paid` with an expiry 30 days out.

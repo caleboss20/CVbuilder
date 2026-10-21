@@ -337,13 +337,13 @@ Before the first request the student sees a note (once per device): only the tex
 
 **Status: Built, off.** Files: `src/server/pay/*`, `src/app/api/pay/*`, `src/lib/payments.ts`, `src/components/builder/use-download-gate.tsx`, `pay-return.tsx`, `src/app/(marketing)/pay/return/page.tsx`, `supabase/payments.sql`.
 
-**What is sold:** GH₵ 7 unlocks **one CV** (identified by a random `cvId` stored with it) for **30 days**, covering PDF, Word and all its versions. Editing and re-downloading in that window is free. A new CV needs a new payment.
+**What is sold:** GH₵ 5 unlocks **one CV** (identified by a random `cvId` stored with it) for **30 days**, covering PDF, Word and all its versions. Editing and re-downloading in that window is free. A new CV needs a new payment.
 
-**The gate** (`useDownloadGate`): with `NEXT_PUBLIC_PAYMENTS_ENABLED` off, every download runs as before. With it on, **not signed in** shows a "Create a free account to download" dialog (and remembers `/builder?download=1` so the student returns after signing up, even after confirming an email in another tab); **signed in** calls `cv_access(cvId)`; **unpaid** shows the price, what it covers, the payment methods and a **Pay GH₵ 7** button; **paid (or the owner)** runs the download. After payment, `/builder?paid=1` shows a "You're all set" dialog with PDF and Word buttons (the print dialog needs a fresh tap).
+**The gate** (`useDownloadGate`): with `NEXT_PUBLIC_PAYMENTS_ENABLED` off, every download runs as before. With it on, **not signed in** shows a "Create a free account to download" dialog (and remembers `/builder?download=1` so the student returns after signing up, even after confirming an email in another tab); **signed in** calls `cv_access(cvId)`; **unpaid** shows the price, what it covers, the payment methods and a **Pay GH₵ 5** button; **paid (or the owner)** runs the download. After payment, `/builder?paid=1` shows a "You're all set" dialog with PDF and Word buttons (the print dialog needs a fresh tap).
 
 **The payment** is described step by step in the guide (section 12.2). Security properties worth knowing: the price comes from `pay_settings`, never from the browser; the **server asks Paystack** whether the money arrived (status success, currency GHS, matching reference) before unlocking; the confirmation database function needs a **secret** only the server holds; a signed **webhook** (HMAC-SHA512) covers a closed tab; confirming twice is safe. `/pay/return` asks up to 4 times, 2.5 seconds apart, then tells the student not to pay again and offers WhatsApp help.
 
-**Copy follows the switch.** `siteConfig.download.enabled` rewrites the hero line, the final call to action, the FAQ, the About page, the share image, the Terms (adds Payments and refunds), the Privacy page (adds Payments) and the Pricing page (adds the GH₵ 7 card).
+**Copy follows the switch.** `siteConfig.download.enabled` rewrites the hero line, the final call to action, the FAQ, the About page, the share image, the Terms (adds Payments and refunds), the Privacy page (adds Payments) and the Pricing page (adds the GH₵ 5 card).
 
 ---
 
@@ -479,3 +479,7 @@ Everyone may make and share up to the free number (15; the server's copy is `cer
 **Status: Built, needs `supabase/share.sql` re-run (adds `cert_event_update`, `cert_recipient_add`, `cert_recipient_rename`, `cert_recipient_remove`).** Files: `src/components/tools/event-manager.tsx`, `cert-share.ts`, `share-panel.tsx`.
 
 Each saved link has a **Manage** button. The organiser can change or clear the event code, keep the link working for 30/90/365 more days, add names (cleaned by `parseNames`, duplicates skipped, still limited by `cert_limit()`), correct a spelling and remove a person. Every function checks the event belongs to the caller. The design cannot be edited afterwards: make a new event. Removing a person also stops their verify QR from verifying.
+
+### Admin dashboard: money and certificates
+
+`supabase/admin-more.sql` adds `admin_overview(days)` (admin only). The dashboard (`src/components/admin/overview-panels.tsx`) shows, under the main numbers: money earned and paid downloads (period and all time), unpaid starts, downloads open now, the latest 10 payments with the payer's email, certificates made and batches, shared links (active, collecting names, people on them), certificates with a verify QR, organisers, active bigger-batch unlocks (from `cert_grants`), new accounts and AI use. If the SQL has not been run, the dashboard says so instead of failing. The same file also sets the CV price to GH₵ 5 (`pay_settings.price_pesewas`); the text price lives in `siteConfig.download.price`. Verify scans are not counted yet.

@@ -90,7 +90,7 @@ Status: the AI is currently switched on for the site owner only while quality is
 
 ### Payments
 
-Building and previewing a CV is free. Downloading it costs GH₵ 7, paid once through [Paystack](https://paystack.com) (mobile money or card), and unlocks that one CV for 30 days.
+Building and previewing a CV is free. Downloading it costs GH₵ 5, paid once through [Paystack](https://paystack.com) (mobile money or card), and unlocks that one CV for 30 days.
 
 - **Sign up, then pay, then download.** A student who taps Download without an account is sent to sign up, and is brought back to their CV afterwards, even after confirming an email in another tab.
 - **The server never trusts the browser.** The price and rules live in Postgres (`supabase/payments.sql`). Our server asks Paystack directly whether the money arrived, and only then calls a database function that unlocks the CV. That function needs a secret that only the server holds, so a student cannot mark their own payment as paid. Paystack's webhook is verified with an HMAC-SHA512 signature, and a payment is safe to confirm twice.

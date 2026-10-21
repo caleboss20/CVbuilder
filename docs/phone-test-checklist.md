@@ -49,7 +49,7 @@ Tick each one. Write down the phone and browser for anything that fails.
 
 ## 9. Pricing
 - [ ] `/pricing` with payments **off**: one card, "Free", with PDF and Word downloads listed as included. No Pro plan anywhere.
-- [ ] `/pricing` with payments **on** (`NEXT_PUBLIC_PAYMENTS_ENABLED=true`): a "Build" card (GH₵ 0) and a "Download" card (GH₵ 7 per CV). The price stays on one line and the badge sits on the card's top edge.
+- [ ] `/pricing` with payments **on** (`NEXT_PUBLIC_PAYMENTS_ENABLED=true`): a "Build" card (GH₵ 0) and a "Download" card (GH₵ 5 per CV). The price stays on one line and the badge sits on the card's top edge.
 
 ## 10. Everything else
 - [ ] Light and dark mode both look right (toggle in the top bar).

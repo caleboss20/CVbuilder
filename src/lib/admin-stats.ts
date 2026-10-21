@@ -65,3 +65,45 @@ export async function fetchAdminStats(days: number, accessToken: string | undefi
   // Anything else: keep the reason so it can be fixed
   return { error: "failed", detail: `${code}: ${message}` };
 }
+
+/** Money, certificates, shared events, unlocks and AI use. It mirrors what `admin_overview` (supabase/admin-more.sql) returns. */
+export type AdminOverview = {
+  days: number;
+  money: { price_pesewas: number; paid_total: number; revenue_total: number; paid_period: number; revenue_period: number; pending: number; active_access: number };
+  recent_payments: { paid_at: string; amount: number; email: string }[];
+  certificates: {
+    batches_period: number;
+    made_period: number;
+    made_total: number;
+    versions_period: number;
+    shared_events: number;
+    shared_active: number;
+    collecting: number;
+    shared_people: number;
+    verify_batches: number;
+    verify_certificates: number;
+    organisers: number;
+  };
+  grants: { email: string; max_names: number; expires_at: string; note: string | null }[];
+  signups_period: number;
+  ai: { used_period?: number; users_period?: number; used_today?: number };
+};
+
+/** Loads the second set of numbers. `missing` is true when supabase/admin-more.sql has not been run yet. */
+export async function fetchAdminOverview(days: number, accessToken: string | undefined): Promise<{ overview: AdminOverview } | { missing: boolean }> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key || !accessToken) return { missing: false };
+  try {
+    const response = await fetch(`${url}/rest/v1/rpc/admin_overview`, {
+      method: "POST",
+      headers: { apikey: key, Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ days }),
+    });
+    if (response.ok) return { overview: (await response.json()) as AdminOverview };
+    const body = (await response.json().catch(() => ({}))) as { code?: string };
+    return { missing: body.code === "PGRST202" || body.code === "42883" };
+  } catch {
+    return { missing: false };
+  }
+}
