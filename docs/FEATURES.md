@@ -445,3 +445,11 @@ Many organisers already have a certificate (a Canva PDF, or a photo or scan) and
 - **Content is data.** 30 course example pages, 3 blog guides (how to write a CV, CV versus resume, the national service CV), 8 letter guides, 9 interview-prep fields. Adding one is a new entry in a data file; the index page, the article page, the sitemap and the metadata all pick it up.
 - **Metadata:** every page sets a title and description; important pages set a canonical URL; personal pages (builder, versions, admin, pay return, auth) are `noindex`. `sitemap.ts` lists every public page, `robots.ts` controls crawling, `opengraph-image.tsx` generates the share picture at build time (so there is no image file to maintain), and the homepage carries `schema.org` JSON-LD for a web application.
 - **Writing rules for guides:** plain language for students in Ghana, **no invented statistics**, only advice a student can act on.
+
+### 15.10 Share one link (certificate events)
+
+**Status: Built, needs `supabase/share.sql` run once in Supabase.** Files: `supabase/share.sql`, `src/lib/cert-share.ts`, `src/components/tools/share-panel.tsx`, `src/components/tools/claim-certificate.tsx`, `src/app/(marketing)/claim/page.tsx`.
+
+A signed-in organiser (built-in designs only for now) taps "Make a link" under the download buttons. The design settings and the names are stored in `cert_events` / `cert_recipients`; the organiser shares ONE link (`/claim?e=<slug>`) and each person types their own name (plus an optional event code) to get only their own certificate, drawn in their own browser.
+
+Rules: names are never sent to the public (the `cert_claim()` function returns one matched person or a status); an exact name wins, otherwise every typed word must start a word of the name and exactly one person must match; at most 40 lookups a minute per event; links expire after 30/90/365 days; the organiser can delete one at any time; 20 active events per organiser; the list shares the free batch limit (`siteConfig.certificates.freeBatch`, 15). Not yet built: self-registration, personal-link list, QR, uploaded-design events.

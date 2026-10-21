@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { SharePanel } from "@/components/tools/share-panel";
 import { Field, TextArea } from "@/components/builder/fields";
 import { SignaturePad } from "@/components/builder/signature-pad";
 import { readLogo } from "@/lib/certificate-logo";
@@ -499,6 +500,7 @@ export function CertificateMaker() {
           {error && <p className="text-sm text-amber-300" role="alert">{error}</p>}
           <p className="text-xs text-fg/45">The ZIP holds one PDF per person, named after them. Your list never leaves this device.</p>
         </div>
+        <SharePanel settings={settings} names={names} />
       </div>
     </div>
   );
