@@ -500,7 +500,7 @@ export function CertificateMaker() {
           {error && <p className="text-sm text-amber-300" role="alert">{error}</p>}
           <p className="text-xs text-fg/45">The ZIP holds one PDF per person, named after them. Your list never leaves this device.</p>
         </div>
-        <SharePanel settings={settings} names={names} />
+        <SharePanel title={settings.event} build={() => settings} names={names} />
       </div>
     </div>
   );

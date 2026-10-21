@@ -7,7 +7,7 @@ import { useUser } from "@/components/auth/use-user";
 import { authConfigured } from "@/lib/auth-config";
 import { claimUrl, createRegisterEvent, createSharedEvent, deleteSharedEvent, listSharedEvents, setReleased, type SharedEvent } from "@/lib/cert-share";
 import { FREE_BATCH } from "@/lib/certificate-names";
-import type { CertSettings } from "@/lib/certificates";
+import type { SharedDesign } from "@/lib/cert-share";
 
 const field = "mt-1.5 block h-11 w-full rounded-md bg-fg/5 px-3.5 text-[15px] text-fg ring-1 ring-fg/15 focus:outline-none focus:ring-2 focus:ring-brand-400";
 const smallButton = "inline-flex h-9 items-center justify-center rounded-md px-3 text-sm font-medium text-fg ring-1 ring-fg/20 hover:bg-fg/5";
@@ -17,7 +17,7 @@ const smallButton = "inline-flex h-9 items-center justify-center rounded-md px-3
  * (or QR) and each person finds only their own certificate by typing their name. Needs a sign-in,
  * because the names are kept on our server (until the link expires or the organiser deletes it).
  */
-export function SharePanel({ settings, names }: { settings: CertSettings; names: string[] }) {
+export function SharePanel({ title, build, names }: { title: string; build: () => SharedDesign; names: string[] }) {
   const { user, loading } = useUser();
   // "list": the names above are used. "register": people add their own names, then the organiser releases the certificates.
   const [mode, setMode] = useState<"list" | "register">("list");
@@ -44,11 +44,11 @@ export function SharePanel({ settings, names }: { settings: CertSettings; names:
     setError("");
     setBusy(true);
     try {
-      const title = settings.event.trim();
+      const settings = build();
       const slug =
         mode === "list"
-          ? await createSharedEvent({ title, settings, code, names, days })
-          : await createRegisterEvent({ title, settings, code, days, cap: FREE_BATCH });
+          ? await createSharedEvent({ title: title.trim(), settings, code, names, days })
+          : await createRegisterEvent({ title: title.trim(), settings, code, days, cap: FREE_BATCH });
       setLink(claimUrl(slug));
       refresh();
     } catch (e) {

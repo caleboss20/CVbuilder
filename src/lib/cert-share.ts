@@ -5,23 +5,27 @@
  */
 
 import { loadSupabase } from "./auth-config";
+import type { OwnShare } from "./certificate-own";
 import type { CertSettings } from "./certificates";
 
+/** What is stored for a shared event: a built-in design's settings, or the organiser's own uploaded certificate. */
+export type SharedDesign = CertSettings | OwnShare;
+
 /** The longest the design may be once logo and signatures are included (the database allows a little more). */
-const MAX_SETTINGS_CHARS = 850_000;
+const MAX_SETTINGS_CHARS = 5_500_000;
 
 export type SharedEvent = { id: string; slug: string; title: string; code: string | null; mode: "list" | "register"; released: boolean; expires_at: string; cert_recipients: { count: number }[] };
 
 /** What a person gets back when they ask for their certificate. */
 export type ClaimResult =
-  | { status: "ok"; name: string; title: string; settings: CertSettings }
+  | { status: "ok"; name: string; title: string; settings: SharedDesign }
   | { status: "none" | "many" | "code" | "busy" | "gone" | "wait" };
 
 /** The public address people open to claim a certificate. */
 export const claimUrl = (slug: string) => `${window.location.origin}/claim?e=${encodeURIComponent(slug)}`;
 
 /** Creates a shareable event and returns its slug. Throws an Error with a message that is safe to show. */
-export async function createSharedEvent(args: { title: string; settings: CertSettings; code: string; names: string[]; days: number }): Promise<string> {
+export async function createSharedEvent(args: { title: string; settings: SharedDesign; code: string; names: string[]; days: number }): Promise<string> {
   const supabase = await loadSupabase();
   if (!supabase) throw new Error("Sharing is not available right now.");
   if (JSON.stringify(args.settings).length > MAX_SETTINGS_CHARS) throw new Error("Your logo or signatures are too large to share. Try a smaller logo.");
@@ -76,7 +80,7 @@ export async function claimCertificate(slug: string, name: string, code: string)
 }
 
 /** Creates an event where people add their own names. `cap` is the most names it may hold. */
-export async function createRegisterEvent(args: { title: string; settings: CertSettings; code: string; days: number; cap: number }): Promise<string> {
+export async function createRegisterEvent(args: { title: string; settings: SharedDesign; code: string; days: number; cap: number }): Promise<string> {
   const supabase = await loadSupabase();
   if (!supabase) throw new Error("Sharing is not available right now.");
   if (JSON.stringify(args.settings).length > MAX_SETTINGS_CHARS) throw new Error("Your logo or signatures are too large to share. Try a smaller logo.");

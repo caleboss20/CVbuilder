@@ -160,6 +160,45 @@ function writePage(
   }
 }
 
+// ------------------------------------------------------------------ sharing
+
+/** The largest uploaded certificate (PDF or photo) that can be shared by link, in bytes. */
+export const MAX_SHARE_BYTES = 3.5 * 1024 * 1024;
+
+/** An uploaded certificate with its name and signature spots, in a form that is stored for a shared link. */
+export type OwnShare = {
+  own: true;
+  kind: OwnDesign["kind"];
+  /** The PDF or JPEG, as base64. */
+  file: string;
+  width: number;
+  height: number;
+  place: NamePlace;
+  signatures: OwnSignature[];
+};
+
+function toBase64(bytes: Uint8Array): string {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(binary);
+}
+
+/** Packs an uploaded design for sharing. Throws an Error with a safe message when it is too large. */
+export function packOwnShare(design: OwnDesign, place: NamePlace, signatures: OwnSignature[]): OwnShare {
+  if (design.bytes.length > MAX_SHARE_BYTES) {
+    throw new Error("That certificate file is too large to share by link (the limit is 3.5 MB). Export a smaller PDF from Canva, or download the certificates instead.");
+  }
+  return { own: true, kind: design.kind, file: toBase64(design.bytes), width: design.width, height: design.height, place, signatures };
+}
+
+/** Turns a shared design back into something the engine can write names on. */
+export function unpackOwnShare(share: OwnShare): OwnDesign {
+  const binary = atob(share.file);
+  const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+  // The picture for the screen is not needed here: the page makes its own preview from the finished PDF
+  return { kind: share.kind, bytes, width: share.width, height: share.height, preview: { src: "", width: 0, height: 0 }, extraPages: false };
+}
+
 const breathe = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 /** One PDF with a page per name, all sharing one copy of the design. Best for printing. */

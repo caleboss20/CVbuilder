@@ -3,10 +3,11 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { claimCertificate, eventInfo, registerName, type ClaimResult, type RegisterStatus } from "@/lib/cert-share";
-import { buildCombinedPdf, previewCertificate } from "@/lib/certificates";
+import { buildOwnCombined, unpackOwnShare } from "@/lib/certificate-own";
+import { buildCombinedPdf } from "@/lib/certificates";
 import { fileNameFor } from "@/lib/certificate-names";
 import { saveFile } from "@/lib/save-file";
-import type { PreviewPage } from "@/lib/sign-pdf";
+import { renderPages, type PreviewPage } from "@/lib/sign-pdf";
 
 const input = "mt-1.5 block h-12 w-full rounded-md bg-fg/5 px-4 text-[15px] text-fg ring-1 ring-fg/15 placeholder:text-fg/35 focus:outline-none focus:ring-2 focus:ring-brand-400";
 const button =
@@ -46,7 +47,7 @@ export function ClaimCertificate() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [registeredAs, setRegisteredAs] = useState("");
-  const [found, setFound] = useState<{ name: string; settings: Extract<ClaimResult, { status: "ok" }>["settings"]; preview: PreviewPage } | null>(null);
+  const [found, setFound] = useState<{ name: string; bytes: Uint8Array; preview: PreviewPage } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -79,7 +80,13 @@ export function ClaimCertificate() {
         setMessage(MESSAGES[result.status]);
         return;
       }
-      setFound({ name: result.name, settings: result.settings, preview: await previewCertificate(result.settings, result.name) });
+      // Either a built-in design or the organiser's own uploaded certificate
+      const design = result.settings;
+      const bytes =
+        "own" in design
+          ? await buildOwnCombined(unpackOwnShare(design), [result.name], design.place, undefined, design.signatures)
+          : await buildCombinedPdf(design, [result.name]);
+      setFound({ name: result.name, bytes, preview: (await renderPages(bytes))[0] });
     } catch {
       setMessage("Something went wrong. Please try again.");
     } finally {
@@ -89,7 +96,7 @@ export function ClaimCertificate() {
 
   async function download() {
     if (!found) return;
-    saveFile(await buildCombinedPdf(found.settings, [found.name]), `${fileNameFor(found.name, new Set())}.pdf`, "application/pdf");
+    saveFile(found.bytes, `${fileNameFor(found.name, new Set())}.pdf`, "application/pdf");
   }
 
   if (info === undefined) return <p className="text-center text-fg/60">Loading…</p>;

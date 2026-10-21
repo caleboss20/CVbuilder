@@ -83,7 +83,7 @@ begin
   if me is null then raise exception 'sign in first'; end if;
   if p_names is null or array_length(p_names, 1) is null then raise exception 'no names'; end if;
   if array_length(p_names, 1) > 500 then raise exception 'too many names'; end if;
-  if length(p_settings::text) > 900000 then raise exception 'design too large'; end if;
+  if length(p_settings::text) > 6000000 then raise exception 'design too large'; end if;
   if (select count(*) from public.cert_events where owner = me and expires_at > now()) >= 20 then
     raise exception 'too many active events';
   end if;
@@ -175,7 +175,7 @@ declare
   new_slug text;
 begin
   if me is null then raise exception 'sign in first'; end if;
-  if length(p_settings::text) > 900000 then raise exception 'design too large'; end if;
+  if length(p_settings::text) > 6000000 then raise exception 'design too large'; end if;
   if (select count(*) from public.cert_events where owner = me and expires_at > now()) >= 20 then
     raise exception 'too many active events';
   end if;

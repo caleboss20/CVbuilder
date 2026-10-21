@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TextArea } from "@/components/builder/fields";
 import { SignaturePad } from "@/components/builder/signature-pad";
+import { SharePanel } from "@/components/tools/share-panel";
 import { FREE_BATCH, MAX_NAMES, SAMPLE_NAMES, fileNameFor, parseNames } from "@/lib/certificate-names";
 import {
   OWN_FONTS,
@@ -11,6 +12,7 @@ import {
   defaultNamePlace,
   readOwnDesign,
   type NamePlace,
+  packOwnShare,
   type OwnDesign,
   type OwnSignature,
 } from "@/lib/certificate-own";
@@ -435,6 +437,7 @@ export function OwnCertificateMaker() {
           )}
           <p className="text-xs text-fg/45">The ZIP holds one PDF per person, named after them.</p>
         </div>
+        {design && <SharePanel title="Certificates" build={() => packOwnShare(design, place, placedSigs)} names={names} />}
       </div>
     </div>
   );
