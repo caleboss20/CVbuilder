@@ -146,3 +146,49 @@ export async function recordForVerify(args: { title: string; issuer: string; nam
   }
   return new Map((data as { name: string; ref: string }[]).map((r) => [r.name, r.ref]));
 }
+
+// ------------------------------------------------------------------ managing an event afterwards
+
+export type Recipient = { id: number; name: string };
+
+/** The people on one of the organiser's events, in alphabetical order. */
+export async function listRecipients(eventId: string): Promise<Recipient[]> {
+  const supabase = await loadSupabase();
+  if (!supabase) return [];
+  const { data } = await supabase.from("cert_recipients").select("id, name").eq("event_id", eventId).order("name");
+  return (data as Recipient[] | null) ?? [];
+}
+
+/** Adds people to an event. Returns how many were new, or throws an Error with a message that is safe to show. */
+export async function addRecipients(eventId: string, names: string[]): Promise<number> {
+  const supabase = await loadSupabase();
+  if (!supabase) throw new Error("Editing is not available right now.");
+  const { data, error } = await supabase.rpc("cert_recipient_add", { p_event: eventId, p_names: names });
+  if (error) {
+    if (error.message.includes("over limit")) throw new Error("That is more people than your plan allows. Ask us about a bigger batch.");
+    throw new Error("We could not add those names. Please try again.");
+  }
+  return Number(data) || 0;
+}
+
+export async function renameRecipient(id: number, name: string): Promise<boolean> {
+  const supabase = await loadSupabase();
+  if (!supabase) return false;
+  const { error } = await supabase.rpc("cert_recipient_rename", { p_id: id, p_name: name });
+  return !error;
+}
+
+export async function removeRecipient(id: number): Promise<boolean> {
+  const supabase = await loadSupabase();
+  if (!supabase) return false;
+  const { error } = await supabase.rpc("cert_recipient_remove", { p_id: id });
+  return !error;
+}
+
+/** Changes an event's code (empty clears it) and, when `extendDays` is above 0, keeps the link working that many days from now. */
+export async function updateSharedEvent(id: string, code: string, extendDays: number): Promise<boolean> {
+  const supabase = await loadSupabase();
+  if (!supabase) return false;
+  const { error } = await supabase.rpc("cert_event_update", { p_id: id, p_code: code, p_extend_days: extendDays });
+  return !error;
+}

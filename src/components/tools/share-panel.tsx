@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { EventManager } from "@/components/tools/event-manager";
 import { QrCode } from "@/components/tools/qr-code";
 import { useUser } from "@/components/auth/use-user";
 import { authConfigured } from "@/lib/auth-config";
@@ -30,6 +31,8 @@ export function SharePanel({ title, build, names }: { title: string; build: () =
   const [copied, setCopied] = useState(false);
   // The link whose QR code is showing
   const [qrFor, setQrFor] = useState("");
+  // The saved link being edited
+  const [manageFor, setManageFor] = useState("");
   const [events, setEvents] = useState<SharedEvent[]>([]);
 
   const refresh = useCallback(() => {
@@ -126,6 +129,7 @@ export function SharePanel({ title, build, names }: { title: string; build: () =
                   <span className="flex shrink-0 gap-2">
                     <button type="button" onClick={() => copy(claimUrl(ev.slug))} className={smallButton}>Copy</button>
                     <button type="button" onClick={() => setQrFor(qrFor === ev.id ? "" : ev.id)} className={smallButton}>QR</button>
+                    <button type="button" onClick={() => setManageFor(manageFor === ev.id ? "" : ev.id)} className={smallButton}>Manage</button>
                     {ev.mode === "register" && (
                       <button type="button" onClick={async () => { if (await setReleased(ev.id, !ev.released)) refresh(); }} className={smallButton}>
                         {ev.released ? "Reopen" : "Release"}
@@ -141,6 +145,7 @@ export function SharePanel({ title, build, names }: { title: string; build: () =
                       Delete
                     </button>
                   </span>
+                  {manageFor === ev.id && <div className="basis-full"><EventManager event={ev} onChanged={refresh} /></div>}
                   {qrFor === ev.id && <div className="basis-full pt-2"><QrCode url={claimUrl(ev.slug)} label={ev.title} /></div>}
                 </li>
               ))}

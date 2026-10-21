@@ -332,6 +332,73 @@ as $$
     jsonb_build_object('valid', false));
 $$;
 
+-- ------------------------------------------------------------ manage a shared event afterwards
+-- The organiser can change the code, extend the link, and add, rename or remove people. Each function
+-- checks that the event belongs to the caller. The design itself is not editable: make a new event for that.
+create or replace function public.cert_event_update(p_id uuid, p_code text, p_extend_days integer)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update public.cert_events
+     set code = nullif(btrim(coalesce(p_code, '')), ''),
+         expires_at = case when coalesce(p_extend_days, 0) > 0 then now() + make_interval(days => least(p_extend_days, 365)) else expires_at end
+   where id = p_id and owner = auth.uid() and not verify_only;
+end;
+$$;
+
+-- Adds people (a name already on the list is skipped). Returns how many were new.
+create or replace function public.cert_recipient_add(p_event uuid, p_names text[])
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  n text;
+  added integer := 0;
+begin
+  if not exists (select 1 from public.cert_events where id = p_event and owner = auth.uid() and not verify_only) then
+    raise exception 'not allowed';
+  end if;
+  foreach n in array coalesce(p_names, '{}') loop
+    if char_length(btrim(n)) >= 1 and not exists (select 1 from public.cert_recipients where event_id = p_event and name_key = public.cert_key(n)) then
+      if (select count(*) from public.cert_recipients where event_id = p_event) >= public.cert_limit() then
+        raise exception 'over limit';
+      end if;
+      insert into public.cert_recipients (event_id, name, name_key) values (p_event, left(btrim(n), 120), public.cert_key(n));
+      added := added + 1;
+    end if;
+  end loop;
+  return added;
+end;
+$$;
+
+create or replace function public.cert_recipient_rename(p_id bigint, p_name text)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update public.cert_recipients r
+     set name = left(btrim(p_name), 120), name_key = public.cert_key(p_name)
+   where r.id = p_id and char_length(btrim(p_name)) >= 1
+     and exists (select 1 from public.cert_events e where e.id = r.event_id and e.owner = auth.uid() and not e.verify_only);
+$$;
+
+create or replace function public.cert_recipient_remove(p_id bigint)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  delete from public.cert_recipients r
+   where r.id = p_id
+     and exists (select 1 from public.cert_events e where e.id = r.event_id and e.owner = auth.uid() and not e.verify_only);
+$$;
+
 -- Who may call what: the claim functions are public; creating needs a signed-in person
 revoke all on function public.cert_event_create(text, jsonb, text, text[], integer) from public, anon;
 grant execute on function public.cert_event_create(text, jsonb, text, text[], integer) to authenticated;
@@ -344,5 +411,13 @@ grant execute on function public.cert_event_info(text) to anon, authenticated;
 grant execute on function public.cert_claim(text, text, text) to anon, authenticated;
 grant execute on function public.cert_verify(text) to anon, authenticated;
 grant execute on function public.cert_limit() to anon, authenticated;
+revoke all on function public.cert_event_update(uuid, text, integer) from public, anon;
+grant execute on function public.cert_event_update(uuid, text, integer) to authenticated;
+revoke all on function public.cert_recipient_add(uuid, text[]) from public, anon;
+grant execute on function public.cert_recipient_add(uuid, text[]) to authenticated;
+revoke all on function public.cert_recipient_rename(bigint, text) from public, anon;
+grant execute on function public.cert_recipient_rename(bigint, text) to authenticated;
+revoke all on function public.cert_recipient_remove(bigint) from public, anon;
+grant execute on function public.cert_recipient_remove(bigint) to authenticated;
 revoke all on function public.cert_event_record(text, text, text[]) from public, anon;
 grant execute on function public.cert_event_record(text, text, text[]) to authenticated;
