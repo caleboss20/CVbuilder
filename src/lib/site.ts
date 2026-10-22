@@ -59,6 +59,8 @@ export const siteConfig = {
     commissionPercent: 6,
     holdDays: 14,
     minPayout: "GH₵ 10",
+    /** How many founding partners the programme starts with (shown on the partner page). */
+    spots: 10,
     payoutDay: "the 1st of every month",
   },
   /** CV versions (the same CV in several looks, one for each company). `max` is the most one CV may have. */

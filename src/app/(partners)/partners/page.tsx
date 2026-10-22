@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button";
 import { EarningsCalculator } from "@/components/partners/earnings-calculator";
 import { PartnersHero } from "@/components/partners/partners-hero";
+import { FoundingPartners } from "@/components/partners/founding-partners";
 import { WhyJoin } from "@/components/partners/why-join";
 import { siteConfig } from "@/lib/site";
 
@@ -26,6 +27,7 @@ export default function PartnersPage() {
     <>
       <PartnersHero />
       <WhyJoin />
+      <FoundingPartners />
 
       {/* The sections below are still in the first draft look; they are redesigned one at a time */}
       <div className="bg-ink-950 text-fg">
