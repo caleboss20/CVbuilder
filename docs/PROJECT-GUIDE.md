@@ -53,7 +53,7 @@ The two ideas that shape everything:
 | **Text to PDF and letter signing** | Anyone | Turn pasted text or an existing letter into a signed PDF | Free |
 | **Interview prep, tracker, national service checklist** | Students | Practice questions by field, an application tracker, a checklist | Free |
 | **AI writing help** | Students | Rewrites a bullet, a project description or a summary; fixes misheard voice input | Built, owner-only while quality is tested |
-| **Bulk certificate maker** | Event organisers, clubs, schools, training centres | Paste names, pick one of 23 designs **or upload their own certificate (a Canva PDF or a photo)**, drag a logo or the name into place, download a certificate for each person | Free up to 15 per batch; paid tiers planned |
+| **Bulk certificate maker** | Event organisers, clubs, schools, training centres | Paste names, pick one of 35 designs **or upload their own certificate (a Canva PDF or a photo)**, drag a logo or the name into place, download a certificate for each person | Free up to 15 per batch; paid tiers planned |
 
 ---
 
@@ -121,7 +121,7 @@ Four small features behind **Improve with AI** and **Check what we heard** butto
 
 **Two ways to work.** *Pick a design* (below), or *Use my own certificate*: the organiser uploads a certificate they already have (a Canva PDF, or a photo or scan) with the name left blank, drags the name to the right place, chooses its font, colour and size, and every name is written onto it. A PDF stays sharp vector art. The same free limit applies to both ways. See `FEATURES.md` section 15.8, and 15.9 for how charging beyond the free amount is designed.
 
-Paste a list of names (WhatsApp, Excel, typed). The tool cleans it (removes numbering, fixes ALL CAPS and lowercase names including Ghanaian letters, drops repeats). Pick one of **23 original designs** (19 wide, 4 tall) in a gallery, pick a colour, fill in the event, date, signers and an optional drawn signature, and optionally add the organiser's **logo**, which can be dragged anywhere on the certificate and resized. Download **a ZIP of separate PDFs** (one per person, named after them), or **one PDF to print**. One name gives a single PDF.
+Paste a list of names (WhatsApp, Excel, typed). The tool cleans it (removes numbering, fixes ALL CAPS and lowercase names including Ghanaian letters, drops repeats). Pick one of **35 original designs** (19 wide, 4 tall) in a gallery, pick a colour, fill in the event, date, signers and an optional drawn signature, and optionally add the organiser's **logo**, which can be dragged anywhere on the certificate and resized. Download **a ZIP of separate PDFs** (one per person, named after them), or **one PDF to print**. One name gives a single PDF.
 
 Free batches are limited to the first **10** names (a setting in `src/lib/site.ts`), with a clear message and a WhatsApp link to ask for a bigger batch. Everything is drawn in the browser as vector art with real gradients, laurel-wreath medals and ribbons, so certificates print sharply and the list of names never leaves the device.
 
@@ -179,7 +179,7 @@ These are the designed models and the cost facts behind them. **No revenue figur
 | CV checker, letters, signing, Text to PDF, interview prep, tracker, NSS checklist | Live | |
 | Accounts, password reset, cloud save, backup | Live | Email sending uses Supabase's default sender: needs the owner's own SMTP before real volume (see 6.3) |
 | Admin analytics and AI lab | Live (owner only) | |
-| Bulk certificates (23 designs, logo, upload-your-own, ZIP, free 10 per batch) | Live | Charging beyond the free amount is designed but not built (`FEATURES.md` 15.9) |
+| Bulk certificates (35 designs, logo, upload-your-own, ZIP, free 10 per batch) | Live | Charging beyond the free amount is designed but not built (`FEATURES.md` 15.9) |
 | AI writing help and voice clean-up | Built, owner-only | Needs `supabase/ai.sql` run, a Gemini key, and `AI_ACCESS=everyone` to open |
 | Payments (Paystack, GH₵ 5 per CV) | Built, off | Needs Paystack keys, `supabase/payments.sql`, and `NEXT_PUBLIC_PAYMENTS_ENABLED=true`. Not tested with real money |
 | Certificate QR verification page | Planned | Needs a database table and a public page |
@@ -429,7 +429,7 @@ callyCV/
 |---|---|
 | `certificate-draw.ts` | Vector drawing toolkit: gradients, shapes, laurel, medals, shadows, text helpers. |
 | `certificate-design-types.ts` | The shape of a design and its layout; page size helper; layout defaults. |
-| `certificate-designs.ts`, `certificate-designs-more.ts` | The 23 designs (15 + 8). |
+| `certificate-designs.ts`, `certificate-designs-more.ts` | The 35 designs (15 + 8). |
 | `certificates.ts` | The engine: settings, kinds of certificate, fonts, drawing a page, combined and separate PDFs, preview, logo placement. |
 | `certificate-names.ts` | Clean a pasted list; the free-batch constants; sample Ghanaian names; safe file names. |
 | `certificate-logo.ts` | Read a logo image and shrink it to a small PNG. |

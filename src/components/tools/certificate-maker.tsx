@@ -10,6 +10,7 @@ import { useCertLimit } from "@/components/tools/use-cert-limit";
 import { FREE_BATCH, MAX_NAMES, SAMPLE_NAMES, fileNameFor, parseNames } from "@/lib/certificate-names";
 import {
   COLORS,
+  DEFAULT_BADGE_TEXT,
   DESIGNS,
   KINDS,
   buildCombinedPdf,
@@ -347,6 +348,17 @@ export function CertificateMaker() {
             <Field label="Date" value={settings.date} onChange={(date) => set({ date })} placeholder="12 March 2026" />
             <Field label="Organised by (optional)" value={settings.issuer} onChange={(issuer) => set({ issuer })} placeholder="KNUST SRC" hint="Use {issuer} in the sentence below to show it." />
           </div>
+          {designById(settings.design).badge && (
+            <div className="rounded-lg border border-fg/10 p-3">
+              <label className="flex items-center gap-2 text-sm font-medium text-fg/80">
+                <input type="checkbox" checked={settings.badge !== false} onChange={(e) => set({ badge: e.target.checked })} />
+                Add the award rosette
+              </label>
+              {settings.badge !== false && (
+                <Field label="Words on the rosette" value={settings.badgeText ?? DEFAULT_BADGE_TEXT} onChange={(badgeText) => set({ badgeText })} placeholder="BEST AWARD" hint="Two short words fit best, such as TOP STUDENT." />
+              )}
+            </div>
+          )}
           <TextArea
             label="Sentence under the name"
             rows={3}

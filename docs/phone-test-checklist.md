@@ -65,7 +65,7 @@ Tick each one. Write down the phone and browser for anything that fails.
 
 ## 12. Certificates (`/certificates`)
 - [ ] The **Pick a design** and **Use my own certificate** tabs both work, and switching keeps what you typed.
-- [ ] The gallery shows all 23 designs (wide and tall) without sideways scrolling. Tapping one changes the preview.
+- [ ] The gallery shows all 35 designs (wide and tall) without sideways scrolling. Tapping one changes the preview.
 - [ ] **Try it with sample Ghanaian names** fills 10 names. The ZIP downloads, opens, and holds 10 PDFs named after the people.
 - [ ] Paste 20 names: the amber notice says only the first 15 will be made. One name gives a single PDF, not a ZIP.
 - [ ] Add a logo and **drag it with your finger** on the preview. The page does not scroll while dragging. The size slider works. The downloaded PDF has the logo where you left it.

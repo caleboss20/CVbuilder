@@ -31,7 +31,19 @@ export type CertDesign =
   | "navyPanel"
   | "cleanFrame"
   | "blueCorners"
-  | "ornateBlue";
+  | "ornateBlue"
+  | "navyRibbon"
+  | "redWaves"
+  | "redFrame"
+  | "blueStripes"
+  | "blueArrows"
+  | "blueDash"
+  | "navyGold"
+  | "maroonGold"
+  | "yellowNavy"
+  | "blackSilver"
+  | "navyCubes"
+  | "hexNavy";
 
 export type Layout = {
   cx: number;
@@ -73,7 +85,10 @@ export type Layout = {
   logo?: { cx: number; top: number; maxW: number; maxH: number };
 };
 
-export type DrawContext = { page: PDFPage; main: string; bold: PDFFont };
+/** The optional award rosette: whether to draw it, and its words (one or two short lines). */
+export type Badge = { on: boolean; lines: string[] };
+
+export type DrawContext = { page: PDFPage; main: string; bold: PDFFont; badge: Badge };
 
 export type DesignDef = {
   id: CertDesign;
@@ -82,6 +97,8 @@ export type DesignDef = {
   color: string;
   /** Landscape unless stated. */
   orientation?: "portrait";
+  /** True when the design has a rosette or badge the organiser can switch off or reword. */
+  badge?: true;
   layout: (main: string) => Layout;
   draw: (ctx: DrawContext) => void;
   /** Drawn on top of the text, such as a frame. */

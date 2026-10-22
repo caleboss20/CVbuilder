@@ -8,6 +8,7 @@
 
 import type { PDFFont, PDFPage } from "pdf-lib";
 import { layout, type CertDesign, type DesignDef } from "./certificate-design-types";
+import { CANVA_DESIGNS } from "./certificate-designs-canva";
 import { MORE_DESIGNS } from "./certificate-designs-more";
 import {
   GOLD,
@@ -373,7 +374,7 @@ const BASE_DESIGNS: DesignDef[] = [
 ];
 
 /** Every design, in the order the gallery shows them. */
-export const DESIGNS: DesignDef[] = [...BASE_DESIGNS, ...MORE_DESIGNS];
+export const DESIGNS: DesignDef[] = [...BASE_DESIGNS, ...MORE_DESIGNS, ...CANVA_DESIGNS];
 
 export function designById(id: CertDesign): DesignDef {
   return DESIGNS.find((d) => d.id === id) ?? DESIGNS[0];

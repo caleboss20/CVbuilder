@@ -24,7 +24,7 @@
 
 **For students (live):** a step-by-step CV builder with a live A4 preview and 38 templates; example CVs for 30 courses; an automatic recommendation of the right CV type; plain-rule coaching on every bullet; a keyword matcher against a pasted job advert; voice input; PDF and Word download; a CV checker that scores any CV out of 100 with specific fixes; 8 letter types in the formal Ghanaian layout with a drawn signature; a tool to sign any existing letter and a Text-to-PDF tool; interview preparation for 9 fields; an application tracker; a national service checklist; and **CV versions**, which produces the same CV in up to 10 looks (one per company), each as its own real-text PDF.
 
-**For organisers (live):** paste a list of names, choose from 23 original designs (wide and tall) or **upload their own certificate** (a Canva PDF or a photo), optionally add a logo anywhere on the page, and download a certificate for every person as a ZIP or one PDF to print. Free for up to 15 per batch.
+**For organisers (live):** paste a list of names, choose from 35 original designs (wide and tall) or **upload their own certificate** (a Canva PDF or a photo), optionally add a logo anywhere on the page, and download a certificate for every person as a ZIP or one PDF to print. Free for up to 15 per batch.
 
 **Built but switched off:** one-time payment (GH₵ 5 per CV) through Paystack with mobile money and cards; AI writing help (rewrite a bullet, tidy a project, write a summary, correct speech-recognition mistakes), restricted to the owner while quality is checked.
 
@@ -120,7 +120,7 @@ These are **arithmetic, not predictions**. The decisive unknown is the conversio
 | Account needed to build | No | Account for the dashboard | Usually yes |
 | Where the CV is stored | The student's device | Its privacy policy says CV content is collected | On their servers |
 | Tools around the CV | Checker, 8 letter types, signing, interview prep, tracker, NSS checklist, versions | AI writing, community chat, map, messaging | Varies |
-| Bulk certificates | Yes (23 designs plus upload-your-own); verification planned | Yes (behind login; details not public) | Separate products |
+| Bulk certificates | Yes (35 designs plus upload-your-own); verification planned | Yes (behind login; details not public) | Separate products |
 | Ghana-specific content | 30 course examples, formal Ghanaian letters, NSS | Not observed | Rarely |
 | Payment terms stated | Planned on Terms and Pricing | Not stated in the public terms we saw | Varies |
 
@@ -148,7 +148,7 @@ These are **arithmetic, not predictions**. The decisive unknown is the conversio
 
 | When | Milestone | State |
 |---|---|---|
-| Now | CV builder, checker, letters, signing, interview prep, tracker, versions, certificates (23 designs, own design, logo) | Live |
+| Now | CV builder, checker, letters, signing, interview prep, tracker, versions, certificates (35 designs, own design, logo) | Live |
 | Next | Switch payments on (Paystack keys, run the payments SQL, test mode, go live) and add pay-screen analytics | Built, needs keys |
 | Next | Own email sender for sign-up emails; Vercel Analytics enabled; testimonial consents | Owner tasks |
 | Soon | Certificate QR verification and attendee sign-up link; paid certificate batches | Planned |
@@ -216,7 +216,7 @@ These are **arithmetic, not predictions**. The decisive unknown is the conversio
 | The AI cannot invent numbers or rewrite voice transcripts freely | `src/server/ai/validate.ts`, `src/server/ai/features/fix-transcript.ts` |
 | AI spend is capped | `supabase/ai.sql`, `src/server/ai/guards.ts` |
 | 38 templates driven by config | `src/lib/templates.ts`, `src/components/cv/cv-templates-ats.tsx` |
-| 23 certificate designs, uploads and logo | `src/lib/certificate-designs*.ts`, `src/lib/certificate-own.ts`, `src/components/tools/*certificate*.tsx` |
+| 35 certificate designs, uploads and logo | `src/lib/certificate-designs*.ts`, `src/lib/certificate-own.ts`, `src/components/tools/*certificate*.tsx` |
 | Free limits are settings | `src/lib/site.ts` (`certificates.freeBatch`, `cvVersions.max`, `download`) |
 | What is measured | `src/lib/track.ts`, `supabase/schema.sql` (`admin_stats`), `supabase/stats.sql` |
 | Status of each feature | `docs/PROJECT-GUIDE.md` section 6.1 |

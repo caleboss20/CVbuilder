@@ -353,7 +353,7 @@ Before the first request the student sees a note (once per device): only the tex
 
 ### 15.1 The page, top to bottom
 
-1. **Choose a template**: a gallery of all 23 designs (thumbnails are drawn once, each in its own colours, one after another), then a colour row (Navy, Emerald, Burgundy, Royal blue, Purple, Black).
+1. **Choose a template**: a gallery of all 35 designs (thumbnails are drawn once, each in its own colours, one after another), then a colour row (Navy, Emerald, Burgundy, Royal blue, Purple, Black).
 2. **Add the names**: paste a list; a live count and notes ("fixed capital letters on 12 · removed 3 repeated"); a *Try it with sample Ghanaian names* button.
 3. **What it says**: kind of certificate, event, date (defaults to today, set after load so the prerendered page never depends on the clock), organised by, the sentence under the name, and the line under CERTIFICATE.
 4. **Who signs**: up to two signers (name and title), each with their own optional drawn or uploaded signature pad. A second signer appears on the certificate once they have a name or a signature.
@@ -377,7 +377,7 @@ A list with newlines is split on newlines; a single line is split on commas, sem
 
 All use "THIS CERTIFICATE IS PROUDLY PRESENTED TO" before the name. `{event}`, `{date}` and `{issuer}` are filled in and leftover commas or double spaces tidied.
 
-### 15.4 The 23 designs
+### 15.4 The 35 designs
 
 Wide (A4 landscape, 19): **Navy Waves** (wave bands, gold ribbons, seal), **Black & Gold** (dark curved panel, big wreath medal, gold frame), **Gold Frame** (notched corners, double gold frame, flourish), **Black Swoosh** (black and gold swooshes, fine gold line texture, wreath medal), **Emerald** (green waves with gold lines, big medal), **Hexagons** (purple-blue waves, hexagons, dots), **Blue Stripes** (diagonal blue stripes, thin frame, medal), **Sky Blades** (bright blue blades, "best award" badge, "1st" wreath), **Red Squares** and **Orange Squares** (rounded squares and a black ribbon badge), **Navy & Red** (navy wave, red and orange swooshes), **Dark & Gold** (deep navy page, gold writing), **Ribbon & Medal** (navy band, gold swoosh, hanging ribbon with medal), **Blue Wave** (light flowing lines, blue wave, gold rosette), **Royal Gold** (navy swooshes, thick gold frame, ribbon banner), **Navy Panel** (navy panel with crossing gold lines, big medal), **Clean Frame** (double gold frame, plain serif name, white-gold medal), **Blue Corners** (navy and light-blue corners, flat badge), **Ornate Border** (beaded border, scroll corners, name in capitals). Tall (A4 portrait, 4): **Teal Diagonal**, **White Wave**, **Ornate Cream** (cream page, gold frame, scroll corners, wreath shield, red wax seal) and **Excellence** (stripes, double frame, medal with navy ribbons).
 
@@ -483,3 +483,7 @@ Each saved link has a **Manage** button. The organiser can change or clear the e
 ### Admin dashboard: money and certificates
 
 `supabase/admin-more.sql` adds `admin_overview(days)` (admin only). The dashboard (`src/components/admin/overview-panels.tsx`) shows, under the main numbers: money earned and paid downloads (period and all time), unpaid starts, downloads open now, the latest 10 payments with the payer's email, certificates made and batches, shared links (active, collecting names, people on them), certificates with a verify QR, organisers, active bigger-batch unlocks (from `cert_grants`), new accounts and AI use. If the SQL has not been run, the dashboard says so instead of failing. The same file also sets the CV price to GH₵ 5 (`pay_settings.price_pesewas`); the text price lives in `siteConfig.download.price`. Each successful check of a verify QR adds one to `cert_events.scans` (shown as "Times a QR was scanned").
+
+### 15.4b The twelve Canva-style designs (navyRibbon to hexNavy)
+
+`src/lib/certificate-designs-canva.ts` adds twelve bright landscape designs traced from reference templates: Navy Gold Ribbon, Red Waves, Red Frame, Blue Stripes, Blue Arrows, Blue Dashes, Navy & Gold Corners, Maroon & Gold, Navy & Yellow Lines, Black & Silver, Navy Cubes and Navy Hexagons. Nine of them carry a rosette or badge. Those designs set `badge: true`, and the maker then shows "Add the award rosette" with an editable wording (`settings.badge`, `settings.badgeText`, default "BEST AWARD"; `badgeLines()` splits it over two lines). Designs without a rosette show no such option. The shapes are approximations of the references, built from the same vector toolkit as the other designs, so they stay sharp and recolour with the colour picker.

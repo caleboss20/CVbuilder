@@ -46,7 +46,22 @@ export type CertSettings = {
    * it anywhere, so nothing is fixed. Missing means the design's usual spot.
    */
   logoPlace?: LogoPlace;
+  /** Whether to draw the design's award rosette (when it has one). Missing means yes. */
+  badge?: boolean;
+  /** The words on the rosette, for example "BEST AWARD". Missing means that. */
+  badgeText?: string;
 };
+
+/** The words shown on a rosette when the organiser has not changed them. */
+export const DEFAULT_BADGE_TEXT = "BEST AWARD";
+
+/** Splits the rosette's words over at most two lines, in capitals. */
+export function badgeLines(text: string | undefined): string[] {
+  const words = (text ?? DEFAULT_BADGE_TEXT).trim().toUpperCase().split(/\s+/).filter(Boolean).slice(0, 6);
+  if (words.length <= 1) return words;
+  const half = Math.ceil(words.length / 2);
+  return [words.slice(0, half).join(" "), words.slice(half).join(" ")];
+}
 
 export type LogoPlace = { x: number; y: number; w: number };
 
@@ -247,7 +262,7 @@ function drawCertificate(doc: PDFDocument, fonts: Fonts, settings: CertSettings,
   const main = settings.color;
   const L = design.layout(main);
 
-  design.draw({ page, main, bold: fonts.bold });
+  design.draw({ page, main, bold: fonts.bold, badge: { on: settings.badge !== false, lines: badgeLines(settings.badgeText) } });
 
   // The organiser's logo, wherever they put it (or the design's usual spot until they move it)
   if (images.logo) {
@@ -300,7 +315,7 @@ function drawCertificate(doc: PDFDocument, fonts: Fonts, settings: CertSettings,
     if (signerTitle) drawCentred(page, signerTitle, pick(fonts, fonts.body, signerTitle), 9, c, L.sig + 31, L.grey);
   });
 
-  design.foreground?.({ page, main, bold: fonts.bold });
+  design.foreground?.({ page, main, bold: fonts.bold, badge: { on: settings.badge !== false, lines: badgeLines(settings.badgeText) } });
 }
 
 // ---------------------------------------------------------------------- outputs
