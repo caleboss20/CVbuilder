@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LogoMark, Wordmark } from "@/components/ui/logo";
 import { PromoBar } from "./promo-bar";
+import { ScrollBar } from "./scroll-bar";
 
 /**
  * The CV11 Partners top of page: a thin announcement bar, then the navbar on a deep blue-violet background
@@ -55,6 +56,9 @@ function LanguageMenu() {
 export function PartnersHeader() {
   return (
     <>
+      {/* The white bar that slides in once the page is scrolled */}
+      <ScrollBar />
+
       {/* Announcement bar, with a close button */}
       <PromoBar />
 
