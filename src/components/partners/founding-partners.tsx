@@ -3,10 +3,10 @@ import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 
 /**
- * The photo on the left: a smiling young woman holding up her resume, supplied by the owner (a small file,
- * 418 x 626 px: a larger original would be sharper, and its licence should be confirmed).
+ * The photo on the left: two people toasting with coffee over their laptops, supplied by the owner (735 x 1103 px;
+ * confirm its licence before the site goes public). Swap this one line when a new photo arrives.
  */
-const PHOTO = { src: "/images/partners/hero-resume.png", alt: "A smiling young woman in glasses holding up her resume", position: "50% 24%" };
+const PHOTO = { src: "/images/partners/founding-cheers.webp", alt: "Two people toasting with coffee cups over their laptops", position: "50% 45%" };
 
 /** The words that scroll along the ribbon on top. */
 const RIBBON = ["Founding partners", `Only ${siteConfig.partners.spots} spots`, "Free to join", "Apply now"];
