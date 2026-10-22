@@ -2,8 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 
-/** The photo: a young woman in an orange top and denim dungarees, smiling at her phone against a yellow wall (supplied by the owner). */
-const PHOTO = { src: "/images/affiliates/celebrate.webp", alt: "A smiling young woman holding her phone in front of a yellow wall", position: "50% 36%" };
+/**
+ * The two photos, supplied by the owner, that take turns inside the circle: a young woman in an orange top
+ * smiling at her phone against a yellow wall, and a young woman laughing with her curls around her face.
+ */
+const PHOTOS = [
+  { src: "/images/affiliates/celebrate.webp", alt: "A smiling young woman holding her phone in front of a yellow wall", position: "50% 36%" },
+  { src: "/images/affiliates/celebrate-alt.webp", alt: "A young woman laughing, with her curly hair around her face", position: "50% 56%" },
+];
 
 /**
  * Paper confetti: thin strips and a few squares in pink, red, blue, green, yellow, violet and white, scattered in
@@ -38,11 +44,30 @@ const CONFETTI = (() => {
 export function CelebrateCta() {
   return (
     <section className="bg-[#16145f] text-white">
+      <style>{`
+        /* One full turn lasts 10 seconds: photo A shows, fades into photo B, which shows, then fades back. Without motion, A stays. */
+        @media (prefers-reduced-motion: no-preference) {
+          @keyframes celebrate-a { 0%, 42% { opacity: 1; } 50%, 92% { opacity: 0; } 100% { opacity: 1; } }
+          @keyframes celebrate-b { 0%, 42% { opacity: 0; } 50%, 92% { opacity: 1; } 100% { opacity: 0; } }
+          .celebrate-a { animation: celebrate-a 10s ease-in-out infinite; }
+          .celebrate-b { animation: celebrate-b 10s ease-in-out infinite; }
+        }
+      `}</style>
       <div className="mx-auto grid max-w-[1110px] items-center gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[minmax(0,500px)_1fr] lg:gap-20">
         {/* The round photo, with confetti */}
         <div className="relative mx-auto w-full max-w-[420px] lg:mx-0 lg:max-w-none">
           <div className="relative aspect-square w-full overflow-hidden rounded-full bg-[#2b2896]">
-            <Image src={PHOTO.src} alt={PHOTO.alt} fill sizes="(min-width: 1024px) 500px, 85vw" className="object-cover" style={{ objectPosition: PHOTO.position }} />
+            {PHOTOS.map((photo, i) => (
+              <Image
+                key={photo.src}
+                src={photo.src}
+                alt={i === 0 ? photo.alt : ""}
+                fill
+                sizes="(min-width: 1024px) 500px, 85vw"
+                className={`object-cover ${i === 0 ? "celebrate-a" : "celebrate-b opacity-0"}`}
+                style={{ objectPosition: photo.position }}
+              />
+            ))}
           </div>
           {CONFETTI.map((p, i) => (
             <span
