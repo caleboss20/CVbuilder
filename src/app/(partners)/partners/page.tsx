@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button";
 import { EarningsCalculator } from "@/components/partners/earnings-calculator";
+import { PartnersHero } from "@/components/partners/partners-hero";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -39,22 +40,10 @@ const faqs = [
 export default function PartnersPage() {
   return (
     <>
-      {/* Hero */}
-      <section className="relative overflow-hidden px-4 pb-20 pt-20 sm:px-6 sm:pt-28">
-        <div aria-hidden="true" className="absolute left-1/2 top-0 -z-10 h-[420px] w-[900px] -translate-x-1/2 rounded-full bg-emerald-500/15 blur-[120px]" />
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="mx-auto w-fit rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-medium text-emerald-300 ring-1 ring-emerald-400/30">CV11 Partners</p>
-          <h1 className="mt-5 text-4xl font-medium tracking-tight text-fg sm:text-6xl">Help people get their CV done. Earn every time.</h1>
-          <p className="mx-auto mt-5 max-w-xl text-base text-fg/65 sm:text-lg">
-            Earn {siteConfig.partners.commission} for every CV that someone you help pays for on CV11. Free to join, paid by mobile money.
-          </p>
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <ButtonLink href="/partners/join" size="lg">Become a partner</ButtonLink>
-            <ButtonLink href="#how" variant="ghost" size="lg">See how it works</ButtonLink>
-          </div>
-        </div>
-      </section>
+      <PartnersHero />
 
+      {/* The sections below are still in the first draft look; they are redesigned one at a time */}
+      <div className="bg-ink-950 text-fg">
       {/* How it works */}
       <section id="how" className="mx-auto max-w-6xl scroll-mt-24 px-4 py-16 sm:px-6">
         <h2 className="text-center text-3xl font-medium tracking-tight text-fg">How it works</h2>
@@ -121,6 +110,7 @@ export default function PartnersPage() {
           <ButtonLink href="/partners/join" size="lg" className="mt-6">Become a partner</ButtonLink>
         </div>
       </section>
+      </div>
     </>
   );
 }
