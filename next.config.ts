@@ -5,6 +5,13 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   cacheComponents: true,
   partialPrefetching: true,
+  // The affiliate program used to live at /partners
+  async redirects() {
+    return [
+      { source: "/partners", destination: "/affiliates", permanent: true },
+      { source: "/partners/:path*", destination: "/affiliates/:path*", permanent: true },
+    ];
+  },
   turbopack: {
     rules: {
       "*.css": {

@@ -3,7 +3,7 @@ import { siteConfig } from "@/lib/site";
 
 /**
  * The CV11 mark: a page with a folded corner (a CV) in violet, with a "C" on it. Like a good app icon it
- * works alone at small sizes. Used by the logo below and by the partner site.
+ * works alone at small sizes. Used by the logo below and by the affiliate site.
  */
 export function LogoMark({ size = 30 }: { size?: number }) {
   return (

@@ -9,7 +9,7 @@ const cedis = (v: number) => `GH₵ ${v.toLocaleString("en-GB", { minimumFractio
 export function EarningsCalculator() {
   const [customers, setCustomers] = useState(30);
   // What one confirmed CV payment earns: the CV price times the commission share
-  const rate = (siteConfig.download.priceCedis * siteConfig.partners.commissionPercent) / 100;
+  const rate = (siteConfig.download.priceCedis * siteConfig.affiliates.commissionPercent) / 100;
   return (
     <div className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-6 sm:p-8">
       <label className="block text-sm font-medium text-fg/80" htmlFor="customers">
@@ -36,7 +36,7 @@ export function EarningsCalculator() {
         </div>
       </dl>
       <p className="mt-4 text-xs text-fg/45">
-        You earn {siteConfig.partners.commission} of every CV payment made with your code. This is arithmetic, not a promise: what you earn depends on how many people you help.
+        You earn {siteConfig.affiliates.commission} of every CV payment made with your code. This is arithmetic, not a promise: what you earn depends on how many people you help.
       </p>
     </div>
   );

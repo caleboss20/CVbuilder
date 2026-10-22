@@ -4,7 +4,7 @@ import { siteConfig } from "@/lib/site";
 
 /** The picture in the arch on the right. Swap this one line when a new photo arrives. */
 // Photo: Pexels photo 7658276 (free to use, no credit needed), 1400 px wide.
-const PHOTO = { src: "/images/partners/hero-woman.jpg", alt: "A smiling young woman in an orange shirt holding a folder of documents", position: "50% 16%" };
+const PHOTO = { src: "/images/affiliates/hero-woman.jpg", alt: "A smiling young woman in an orange shirt holding a folder of documents", position: "50% 16%" };
 
 /**
  * A small label on a splash of paint: an irregular blob with a few flying drops, in a bright violet, behind
@@ -30,14 +30,14 @@ function PaintLabel({ children }: { children: string }) {
 }
 
 /**
- * The first screen of the partner site, with the measurements of a software affiliate page: a 944 px wide
+ * The first screen of the affiliate site, with the measurements of a software affiliate page: a 944 px wide
  * block in the middle of the page, the words in a 472 px column on the left (a label, a 60 px headline,
  * a 20 px paragraph and a 48 px button, each 24 px below the one before), then a 58 px gap, then a
  * 414 x 445 photo with a fully round top, standing on the bottom edge of the hero. The deep blue-violet
  * background carries on from the navbar. What makes it CV11's own: the paint-splash label and the round
  * commission badge that sits low on the arch's edge, clear of the face.
  */
-export function PartnersHero({ photo = PHOTO }: { photo?: { src: string; alt: string; position?: string } }) {
+export function AffiliatesHero({ photo = PHOTO }: { photo?: { src: string; alt: string; position?: string } }) {
   return (
     <section className="relative overflow-hidden bg-[#16145f]">
       {/* A soft violet glow behind the photo */}
@@ -47,19 +47,19 @@ export function PartnersHero({ photo = PHOTO }: { photo?: { src: string; alt: st
       <div className="relative mx-auto grid w-full max-w-[944px] gap-8 px-5 pt-8 sm:px-8 lg:grid-cols-[minmax(0,1fr)_414px] lg:gap-[58px] lg:px-0 lg:pt-6">
         {/* Words */}
         <div className="flex flex-col items-start pb-2 lg:pb-12 lg:pt-6">
-          <PaintLabel>Partner programme</PaintLabel>
+          <PaintLabel>Affiliate program</PaintLabel>
           <h1 className="mt-6 text-balance text-[2.5rem] font-medium leading-[1.05] tracking-[-0.75px] text-white sm:text-[60px] sm:leading-[60px]">
             Help people get hired. Get paid.
           </h1>
           <p className="mt-6 max-w-[420px] text-lg leading-7 text-white/85 sm:text-xl">
-            Earn {siteConfig.partners.commission} on every CV paid for with your code. Paid straight to your MoMo.
+            Earn {siteConfig.affiliates.commission} on every CV paid for with your code. Paid straight to your MoMo.
           </p>
           <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-5">
             <Link
-              href="/partners/join"
+              href="/affiliates/join"
               className="inline-flex h-12 items-center gap-2 whitespace-nowrap rounded-lg bg-white px-5 text-lg font-medium text-[#16145f] sm:px-6 transition-colors hover:bg-[#e6e7ff]"
             >
-              Join the programme
+              Join the program
               <span aria-hidden="true">→</span>
             </Link>
             <p className="text-sm text-white/70">Free to join. No targets.</p>
@@ -77,7 +77,7 @@ export function PartnersHero({ photo = PHOTO }: { photo?: { src: string; alt: st
             className="absolute -bottom-0 left-0 grid size-[84px] -rotate-6 place-items-center rounded-full bg-[#7c80ff] text-center text-white shadow-[0_14px_30px_-12px_rgba(0,0,0,0.6)] sm:bottom-6 sm:size-[96px] lg:-left-10 lg:bottom-16 lg:size-[108px]"
           >
             <span className="leading-none">
-              <span className="block text-2xl font-semibold tracking-tight sm:text-3xl">{siteConfig.partners.commission}</span>
+              <span className="block text-2xl font-semibold tracking-tight sm:text-3xl">{siteConfig.affiliates.commission}</span>
               <span className="mt-0.5 block text-[10px] font-medium uppercase tracking-wide text-white/90">commission</span>
             </span>
           </div>

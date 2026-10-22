@@ -30,7 +30,7 @@ export const siteConfig = {
   download: {
     enabled: process.env.NEXT_PUBLIC_PAYMENTS_ENABLED === "true",
     price: "GH₵ 7",
-    /** The price as a number, for sums such as the partner earnings calculator. */
+    /** The price as a number, for sums such as the affiliate earnings calculator. */
     priceCedis: 7,
     days: 30,
   },
@@ -50,16 +50,16 @@ export const siteConfig = {
     ],
   },
   /**
-   * The partner (affiliate) programme at /partners. `commissionPercent` is the share of each confirmed
-   * payment made with their code that a partner earns (the percentage actually recorded is
+   * The affiliate program at /affiliates. `commissionPercent` is the share of each confirmed
+   * payment made with their code that an affiliate earns (the percentage actually recorded is
    * pay_settings.partner_commission_percent in the database, keep the two equal). `holdDays` matches pay_settings.partner_hold_days.
    */
-  partners: {
+  affiliates: {
     commission: "6%",
     commissionPercent: 6,
     holdDays: 14,
     minPayout: "GH₵ 10",
-    /** How many founding partners the programme starts with (shown on the partner page). */
+    /** How many founding affiliates the program starts with (shown on the affiliate page). */
     spots: 10,
     payoutDay: "the 1st of every month",
   },

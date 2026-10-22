@@ -31,7 +31,7 @@ export async function fetchCvAccess(cvId: string): Promise<CvAccess | null> {
 
 const PARTNER_KEY = "cv11-partner";
 
-/** Keeps a partner code seen in a link (?p=KOFI) so it is still there when the student reaches the pay screen. */
+/** Keeps an affiliate code seen in a link (?p=KOFI) so it is still there when the student reaches the pay screen. */
 export function rememberPartner(code: string) {
   const clean = code.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
   if (clean.length < 3) return;
@@ -40,7 +40,7 @@ export function rememberPartner(code: string) {
   } catch {}
 }
 
-/** The partner code kept from a link, or "". */
+/** The affiliate code kept from a link, or "". */
 export function savedPartner(): string {
   try {
     return localStorage.getItem(PARTNER_KEY) ?? "";

@@ -2,24 +2,24 @@ import type { Metadata } from "next";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Partner Programme Terms",
+  title: "Affiliate Program Terms",
 };
 
-const p = siteConfig.partners;
+const p = siteConfig.affiliates;
 
-export default function PartnerTermsPage() {
+export default function AffiliateTermsPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24">
-      <h1 className="text-3xl font-medium tracking-tight text-zinc-950 sm:text-4xl">CV11 Partner Programme terms</h1>
-      <p className="mt-3 text-sm text-zinc-600">These are the plain rules of the programme. We may update them, and we will say so on this page.</p>
+      <h1 className="text-3xl font-medium tracking-tight text-zinc-950 sm:text-4xl">CV11 Affiliate Program terms</h1>
+      <p className="mt-3 text-sm text-zinc-600">These are the plain rules of the program. We may update them, and we will say so on this page.</p>
       <div className="mt-8 space-y-6 text-[15px] leading-relaxed text-zinc-600">
         <section>
-          <h2 className="text-lg font-medium text-zinc-950">1. What a partner is</h2>
-          <p className="mt-2">A partner is a person who brings paying customers to CV11 using a personal code or link. Partners are not employees or agents of CV11 and are free to stop at any time.</p>
+          <h2 className="text-lg font-medium text-zinc-950">1. What an affiliate is</h2>
+          <p className="mt-2">An affiliate is a person who brings paying customers to CV11 using a personal code or link. Affiliates are not employees or agents of CV11 and are free to stop at any time.</p>
         </section>
         <section>
           <h2 className="text-lg font-medium text-zinc-950">2. Joining</h2>
-          <p className="mt-2">Joining is free. You apply with a CV11 account, your name as registered on your mobile money and your phone number. We review every application and may refuse or end a partnership at any time.</p>
+          <p className="mt-2">Joining is free. You apply with a CV11 account, your name as registered on your mobile money and your phone number. We review every application and may refuse or end an affiliateship at any time.</p>
         </section>
         <section>
           <h2 className="text-lg font-medium text-zinc-950">3. What you earn</h2>

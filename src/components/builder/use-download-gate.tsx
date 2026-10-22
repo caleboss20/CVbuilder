@@ -23,7 +23,7 @@ export function useDownloadGate({ cvId, onPdf, onWord }: { cvId: string | undefi
   const [state, setState] = useState<DialogState>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  // A partner code the student typed, or one kept from a link they opened. The dialog only exists after a
+  // An affiliate code the student typed, or one kept from a link they opened. The dialog only exists after a
   // click, so reading the saved code when this first runs cannot disagree with the server render.
   const [partner, setPartner] = useState(() => savedPartner());
   // The code box stays folded away until someone asks for it (or arrived with a code from a link)
@@ -105,12 +105,12 @@ export function useDownloadGate({ cvId, onPdf, onWord }: { cvId: string | undefi
             </ul>
             {!codeOpen && (
               <button type="button" onClick={() => setCodeOpen(true)} className="mt-4 text-sm text-fg/55 underline underline-offset-2 hover:text-fg">
-                Have a partner code?
+                Have an affiliate code?
               </button>
             )}
             {codeOpen && (
             <label className="mt-4 block text-sm text-fg/70">
-              Partner code (optional)
+              Affiliate code (optional)
               <input
                 value={partner}
                 onChange={(e) => setPartner(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12))}

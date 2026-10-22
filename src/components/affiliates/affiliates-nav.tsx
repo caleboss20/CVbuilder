@@ -5,9 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import { LogoMark, Wordmark } from "@/components/ui/logo";
 
 const links = [
-  { label: "How it works", href: "/partners#how" },
-  { label: "Earnings", href: "/partners#earn" },
-  { label: "FAQ", href: "/partners#faq" },
+  { label: "How it works", href: "/affiliates#how" },
+  { label: "Earnings", href: "/affiliates#earn" },
+  { label: "FAQ", href: "/affiliates#faq" },
   { label: "CV11", href: "/" },
 ];
 
@@ -46,7 +46,7 @@ function LanguageMenu({ light }: { light: boolean }) {
  * goes away and this bar stays stuck to the top of the screen, and turns white with a soft shadow, the logo and
  * links turn dark and the join button turns violet. It is taller than a plain navbar so it feels solid.
  */
-export function PartnersNav() {
+export function AffiliatesNav() {
   const ref = useRef<HTMLElement>(null);
   const [stuck, setStuck] = useState(false);
 
@@ -81,13 +81,13 @@ export function PartnersNav() {
       }`}
     >
       <div className="mx-auto flex h-[76px] max-w-[1200px] items-center gap-3 px-4 sm:h-[92px] sm:gap-8 sm:px-8">
-        <Link href="/partners" aria-label="CV11 Partners home" className="flex min-w-0 items-center gap-2">
+        <Link href="/affiliates" aria-label="CV11 Affiliates home" className="flex min-w-0 items-center gap-2">
           <LogoMark size={30} />
           <Wordmark className={stuck ? "text-zinc-950" : "text-white"} size={22} />
-          <span className={`hidden whitespace-nowrap text-[15px] font-medium tracking-tight min-[420px]:inline ${stuck ? "text-zinc-500" : "text-white/70"}`}>Partners</span>
+          <span className={`hidden whitespace-nowrap text-[15px] font-medium tracking-tight min-[420px]:inline ${stuck ? "text-zinc-500" : "text-white/70"}`}>Affiliates</span>
         </Link>
 
-        <nav aria-label="Partners" className={`hidden items-center gap-7 text-sm lg:flex ${stuck ? "text-zinc-700" : "text-white/85"}`}>
+        <nav aria-label="Affiliates" className={`hidden items-center gap-7 text-sm lg:flex ${stuck ? "text-zinc-700" : "text-white/85"}`}>
           {links.map((l) => (
             <a key={l.label} href={l.href} className={stuck ? "hover:text-zinc-950" : "hover:text-white"}>
               {l.label}
@@ -99,17 +99,17 @@ export function PartnersNav() {
           <div className="hidden sm:block">
             <LanguageMenu light={stuck} />
           </div>
-          <Link href="/partners/dashboard" className={`hidden px-2 text-sm font-medium sm:block ${stuck ? "text-zinc-800 hover:text-zinc-950" : "text-white/90 hover:text-white"}`}>
+          <Link href="/affiliates/dashboard" className={`hidden px-2 text-sm font-medium sm:block ${stuck ? "text-zinc-800 hover:text-zinc-950" : "text-white/90 hover:text-white"}`}>
             Login
           </Link>
           <Link
-            href="/partners/join"
+            href="/affiliates/join"
             className={`inline-flex h-10 items-center whitespace-nowrap rounded-lg px-3.5 text-[13px] font-medium transition-colors sm:h-11 sm:px-5 sm:text-sm ${
               stuck ? "bg-[#5b5fe0] text-white hover:bg-[#4a4ed0]" : "bg-white text-[#16145f] hover:bg-[#e6e7ff]"
             }`}
           >
             <span className="sm:hidden">Join now</span>
-            <span className="hidden sm:inline">{stuck ? "Join the programme" : "Join now"}</span>
+            <span className="hidden sm:inline">{stuck ? "Join the program" : "Join now"}</span>
           </Link>
         </div>
       </div>

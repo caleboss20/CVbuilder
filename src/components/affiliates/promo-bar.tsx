@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const KEY = "cv11-partners-bar-closed";
+const KEY = "cv11-affiliates-bar-closed";
 
 /** The thin announcement bar above the navbar. It can be closed, and stays closed on this device. */
 export function PromoBar() {
@@ -28,8 +28,8 @@ export function PromoBar() {
 
   return (
     <div className="relative bg-[#0c0b33] px-10 py-3 text-center text-sm text-white/90">
-      Now inviting our first partners.{" "}
-      <Link href="/partners/join" className="font-medium text-white underline underline-offset-4 hover:text-[#c7c9ff]">
+      Now inviting our first affiliates.{" "}
+      <Link href="/affiliates/join" className="font-medium text-white underline underline-offset-4 hover:text-[#c7c9ff]">
         Apply today
       </Link>
       <button

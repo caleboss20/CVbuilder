@@ -52,8 +52,8 @@ export function AdminDashboard() {
   // Money, certificates and the rest; missing when supabase/admin-more.sql has not been run
   const [overview, setOverview] = useState<AdminOverview | null>(null);
   const [overviewMissing, setOverviewMissing] = useState(false);
-  const [partners, setPartners] = useState<AdminAffiliate[] | null>(null);
-  const [partnersMissing, setPartnersMissing] = useState(false);
+  const [affiliates, setAffiliates] = useState<AdminAffiliate[] | null>(null);
+  const [affiliatesMissing, setAffiliatesMissing] = useState(false);
   const [error, setError] = useState<AdminError | null>(null);
   // The technical reason, shown so a failure can be fixed instead of guessed at
   const [detail, setDetail] = useState("");
@@ -63,8 +63,8 @@ export function AdminDashboard() {
     async (period: number) => {
       setBusy(true);
       const [result, more, aff] = await Promise.all([fetchAdminStats(period, token), fetchAdminOverview(period, token), fetchAdminAffiliates(token)]);
-      if ("partners" in aff) setPartners(aff.partners);
-      setPartnersMissing("missing" in aff && aff.missing);
+      if ("affiliates" in aff) setAffiliates(aff.affiliates);
+      setAffiliatesMissing("missing" in aff && aff.missing);
       if ("overview" in more) setOverview(more.overview);
       setOverviewMissing("missing" in more && more.missing);
       if ("stats" in result) {
@@ -124,7 +124,7 @@ export function AdminDashboard() {
       <>
         <Panels stats={stats} series={series} onSeries={setSeries} />
         <OverviewPanels overview={overview} missing={overviewMissing} />
-        <AffiliatePanel partners={partners} missing={partnersMissing} />
+        <AffiliatePanel affiliates={affiliates} missing={affiliatesMissing} />
       </>
     );
 

@@ -18,8 +18,8 @@ const reasons: { icon: ReactNode; title: string; body: string }[] = [
         <path d="M11.5 20.5l9-9M12 12.5h.01M20 19.5h.01" />
       </Icon>
     ),
-    title: `Earn ${siteConfig.partners.commission} on every CV`,
-    body: `Get ${siteConfig.partners.commission} of every CV payment made with your code, for every person you bring, with no cap on how much you can earn.`,
+    title: `Earn ${siteConfig.affiliates.commission} on every CV`,
+    body: `Get ${siteConfig.affiliates.commission} of every CV payment made with your code, for every person you bring, with no cap on how much you can earn.`,
   },
   {
     icon: (
@@ -29,7 +29,7 @@ const reasons: { icon: ReactNode; title: string; body: string }[] = [
       </Icon>
     ),
     title: "Paid by mobile money",
-    body: `Rewards go straight to your MTN, Telecel or AirtelTigo wallet on ${siteConfig.partners.payoutDay}. No bank account needed.`,
+    body: `Rewards go straight to your MTN, Telecel or AirtelTigo wallet on ${siteConfig.affiliates.payoutDay}. No bank account needed.`,
   },
   {
     icon: (
@@ -87,7 +87,7 @@ export function WhyJoin() {
 
       <div className="mx-auto max-w-[1110px] px-5 pb-20 pt-16 sm:px-8 sm:pb-28 sm:pt-24">
         <h2 className="mx-auto max-w-[900px] text-balance text-center text-[2rem] font-semibold uppercase leading-[1.02] tracking-[-0.04em] text-zinc-950 sm:text-[46px] sm:leading-[46px]">
-          Why join the partner programme?
+          Why join the affiliate program?
         </h2>
 
         <ul className="mt-12 grid gap-5 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">

@@ -115,26 +115,26 @@ export function OverviewPanels({ overview, missing }: { overview: AdminOverview 
   );
 }
 
-/** Partners: who has applied, who is approved, and what each is owed. `partners` is null until it loads. */
-export function AffiliatePanel({ partners, missing }: { partners: AdminAffiliate[] | null; missing: boolean }) {
+/** Affiliates: who has applied, who is approved, and what each is owed. `affiliates` is null until it loads. */
+export function AffiliatePanel({ affiliates, missing }: { affiliates: AdminAffiliate[] | null; missing: boolean }) {
   if (missing) {
     return (
       <section className={`${cardClass} p-5 text-sm text-afg/60`}>
-        To see partners here, run <span className="font-mono">supabase/affiliates.sql</span> in the Supabase SQL Editor, then refresh.
+        To see affiliates here, run <span className="font-mono">supabase/affiliates.sql</span> in the Supabase SQL Editor, then refresh.
       </section>
     );
   }
-  if (!partners) return null;
-  const owedTotal = partners.reduce((sum, p) => sum + p.owed, 0);
+  if (!affiliates) return null;
+  const owedTotal = affiliates.reduce((sum, p) => sum + p.owed, 0);
   return (
-    <section className={`${cardClass} p-5`} aria-label="Partners">
+    <section className={`${cardClass} p-5`} aria-label="Affiliates">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-sm font-medium">Partners</h2>
+        <h2 className="text-sm font-medium">Affiliates</h2>
         <p className="text-xs text-afg/50">Owed now, across everyone: {cedis(owedTotal)}</p>
       </div>
       <ul className="mt-4 divide-y divide-afg/10 text-sm">
-        {partners.length === 0 && <li className="py-2 text-afg/40">No applications yet. People apply at /partners.</li>}
-        {partners.map((p, i) => (
+        {affiliates.length === 0 && <li className="py-2 text-afg/40">No applications yet. People apply at /affiliates.</li>}
+        {affiliates.map((p, i) => (
           <li key={i} className="py-3">
             <div className="flex flex-wrap items-center justify-between gap-x-3">
               <span className="min-w-0 truncate font-medium">

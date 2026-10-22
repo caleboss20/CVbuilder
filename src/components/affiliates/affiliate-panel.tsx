@@ -19,10 +19,10 @@ const field = "mt-1.5 block h-11 w-full rounded-md bg-zinc-100 px-3.5 text-[15px
 const button = "inline-flex h-11 items-center justify-center rounded-md bg-zinc-950 px-5 text-[15px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50";
 
 /**
- * The partner's page: log in, apply, see the application's status, and (once approved) the code, the link to
- * share and the earnings. Used for both /partners/join and /partners/dashboard.
+ * The affiliate's page: log in, apply, see the application's status, and (once approved) the code, the link to
+ * share and the earnings. Used for both /affiliates/join and /affiliates/dashboard.
  */
-export function PartnerPanel() {
+export function AffiliatePanel() {
   const { user, loading } = useUser({ eager: true });
   const [me, setMe] = useState<Me | null>(null);
   const [name, setName] = useState("");
@@ -36,12 +36,12 @@ export function PartnerPanel() {
   const load = useCallback(async () => {
     const supabase = await loadSupabase();
     const { data, error } = (await supabase?.rpc("affiliate_me")) ?? {};
-    if (error) setMessage("The partner programme is not switched on yet. Please check back soon.");
+    if (error) setMessage("The affiliate program is not switched on yet. Please check back soon.");
     else if (data) setMe(data as Me);
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- loads the signed-in person's partner record
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- loads the signed-in person's affiliate record
     if (user) void load();
   }, [user, load]);
 
@@ -53,7 +53,7 @@ export function PartnerPanel() {
     const { error } = (await supabase?.rpc("affiliate_apply", { p_name: name, p_phone: phone, p_note: note })) ?? {};
     setBusy(false);
     if (error) {
-      setMessage(error.message.includes("closed") ? "We are not taking new partners right now. Please check back soon." : "We could not send your application. Please check the details and try again.");
+      setMessage(error.message.includes("closed") ? "We are not taking new affiliates right now. Please check back soon." : "We could not send your application. Please check the details and try again.");
       return;
     }
     await load();
@@ -70,7 +70,7 @@ export function PartnerPanel() {
     }
   }
 
-  if (!authConfigured) return <p className="text-center text-zinc-600">Partner sign-up is not available right now.</p>;
+  if (!authConfigured) return <p className="text-center text-zinc-600">Affiliate sign-up is not available right now.</p>;
   if (loading) return <p className="text-center text-zinc-600">Loading…</p>;
 
   // Not logged in
@@ -78,10 +78,10 @@ export function PartnerPanel() {
     return (
       <div className={`${card} text-center`}>
         <h2 className="text-xl font-medium text-zinc-950">Log in to join</h2>
-        <p className="mt-2 text-sm text-zinc-600">Partners use a free CV11 account, so we know who to pay.</p>
+        <p className="mt-2 text-sm text-zinc-600">Affiliates use a free CV11 account, so we know who to pay.</p>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link href="/signup" onClick={() => rememberResume("/partners/dashboard")} className={button}>Create a free account</Link>
-          <Link href="/login" onClick={() => rememberResume("/partners/dashboard")} className="inline-flex h-11 items-center justify-center rounded-md px-5 text-[15px] text-zinc-950 ring-1 ring-zinc-300 hover:bg-zinc-100">I already have one</Link>
+          <Link href="/signup" onClick={() => rememberResume("/affiliates/dashboard")} className={button}>Create a free account</Link>
+          <Link href="/login" onClick={() => rememberResume("/affiliates/dashboard")} className="inline-flex h-11 items-center justify-center rounded-md px-5 text-[15px] text-zinc-950 ring-1 ring-zinc-300 hover:bg-zinc-100">I already have one</Link>
         </div>
       </div>
     );
@@ -93,7 +93,7 @@ export function PartnerPanel() {
   if (me.status === "none") {
     return (
       <form onSubmit={apply} className={`${card} space-y-4`}>
-        <h2 className="text-xl font-medium text-zinc-950">Apply to become a partner</h2>
+        <h2 className="text-xl font-medium text-zinc-950">Apply to become an affiliate</h2>
         <label className="block text-sm font-medium text-zinc-600">
           Full name (as registered on your MoMo)
           <input value={name} onChange={(e) => setName(e.target.value)} className={field} required minLength={2} maxLength={100} autoComplete="name" />
@@ -109,7 +109,7 @@ export function PartnerPanel() {
         <label className="flex items-start gap-2 text-sm text-zinc-600">
           <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-1" />
           <span>
-            I agree to the <Link href="/partners/terms" className="text-violet-700 underline">partner terms</Link>.
+            I agree to the <Link href="/affiliates/terms" className="text-violet-700 underline">affiliate terms</Link>.
           </span>
         </label>
         <button type="submit" disabled={busy || !agreed} className={button}>{busy ? "Sending…" : "Send my application"}</button>
@@ -130,7 +130,7 @@ export function PartnerPanel() {
   if (me.status === "paused") {
     return (
       <div className={card}>
-        <h2 className="text-xl font-medium text-zinc-950">Your partner code is paused</h2>
+        <h2 className="text-xl font-medium text-zinc-950">Your affiliate code is paused</h2>
         <p className="mt-2 text-zinc-600">New payments are not earning rewards right now. {whatsappLink() ? "Message us on WhatsApp if you have a question." : "Please contact CV11 if you have a question."}</p>
       </div>
     );
@@ -140,9 +140,9 @@ export function PartnerPanel() {
   return (
     <div className="space-y-5">
       <div className={card}>
-        <p className="text-sm text-zinc-600">Welcome, {me.name}. Your partner code:</p>
+        <p className="text-sm text-zinc-600">Welcome, {me.name}. Your affiliate code:</p>
         <p className="mt-1 font-mono text-4xl font-semibold tracking-widest text-violet-700">{me.code}</p>
-        <p className="mt-4 text-sm text-zinc-600">Tell people to type it in the <b className="text-zinc-950">Partner code</b> box when they pay, or share your link:</p>
+        <p className="mt-4 text-sm text-zinc-600">Tell people to type it in the <b className="text-zinc-950">Affiliate code</b> box when they pay, or share your link:</p>
         <p className="mt-2 break-all rounded-lg bg-zinc-100 p-3 text-sm text-zinc-950">{link}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <button type="button" onClick={copy} className="inline-flex h-10 items-center rounded-md px-4 text-sm text-zinc-950 ring-1 ring-zinc-300 hover:bg-zinc-100">{copied ? "Copied" : "Copy link"}</button>
@@ -171,7 +171,7 @@ export function PartnerPanel() {
         ))}
       </dl>
       <p className="text-xs text-zinc-600">
-        Already paid to you: {cedis(me.paid_out)}. Rewards are sent by mobile money on {siteConfig.partners.payoutDay}, once you are owed at least {siteConfig.partners.minPayout}.
+        Already paid to you: {cedis(me.paid_out)}. Rewards are sent by mobile money on {siteConfig.affiliates.payoutDay}, once you are owed at least {siteConfig.affiliates.minPayout}.
       </p>
     </div>
   );

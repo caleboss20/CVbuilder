@@ -6,12 +6,12 @@ import { siteConfig } from "@/lib/site";
  * The photo on the left: two people toasting with coffee over their laptops, supplied by the owner (735 x 1103 px;
  * confirm its licence before the site goes public). Swap this one line when a new photo arrives.
  */
-const PHOTO = { src: "/images/partners/founding-cheers.webp", alt: "Two people toasting with coffee cups over their laptops", position: "50% 45%" };
+const PHOTO = { src: "/images/affiliates/founding-cheers.webp", alt: "Two people toasting with coffee cups over their laptops", position: "50% 45%" };
 
 /** The words that scroll along the ribbon on top. */
-const RIBBON = ["Founding partners", `Only ${siteConfig.partners.spots} spots`, "Free to join", "Apply now"];
+const RIBBON = ["Founding affiliates", `Only ${siteConfig.affiliates.spots} spots`, "Free to join", "Apply now"];
 
-const steps = ["Apply in two minutes. It is free.", "Get your personal code and link.", `Help people with their CV and get paid on ${siteConfig.partners.payoutDay}.`];
+const steps = ["Apply in two minutes. It is free.", "Get your personal code and link.", `Help people with their CV and get paid on ${siteConfig.affiliates.payoutDay}.`];
 
 /** A highlighted word, like a marker pen. */
 function Mark({ children }: { children: string }) {
@@ -23,9 +23,9 @@ function Mark({ children }: { children: string }) {
  * sliding along the top, then a photo on the left and the offer on the right. It follows the usual
  * principles of a page that makes people sign up: one clear action, a headline about what they get, the
  * numbers that matter picked out, three easy steps, real scarcity (we are starting with a few founding
- * partners), and the worry removed right under the button (free, no targets).
+ * affiliates), and the worry removed right under the button (free, no targets).
  */
-export function FoundingPartners({ photo = PHOTO }: { photo?: { src: string; alt: string; position: string } }) {
+export function FoundingAffiliates({ photo = PHOTO }: { photo?: { src: string; alt: string; position: string } }) {
   const ribbon = [...RIBBON, ...RIBBON, ...RIBBON, ...RIBBON];
   return (
     <section id="join" className="scroll-mt-24 bg-white text-zinc-950">
@@ -63,7 +63,7 @@ export function FoundingPartners({ photo = PHOTO }: { photo?: { src: string; alt
         <div>
           <h2 className="text-balance text-[2rem] font-semibold leading-[1.05] tracking-[-0.04em] sm:text-[36px] sm:leading-[36px]">Start earning from your very first CV</h2>
           <p className="mt-6 max-w-[460px] text-base font-medium leading-6 tracking-[-0.02em] text-zinc-700 sm:text-[17px] sm:leading-7">
-            Earn <Mark>{siteConfig.partners.commission}</Mark> of every CV payment made with your code, and keep <Mark>100%</Mark> of any fee you charge for your own time. Help one person or a hundred: there is no cap.
+            Earn <Mark>{siteConfig.affiliates.commission}</Mark> of every CV payment made with your code, and keep <Mark>100%</Mark> of any fee you charge for your own time. Help one person or a hundred: there is no cap.
           </p>
 
           <ol className="mt-8 max-w-[460px] divide-y divide-zinc-200 border-y border-zinc-200 text-base font-medium tracking-[-0.02em]">
@@ -77,14 +77,14 @@ export function FoundingPartners({ photo = PHOTO }: { photo?: { src: string; alt
 
           <div className="mt-9">
             <Link
-              href="/partners/join"
+              href="/affiliates/join"
               className="inline-flex h-14 items-center gap-2 rounded-lg bg-[#5b5fe0] px-8 text-base font-semibold text-white transition-colors hover:bg-[#4a4ed0]"
             >
               Claim my founding spot
               <span aria-hidden="true">→</span>
             </Link>
             <p className="mt-4 text-sm text-zinc-500">
-              We are starting with {siteConfig.partners.spots} founding partners. Free to join, no targets, and we reply within a few days.
+              We are starting with {siteConfig.affiliates.spots} founding affiliates. Free to join, no targets, and we reply within a few days.
             </p>
           </div>
         </div>

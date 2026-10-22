@@ -109,7 +109,7 @@ export async function fetchAdminOverview(days: number, accessToken: string | und
   }
 }
 
-/** One partner as the admin sees them. Money is in pesewas. */
+/** One affiliate as the admin sees them. Money is in pesewas. */
 export type AdminAffiliate = {
   name: string;
   phone: string;
@@ -124,8 +124,8 @@ export type AdminAffiliate = {
   paid_out: number;
 };
 
-/** Loads the partner list. `missing` is true when supabase/affiliates.sql has not been run yet. */
-export async function fetchAdminAffiliates(accessToken: string | undefined): Promise<{ partners: AdminAffiliate[] } | { missing: boolean }> {
+/** Loads the affiliate list. `missing` is true when supabase/affiliates.sql has not been run yet. */
+export async function fetchAdminAffiliates(accessToken: string | undefined): Promise<{ affiliates: AdminAffiliate[] } | { missing: boolean }> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key || !accessToken) return { missing: false };
@@ -135,7 +135,7 @@ export async function fetchAdminAffiliates(accessToken: string | undefined): Pro
       headers: { apikey: key, Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
       body: "{}",
     });
-    if (response.ok) return { partners: (await response.json()) as AdminAffiliate[] };
+    if (response.ok) return { affiliates: (await response.json()) as AdminAffiliate[] };
     const body = (await response.json().catch(() => ({}))) as { code?: string };
     return { missing: body.code === "PGRST202" || body.code === "42883" };
   } catch {

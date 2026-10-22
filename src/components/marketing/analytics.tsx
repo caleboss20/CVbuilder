@@ -24,7 +24,7 @@ export function SiteAnalytics() {
 
   useEffect(() => {
     recordFirstVisit();
-    // A partner's link ends in ?p=CODE: keep the code until the student reaches the pay screen
+    // An affiliate's link ends in ?p=CODE: keep the code until the student reaches the pay screen
     const code = new URLSearchParams(window.location.search).get("p");
     if (code) rememberPartner(code);
   }, []);
