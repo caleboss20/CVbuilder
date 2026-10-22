@@ -18,6 +18,10 @@ export type Me =
 type Approved = Extract<Me, { status: "approved" }>;
 /** One payout recorded for the affiliate. */
 export type Payout = { id: number; amount_pesewas: number; paid_at: string; note: string | null };
+/** One CV paid for with the affiliate's code (no customer details are ever shown). */
+export type Referral = { paid_at: string; amount: number; reward: number; owed: boolean };
+/** What the affiliate_activity function returns: recent referrals and each of the last 30 days' earnings. */
+export type Activity = { referrals: Referral[]; daily: { day: string; earned: number }[] };
 type Section = "home" | "share" | "payouts" | "help";
 
 const cedis = (pesewas: number) => `GH₵ ${(pesewas / 100).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -112,6 +116,55 @@ function EarningsDonut({ me }: { me: Approved }) {
         ))}
       </ul>
     </div>
+  );
+}
+
+/** Earnings for each of the last 30 days, as bars. Shows a plain line of text until there is something to draw. */
+function EarningsChart({ daily }: { daily: Activity["daily"] }) {
+  const max = Math.max(...daily.map((d) => d.earned), 0);
+  const total = daily.reduce((sum, d) => sum + d.earned, 0);
+  return (
+    <section aria-label="Earnings, last 30 days">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="text-xl font-semibold tracking-tight text-zinc-950">Earnings, last 30 days</h2>
+        <p className="text-sm font-semibold tabular-nums text-zinc-950">{cedis(total)}</p>
+      </div>
+      <Card className="mt-4">
+        {max === 0 ? (
+          <p className="py-8 text-center text-[15px] text-zinc-500">Nothing earned in the last 30 days yet. Share your code to get started.</p>
+        ) : (
+          <div className="flex h-40 items-end gap-1" role="img" aria-label={`Earnings of ${cedis(total)} over the last 30 days`}>
+            {daily.map((d) => (
+              <div key={d.day} title={`${d.day}: ${cedis(d.earned)}`} className="flex-1 rounded-t bg-[#9a9dff]" style={{ height: `${Math.max((d.earned / max) * 100, d.earned > 0 ? 4 : 1)}%`, opacity: d.earned > 0 ? 1 : 0.25 }} />
+            ))}
+          </div>
+        )}
+      </Card>
+    </section>
+  );
+}
+
+/** The latest CVs paid with the code: the date, what was earned, and whether it is owed yet. */
+function Referrals({ referrals }: { referrals: Referral[] }) {
+  return (
+    <section aria-label="Recent referrals">
+      <h2 className="text-xl font-semibold tracking-tight text-zinc-950">Recent referrals</h2>
+      <Card className="mt-4">
+        {referrals.length === 0 ? (
+          <p className="text-[15px] text-zinc-500">No CVs paid with your code yet.</p>
+        ) : (
+          <ul className="divide-y divide-zinc-200">
+            {referrals.slice(0, 8).map((r, i) => (
+              <li key={i} className="flex items-center justify-between gap-4 py-3 text-[15px]">
+                <span className="text-zinc-700">{new Date(r.paid_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
+                <span className="font-semibold tabular-nums text-zinc-950">+ {cedis(r.reward)}</span>
+                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${r.owed ? "bg-[#e9f6ec] text-emerald-800" : "bg-[#fdf3e7] text-amber-800"}`}>{r.owed ? "Owed" : "Waiting"}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+    </section>
   );
 }
 
@@ -290,6 +343,7 @@ export function AffiliateDashboard() {
   const [me, setMe] = useState<Me | null>(null);
   const [error, setError] = useState("");
   const [payouts, setPayouts] = useState<Payout[]>([]);
+  const [activity, setActivity] = useState<Activity | null>(null);
 
   const load = useCallback(async () => {
     const supabase = await loadSupabase();
@@ -299,6 +353,9 @@ export function AffiliateDashboard() {
     // The payouts recorded for this person (the database returns only their own)
     const { data: rows } = (await supabase?.from("affiliate_payouts").select("id, amount_pesewas, paid_at, note").order("paid_at", { ascending: false }).limit(50)) ?? {};
     if (rows) setPayouts(rows as Payout[]);
+    // Recent referrals and the 30-day chart (supabase/affiliate-activity.sql); the dashboard works without it
+    const { data: act } = (await supabase?.rpc("affiliate_activity")) ?? {};
+    if (act) setActivity(act as Activity);
   }, []);
 
   useEffect(() => {
@@ -322,11 +379,11 @@ export function AffiliateDashboard() {
 
   if (!authConfigured) return <p className="p-10 text-center text-zinc-600">The affiliate dashboard is not available right now.</p>;
   if (loading || !user) return <div className="min-h-screen bg-white" />;
-  return <AffiliateDashboardView me={me} payouts={payouts} error={error} email={user.email ?? ""} onLogOut={logOut} />;
+  return <AffiliateDashboardView me={me} payouts={payouts} activity={activity} error={error} email={user.email ?? ""} onLogOut={logOut} />;
 }
 
 /** The dashboard's screen, drawn from the data it is given (so it can be shown with sample figures). */
-export function AffiliateDashboardView({ me, payouts = [], error = "", email, onLogOut }: { me: Me | null; payouts?: Payout[]; error?: string; email: string; onLogOut: () => void }) {
+export function AffiliateDashboardView({ me, payouts = [], activity = null, error = "", email, onLogOut }: { me: Me | null; payouts?: Payout[]; activity?: Activity | null; error?: string; email: string; onLogOut: () => void }) {
   const [section, setSection] = useState<Section>("home");
   const approved = me && me.status === "approved" ? me : null;
   const link = approved && typeof window !== "undefined" ? `${window.location.origin}/?p=${approved.code}` : "";
@@ -396,6 +453,7 @@ export function AffiliateDashboardView({ me, payouts = [], error = "", email, on
                   <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Welcome back, {first}</h2>
                   <p className="mt-1 text-zinc-500">Here is what is happening with your code today.</p>
                 </div>
+                {activity && <EarningsChart daily={activity.daily} />}
                 <SetupGuide me={approved} />
                 <Card className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
@@ -404,6 +462,7 @@ export function AffiliateDashboardView({ me, payouts = [], error = "", email, on
                   </div>
                   <button type="button" onClick={() => setSection("share")} className={primary}>Share your code →</button>
                 </Card>
+                {activity && <Referrals referrals={activity.referrals} />}
               </div>
 
               <aside aria-label="Statistics" className="space-y-4 xl:border-l xl:border-zinc-200 xl:pl-10">
