@@ -3,7 +3,8 @@ import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 
 /** The picture in the arch on the right. Swap this one line when a new photo arrives. */
-const PHOTO = { src: "/images/partners/hero-team.webp", alt: "Friends laughing together while looking at a tablet" };
+// Photo: Pexels photo 7658276 (free to use, no credit needed), 1400 px wide.
+const PHOTO = { src: "/images/partners/hero-woman.jpg", alt: "A smiling young woman in an orange shirt holding a folder of documents", position: "50% 18%" };
 
 /**
  * A small label on a splash of paint: an irregular blob with a few flying drops, in a bright violet, behind
@@ -34,16 +35,16 @@ function PaintLabel({ children }: { children: string }) {
  * paragraph and one button), and a photo standing on the bottom edge on the right. What makes it CV11's own:
  * the photo sits in an arch rather than a box, and a round commission badge overlaps its edge.
  */
-export function PartnersHero() {
+export function PartnersHero({ photo = PHOTO }: { photo?: { src: string; alt: string; position?: string } }) {
   return (
     <section className="relative overflow-hidden bg-[#16145f]">
       {/* A soft violet glow behind the photo */}
       <div aria-hidden="true" className="pointer-events-none absolute -right-24 top-0 size-[620px] rounded-full bg-[#7c80ff]/35 blur-[120px]" />
       <div aria-hidden="true" className="pointer-events-none absolute -left-40 bottom-0 size-[420px] rounded-full bg-[#3a36d6]/40 blur-[110px]" />
 
-      <div className="relative mx-auto grid max-w-[1200px] items-end gap-10 px-5 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:gap-6">
+      <div className="relative mx-auto grid max-w-[1200px] gap-8 px-5 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:gap-6">
         {/* Words */}
-        <div className="pb-4 pt-10 lg:self-center lg:pb-24 lg:pt-20">
+        <div className="flex flex-col items-start justify-center pt-8 lg:py-12">
           <PaintLabel>Partner programme</PaintLabel>
           <h1 className="mt-7 max-w-[520px] text-[2.5rem] font-medium leading-[1.05] tracking-[-0.75px] text-white sm:text-[60px] sm:leading-[60px]">
             Help people get hired.
@@ -66,9 +67,9 @@ export function PartnersHero() {
         </div>
 
         {/* Photo in an arch, standing on the bottom edge */}
-        <div className="relative mx-auto w-full max-w-[440px] lg:max-w-none">
-          <div className="relative ml-auto h-[360px] w-full max-w-[440px] overflow-hidden rounded-t-[220px] bg-[#e9ecff] sm:h-[460px] lg:h-[540px]">
-            <Image src={PHOTO.src} alt={PHOTO.alt} fill priority sizes="(min-width: 1024px) 440px, 90vw" className="object-cover object-[52%_30%]" />
+        <div className="relative mx-auto flex w-full max-w-[440px] items-end lg:mx-0 lg:ml-auto lg:max-w-[460px]">
+          <div className="relative h-[340px] w-full overflow-hidden rounded-t-[220px] bg-[#e9ecff] sm:h-[420px] lg:h-[500px]">
+            <Image src={photo.src} alt={photo.alt} fill priority sizes="(min-width: 1024px) 440px, 90vw" className="object-cover" style={{ objectPosition: photo.position ?? "46% 30%" }} />
           </div>
           {/* The commission badge, overlapping the arch's edge */}
           <div
