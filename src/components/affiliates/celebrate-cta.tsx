@@ -53,9 +53,9 @@ export function CelebrateCta() {
           .celebrate-b { animation: celebrate-b 10s ease-in-out infinite; }
         }
       `}</style>
-      <div className="mx-auto grid max-w-[1110px] items-center gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[minmax(0,500px)_1fr] lg:gap-20">
+      <div className="mx-auto grid max-w-[1110px] items-center gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[minmax(0,380px)_1fr] lg:gap-24">
         {/* The round photo, with confetti */}
-        <div className="relative mx-auto w-full max-w-[420px] lg:mx-0 lg:max-w-none">
+        <div className="relative mx-auto w-full max-w-[320px] lg:mx-0 lg:max-w-none">
           <div className="relative aspect-square w-full overflow-hidden rounded-full bg-[#2b2896]">
             {PHOTOS.map((photo, i) => (
               <Image
@@ -63,7 +63,7 @@ export function CelebrateCta() {
                 src={photo.src}
                 alt={i === 0 ? photo.alt : ""}
                 fill
-                sizes="(min-width: 1024px) 500px, 85vw"
+                sizes="(min-width: 1024px) 380px, 80vw"
                 className={`object-cover ${i === 0 ? "celebrate-a" : "celebrate-b opacity-0"}`}
                 style={{ objectPosition: photo.position }}
               />
