@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LogoMark, Wordmark } from "@/components/ui/logo";
 import { PromoBar } from "./promo-bar";
-import { ScrollBar } from "./scroll-bar";
+import { PartnersNav } from "./partners-nav";
 
 /**
  * The CV11 Partners top of page: a thin announcement bar, then the navbar on a deep blue-violet background
@@ -20,72 +20,12 @@ export function PartnersLogo() {
   );
 }
 
-const links = [
-  { label: "How it works", href: "/partners#how" },
-  { label: "Earnings", href: "/partners#earn" },
-  { label: "FAQ", href: "/partners#faq" },
-  { label: "CV11", href: "/" },
-];
-
-/** The language menu. English is the only language for now, so it is a small list with one choice. */
-function LanguageMenu() {
-  return (
-    <details className="group relative">
-      <summary className="flex h-9 cursor-pointer list-none items-center gap-1.5 rounded-lg px-2.5 text-sm text-white/85 marker:hidden hover:bg-white/10 [&::-webkit-details-marker]:hidden">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z" />
-        </svg>
-        English
-        <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="transition-transform group-open:rotate-180">
-          <path d="M5 8l5 5 5-5" />
-        </svg>
-      </summary>
-      <ul className="absolute right-0 top-full z-50 mt-1 w-40 rounded-lg bg-white py-1 text-sm shadow-lg">
-        <li className="flex items-center justify-between px-3 py-2 font-medium text-zinc-950">
-          English
-          <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="#5b5fe0" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M4.5 10.5l3.5 3.5 7.5-8" />
-          </svg>
-        </li>
-      </ul>
-    </details>
-  );
-}
-
+/** The announcement bar, then the navbar that sticks to the top and turns white as the page scrolls. */
 export function PartnersHeader() {
   return (
     <>
-      {/* The white bar that slides in once the page is scrolled */}
-      <ScrollBar />
-
-      {/* Announcement bar, with a close button */}
       <PromoBar />
-
-      {/* Navbar */}
-      <header className="relative z-30 bg-[#16145f]">
-        <div className="mx-auto flex h-[72px] max-w-[1200px] items-center gap-3 px-4 sm:h-[84px] sm:gap-8 sm:px-8">
-          <PartnersLogo />
-          <nav aria-label="Partners" className="hidden items-center gap-7 text-sm text-white/85 lg:flex">
-            {links.map((l) => (
-              <a key={l.label} href={l.href} className="hover:text-white">
-                {l.label}
-              </a>
-            ))}
-          </nav>
-          <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-3">
-            <div className="hidden sm:block">
-              <LanguageMenu />
-            </div>
-            <Link href="/partners/dashboard" className="hidden px-2 text-sm text-white/90 hover:text-white sm:block">
-              Login
-            </Link>
-            <Link href="/partners/join" className="inline-flex h-9 items-center whitespace-nowrap rounded-lg bg-white px-3.5 text-[13px] font-medium text-[#16145f] transition-colors hover:bg-[#e6e7ff] sm:h-10 sm:px-5 sm:text-sm">
-              Join now
-            </Link>
-          </div>
-        </div>
-      </header>
+      <PartnersNav />
     </>
   );
 }
