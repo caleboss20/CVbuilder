@@ -2,16 +2,20 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { authConfigured } from "@/lib/auth-config";
 import { DOWNLOAD_DAYS, DOWNLOAD_PRICE, paymentsEnabled, takeResume } from "@/lib/payments";
 import { getSupabase } from "@/lib/supabase";
 import { useUser } from "./use-user";
 
+/** One paid CV download, as listed under "Your payments". */
+type PaidRow = { reference: string; amount_pesewas: number; paid_at: string };
+
 /** What a signed-in student sees: who they are, how downloads work, and a way to sign out. */
 export function AccountPanel() {
   const router = useRouter();
   const { user, loading } = useUser({ eager: true });
+  const [paid, setPaid] = useState<PaidRow[]>([]);
 
   // A student who confirmed their email while trying to download lands here: send them back to their CV
   useEffect(() => {
@@ -19,6 +23,19 @@ export function AccountPanel() {
     const back = takeResume();
     if (back) router.replace(back);
   }, [user, router]);
+
+  // The student's own paid downloads, newest first (the database only returns their own rows)
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    void (async () => {
+      const { data } = (await getSupabase()?.from("payments").select("reference, amount_pesewas, paid_at").eq("user_id", user.id).eq("status", "paid").order("paid_at", { ascending: false }).limit(20)) ?? {};
+      if (!cancelled && data) setPaid(data as PaidRow[]);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   if (!authConfigured) return <p className="text-sm text-fg/70">Accounts are not switched on yet.</p>;
   if (loading) return <p className="text-sm text-fg/55">Loading…</p>;
@@ -54,6 +71,23 @@ export function AccountPanel() {
           </dd>
         </div>
       </dl>
+
+      {paid.length > 0 && (
+        <div>
+          <h2 className="text-xs uppercase tracking-wide text-fg/45">Your payments</h2>
+          <ul className="mt-2 divide-y divide-fg/10 text-sm">
+            {paid.map((p) => (
+              <li key={p.reference} className="flex items-center justify-between gap-3 py-3">
+                <span className="text-fg">
+                  {new Date(p.paid_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })} · GH₵ {(p.amount_pesewas / 100).toFixed(2)}
+                </span>
+                <Link href={`/receipt?ref=${encodeURIComponent(p.reference)}`} className="text-brand-300 hover:text-fg">Receipt</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <button
         type="button"
         onClick={() => getSupabase()?.auth.signOut()}

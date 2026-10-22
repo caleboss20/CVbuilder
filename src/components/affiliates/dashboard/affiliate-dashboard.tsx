@@ -10,12 +10,14 @@ import { rememberResume } from "@/lib/payments";
 import { siteConfig, whatsappLink } from "@/lib/site";
 
 /** What the database says about the signed-in person (the `affiliate_me` function). */
-type Me =
+export type Me =
   | { status: "none" }
   | { status: "pending"; name: string }
   | { status: "paused"; name: string }
   | { status: "approved"; name: string; code: string; customers: number; earned: number; owed: number; waiting: number; paid_out: number; hold_days: number };
 type Approved = Extract<Me, { status: "approved" }>;
+/** One payout recorded for the affiliate. */
+export type Payout = { id: number; amount_pesewas: number; paid_at: string; note: string | null };
 type Section = "home" | "share" | "payouts" | "help";
 
 const cedis = (pesewas: number) => `GH₵ ${(pesewas / 100).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -182,7 +184,7 @@ function SharePanel({ me, link }: { me: Approved; link: string }) {
 }
 
 /** What is owed, what is waiting and when the money is sent. */
-function PayoutsPanel({ me }: { me: Approved }) {
+function PayoutsPanel({ me, payouts }: { me: Approved; payouts: Payout[] }) {
   const a = siteConfig.affiliates;
   return (
     <div className="grid gap-5 xl:grid-cols-[1fr_340px]">
@@ -194,6 +196,22 @@ function PayoutsPanel({ me }: { me: Approved }) {
             <li>We send owed rewards by mobile money on {a.payoutDay}, once you are owed at least {a.minPayout}.</li>
             <li>Smaller amounts carry over to the next month.</li>
           </ul>
+        </Card>
+        <Card>
+          <h3 className="font-semibold text-zinc-950">Payout history</h3>
+          {payouts.length === 0 ? (
+            <p className="mt-3 text-[15px] text-zinc-600">No payouts yet. Each one we send will appear here with a receipt.</p>
+          ) : (
+            <ul className="mt-3 divide-y divide-zinc-200">
+              {payouts.map((p) => (
+                <li key={p.id} className="flex items-center justify-between gap-4 py-3 text-[15px]">
+                  <span className="text-zinc-700">{new Date(p.paid_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
+                  <span className="font-semibold tabular-nums text-zinc-950">{cedis(p.amount_pesewas)}</span>
+                  <Link href={`/receipt?payout=${p.id}`} className="font-medium text-[#4a4ed0] hover:underline">Receipt</Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
         <div className="grid gap-4 sm:grid-cols-3">
           <Tint tone="bg-[#eef0ff]" icon={ICONS.coins} label="Owed now" value={cedis(me.owed)} />
@@ -270,14 +288,17 @@ export function AffiliateDashboard() {
   const router = useRouter();
   const { user, loading } = useUser({ eager: true });
   const [me, setMe] = useState<Me | null>(null);
-  const [section, setSection] = useState<Section>("home");
   const [error, setError] = useState("");
+  const [payouts, setPayouts] = useState<Payout[]>([]);
 
   const load = useCallback(async () => {
     const supabase = await loadSupabase();
     const { data, error: err } = (await supabase?.rpc("affiliate_me")) ?? {};
     if (err) setError("The affiliate program is not switched on yet. Please check back soon.");
     else if (data) setMe(data as Me);
+    // The payouts recorded for this person (the database returns only their own)
+    const { data: rows } = (await supabase?.from("affiliate_payouts").select("id, amount_pesewas, paid_at, note").order("paid_at", { ascending: false }).limit(50)) ?? {};
+    if (rows) setPayouts(rows as Payout[]);
   }, []);
 
   useEffect(() => {
@@ -299,13 +320,18 @@ export function AffiliateDashboard() {
     router.replace("/affiliates");
   }
 
+  if (!authConfigured) return <p className="p-10 text-center text-zinc-600">The affiliate dashboard is not available right now.</p>;
+  if (loading || !user) return <div className="min-h-screen bg-white" />;
+  return <AffiliateDashboardView me={me} payouts={payouts} error={error} email={user.email ?? ""} onLogOut={logOut} />;
+}
+
+/** The dashboard's screen, drawn from the data it is given (so it can be shown with sample figures). */
+export function AffiliateDashboardView({ me, payouts = [], error = "", email, onLogOut }: { me: Me | null; payouts?: Payout[]; error?: string; email: string; onLogOut: () => void }) {
+  const [section, setSection] = useState<Section>("home");
   const approved = me && me.status === "approved" ? me : null;
   const link = approved && typeof window !== "undefined" ? `${window.location.origin}/?p=${approved.code}` : "";
   const first = me && "name" in me ? me.name.split(" ")[0] : "";
   const current = NAV.find((n) => n.id === section) ?? NAV[0];
-
-  if (!authConfigured) return <p className="p-10 text-center text-zinc-600">The affiliate dashboard is not available right now.</p>;
-  if (loading || !user) return <div className="min-h-screen bg-white" />;
 
   return (
     <div className="min-h-screen bg-white text-zinc-950 lg:grid lg:grid-cols-[272px_1fr]">
@@ -343,7 +369,7 @@ export function AffiliateDashboard() {
         </nav>
 
         <div className="hidden border-t border-zinc-200 p-6 lg:block">
-          <p className="truncate text-xs text-zinc-500">{user.email}</p>
+          <p className="truncate text-xs text-zinc-500">{email}</p>
         </div>
       </aside>
 
@@ -354,7 +380,7 @@ export function AffiliateDashboard() {
             <h1 className="text-xl font-bold tracking-tight sm:text-2xl">{current.label}</h1>
             <p className="text-sm text-zinc-500">{section === "home" ? "Everything here" : section === "share" ? "Your code and link" : section === "payouts" ? "What you are owed" : "Answers and contact"}</p>
           </div>
-          <button type="button" onClick={logOut} className={`${outline} h-10 px-5`}>Log out</button>
+          <button type="button" onClick={onLogOut} className={`${outline} h-10 px-5`}>Log out</button>
         </header>
 
         <main className="px-5 py-8 sm:px-8 lg:py-10">
@@ -393,7 +419,7 @@ export function AffiliateDashboard() {
             </div>
           )}
           {approved && section === "share" && <SharePanel me={approved} link={link} />}
-          {approved && section === "payouts" && <PayoutsPanel me={approved} />}
+          {approved && section === "payouts" && <PayoutsPanel me={approved} payouts={payouts} />}
           {section === "help" && <HelpPanel />}
         </main>
       </div>
