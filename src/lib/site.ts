@@ -55,8 +55,8 @@ export const siteConfig = {
    * pay_settings.partner_commission_percent in the database, keep the two equal). `holdDays` matches pay_settings.partner_hold_days.
    */
   affiliates: {
-    commission: "6%",
-    commissionPercent: 6,
+    commission: "25%",
+    commissionPercent: 25,
     holdDays: 14,
     minPayout: "GH₵ 10",
     /** How many founding affiliates the program starts with (shown on the affiliate page). */

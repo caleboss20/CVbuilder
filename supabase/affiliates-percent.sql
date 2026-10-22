@@ -1,8 +1,8 @@
--- Switches the partner reward from a flat amount to a percentage of each payment (6% by default).
+-- Switches the partner reward from a flat amount to a percentage of each payment (25% by default).
 -- Run this once in Supabase: SQL Editor > New query > paste > Run. It is safe to run again.
 -- (supabase/affiliates.sql already contains this for new set-ups; this file is for a database that ran the earlier version.)
 
-alter table public.pay_settings add column if not exists partner_commission_percent numeric(5, 2) not null default 6 check (partner_commission_percent between 0 and 100);
+alter table public.pay_settings add column if not exists partner_commission_percent numeric(5, 2) not null default 25 check (partner_commission_percent between 0 and 100);
 
 create or replace function public.payment_start(p_cv_id text, p_partner text default null)
 returns jsonb

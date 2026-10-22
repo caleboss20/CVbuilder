@@ -10,7 +10,7 @@
 -- Only the public anon key is used by the app, so these functions run as the signed-in person
 -- (auth.uid()) and are written so nobody can read or change anyone else's counts.
 
--- ---------------------------------------------------------------- settings
+-- ---------------------------------------------------------------------------------------------- settings
 create table if not exists public.ai_settings (
   id boolean primary key default true check (id),       -- one row only
   per_user_daily integer not null default 5,             -- free AI requests per student per day

@@ -12,10 +12,10 @@
 --     and disputes can sort themselves out first.
 --   * You pay partners by MoMo, then record it in the table "affiliate_payouts" (affiliate_id, amount in
 --     pesewas, a note). The admin dashboard shows who is owed what.
--- Settings live in pay_settings: partner_commission_percent (6 = 6% of each payment), partner_hold_days, partners_open.
+-- Settings live in pay_settings: partner_commission_percent (25 = 25% of each payment), partner_hold_days, partners_open.
 
 -- ---------------------------------------------------------------- settings
-alter table public.pay_settings add column if not exists partner_commission_percent numeric(5, 2) not null default 6 check (partner_commission_percent between 0 and 100);
+alter table public.pay_settings add column if not exists partner_commission_percent numeric(5, 2) not null default 25 check (partner_commission_percent between 0 and 100);
 alter table public.pay_settings add column if not exists partner_hold_days integer not null default 14 check (partner_hold_days >= 0);
 alter table public.pay_settings add column if not exists partners_open boolean not null default true;
 
