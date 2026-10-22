@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button";
+import { CelebrateCta } from "@/components/affiliates/celebrate-cta";
 import { EarningsCalculator } from "@/components/affiliates/earnings-calculator";
 import { AffiliatesHero } from "@/components/affiliates/affiliates-hero";
 import { FoundingAffiliates } from "@/components/affiliates/founding-affiliates";
@@ -40,6 +41,12 @@ export default function AffiliatesPage() {
         <EarningsCalculator />
       </section>
 
+      </div>
+
+      {/* A celebration band before the questions */}
+      <CelebrateCta />
+
+      <div className="bg-ink-950 text-fg">
       {/* FAQ */}
       <section id="faq" className="mx-auto max-w-3xl scroll-mt-24 px-4 py-16 sm:px-6">
         <h2 className="text-center text-3xl font-medium tracking-tight text-fg">Questions</h2>
