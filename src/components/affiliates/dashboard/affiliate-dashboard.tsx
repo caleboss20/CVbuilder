@@ -22,7 +22,7 @@ export type Payout = { id: number; amount_pesewas: number; paid_at: string; note
 export type Referral = { paid_at: string; amount: number; reward: number; owed: boolean };
 /** What the affiliate_activity function returns: recent referrals and each of the last 30 days' earnings. */
 export type Activity = { referrals: Referral[]; daily: { day: string; earned: number }[] };
-type Section = "home" | "share" | "payouts" | "help";
+type Section = "home" | "share" | "payouts" | "profile" | "help";
 
 const cedis = (pesewas: number) => `GH₵ ${(pesewas / 100).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const pill = "inline-flex h-11 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-colors";
@@ -52,6 +52,7 @@ const NAV: { id: Section; label: string; icon: string }[] = [
   { id: "home", label: "Dashboard", icon: ICONS.home },
   { id: "share", label: "Share & code", icon: ICONS.share },
   { id: "payouts", label: "Payouts", icon: ICONS.payouts },
+  { id: "profile", label: "Profile", icon: ICONS.users },
   { id: "help", label: "Help", icon: ICONS.help },
 ];
 
@@ -280,6 +281,72 @@ function PayoutsPanel({ me, payouts }: { me: Approved; payouts: Payout[] }) {
   );
 }
 
+/**
+ * The affiliate's name and mobile money number, with a form to correct them. These decide where payouts go, so once
+ * someone is approved a change waits for the owner to confirm it (the database decides; this form just says so).
+ */
+function ProfilePanel({ email, onSaved }: { email: string; onSaved: () => void }) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [waiting, setWaiting] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+  const field = "mt-1.5 block h-12 w-full rounded-full border border-zinc-300 bg-white px-5 text-[15px] text-zinc-950 focus:border-[#5b5fe0] focus:outline-none";
+
+  // Load the saved details (the database returns only this person's own row)
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const supabase = await loadSupabase();
+      const { data } = (await supabase?.from("affiliates").select("name, phone, pending_name, pending_phone").maybeSingle()) ?? {};
+      if (cancelled || !data) return;
+      setName(data.pending_name ?? data.name ?? "");
+      setPhone(data.pending_phone ?? data.phone ?? "");
+      setWaiting(Boolean(data.pending_name || data.pending_phone));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setMessage("");
+    const supabase = await loadSupabase();
+    const { data, error } = (await supabase?.rpc("affiliate_update_profile", { p_name: name, p_phone: phone })) ?? {};
+    setBusy(false);
+    if (error) {
+      setMessage(error.code === "PGRST202" ? "Saving details is not switched on yet." : "We could not save that. Check the name and number and try again.");
+      return;
+    }
+    setWaiting(data === "requested");
+    setMessage(data === "requested" ? "Thank you. We will confirm this change before your next payout. Until then, payouts go to your old details." : "Saved.");
+    onSaved();
+  }
+
+  return (
+    <Card className="max-w-xl">
+      <h3 className="font-semibold text-zinc-950">Your payout details</h3>
+      <p className="mt-1 text-sm leading-6 text-zinc-600">Rewards are sent by mobile money to this name and number. Make sure they match your wallet exactly.</p>
+      <form onSubmit={save} className="mt-5 space-y-4">
+        <label className="block text-sm font-medium text-zinc-700">
+          Full name (as registered on your mobile money)
+          <input value={name} onChange={(e) => setName(e.target.value)} required minLength={2} maxLength={100} autoComplete="name" className={field} />
+        </label>
+        <label className="block text-sm font-medium text-zinc-700">
+          Mobile money number
+          <input value={phone} onChange={(e) => setPhone(e.target.value)} required minLength={7} maxLength={20} inputMode="tel" autoComplete="tel" className={field} />
+        </label>
+        <p className="text-sm text-zinc-500">Account email: {email}</p>
+        {waiting && <p className="rounded-xl bg-[#fdf3e7] px-4 py-3 text-sm text-amber-900">A change is waiting for our confirmation.</p>}
+        {message && <p className="text-sm text-zinc-700" role="status">{message}</p>}
+        <button type="submit" disabled={busy} className={`${primary} disabled:opacity-50`}>{busy ? "Saving…" : "Save details"}</button>
+      </form>
+    </Card>
+  );
+}
+
 /** Where to read more or ask a question. */
 function HelpPanel() {
   const chat = whatsappLink("Hi CV11, I have a question about my affiliate account.");
@@ -435,7 +502,7 @@ export function AffiliateDashboardView({ me, payouts = [], activity = null, erro
         <header className="flex items-center justify-between gap-4 border-b border-zinc-200 px-5 py-4 sm:px-8 lg:py-5">
           <div>
             <h1 className="text-xl font-bold tracking-tight sm:text-2xl">{current.label}</h1>
-            <p className="text-sm text-zinc-500">{section === "home" ? "Everything here" : section === "share" ? "Your code and link" : section === "payouts" ? "What you are owed" : "Answers and contact"}</p>
+            <p className="text-sm text-zinc-500">{section === "home" ? "Everything here" : section === "share" ? "Your code and link" : section === "payouts" ? "What you are owed" : section === "profile" ? "Your payout details" : "Answers and contact"}</p>
           </div>
           <button type="button" onClick={onLogOut} className={`${outline} h-10 px-5`}>Log out</button>
         </header>
@@ -479,6 +546,7 @@ export function AffiliateDashboardView({ me, payouts = [], activity = null, erro
           )}
           {approved && section === "share" && <SharePanel me={approved} link={link} />}
           {approved && section === "payouts" && <PayoutsPanel me={approved} payouts={payouts} />}
+          {approved && section === "profile" && <ProfilePanel email={email} onSaved={() => {}} />}
           {section === "help" && <HelpPanel />}
         </main>
       </div>

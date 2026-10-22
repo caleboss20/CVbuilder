@@ -117,6 +117,9 @@ export function OverviewPanels({ overview, missing }: { overview: AdminOverview 
   );
 }
 
+/** An affiliate's request to change their name or mobile money number. */
+type Change = { id: string; code: string | null; name: string; phone: string; pending_name: string | null; pending_phone: string | null };
+
 /** A payment that went over an affiliate limit and so earned no reward. */
 type Flagged = { reference: string; flag: string; paid_at: string; amount: number; buyer: string };
 
@@ -124,6 +127,7 @@ type Flagged = { reference: string; flag: string; paid_at: string; amount: numbe
 export function AffiliatePanel({ affiliates, missing, onChanged }: { affiliates: AdminAffiliate[] | null; missing: boolean; onChanged: () => void }) {
   const [message, setMessage] = useState("");
   const [flagged, setFlagged] = useState<Flagged[]>([]);
+  const [changes, setChanges] = useState<Change[]>([]);
 
   // Payments that went over a limit (supabase/admin-flagged.sql); the list stays empty if that has not been run
   useEffect(() => {
@@ -131,6 +135,18 @@ export function AffiliatePanel({ affiliates, missing, onChanged }: { affiliates:
     void (async () => {
       const { data } = (await getSupabase()?.rpc("admin_flagged_payments")) ?? {};
       if (!cancelled && Array.isArray(data)) setFlagged(data as Flagged[]);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [affiliates]);
+
+  // Name or number changes waiting for the owner (supabase/affiliate-profile.sql)
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const { data } = (await getSupabase()?.rpc("admin_affiliate_changes")) ?? {};
+      if (!cancelled && Array.isArray(data)) setChanges(data as Change[]);
     })();
     return () => {
       cancelled = true;
@@ -219,6 +235,25 @@ export function AffiliatePanel({ affiliates, missing, onChanged }: { affiliates:
           </li>
         ))}
       </ul>
+      {changes.length > 0 && (
+        <div className="mt-4 border-t border-afg/10 pt-4">
+          <h3 className="text-sm font-medium">Profile changes</h3>
+          <p className="mt-1 text-xs text-afg/50">These decide where payouts go. Confirm a change only if you are sure the request is from the real person, for example by calling the old number.</p>
+          <ul className="mt-2 divide-y divide-afg/10 text-xs">
+            {changes.map((c) => (
+              <li key={c.id} className="py-2">
+                <p className="font-medium">{c.name} {c.code ? <span className="font-mono text-afg/60">({c.code})</span> : null}</p>
+                <p className="mt-0.5 text-afg/60">Now: {c.name}, {c.phone}</p>
+                <p className="text-afg/80">Wants: {c.pending_name ?? c.name}, {c.pending_phone ?? c.phone}</p>
+                <div className="mt-2 flex gap-2">
+                  <button type="button" className="rounded-md border border-afg/20 px-2.5 py-1 hover:bg-afg/5" onClick={() => void act("admin_affiliate_decide", { p_id: c.id, p_accept: true })}>Confirm</button>
+                  <button type="button" className="rounded-md border border-afg/20 px-2.5 py-1 hover:bg-afg/5" onClick={() => void act("admin_affiliate_decide", { p_id: c.id, p_accept: false })}>Reject</button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {flagged.length > 0 && (
         <div className="mt-4 border-t border-afg/10 pt-4">
           <h3 className="text-sm font-medium">Flagged payments</h3>
