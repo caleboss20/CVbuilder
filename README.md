@@ -184,3 +184,7 @@ npm run lint    # ESLint
 Built by [@caleboss20](https://github.com/caleboss20).
 
 If you are a student in Ghana, the site is free: **[cv11-one.vercel.app](https://cv11-one.vercel.app)**.
+
+## Affiliate program
+
+CV11 has an invite-only affiliate program at `/affiliates` (25% of each paid CV, paid by mobile money). Everything about it, including the SQL to run, the owner checklist and how to change each setting, is in [docs/AFFILIATES.md](docs/AFFILIATES.md).

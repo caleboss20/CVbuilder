@@ -209,7 +209,7 @@ These are the designed models and the cost facts behind them. **No revenue figur
 
 ### 6.3 Owner checklist (things only the owner can do)
 
-1. Run the SQL files in Supabase in this order: `schema.sql`, `stats.sql`, `ai.sql`, `payments.sql`, `share.sql`, `admin-more.sql`, `owner-devices.sql` (see 14.3). Add the owner's email to the `admins` table.
+1. Run the SQL files in Supabase in this order: `schema.sql`, `stats.sql`, `ai.sql`, `payments.sql`, `share.sql`, `admin-more.sql`, `owner-devices.sql` (see 14.3), then for the affiliate program `affiliates.sql` and `affiliate-update-all.sql` (see AFFILIATES.md, section 5). Add the owner's email to the `admins` table.
 2. Create a Paystack account. Test keys are instant and free; going live needs Paystack's account verification. Add the keys as environment variables, set the webhook URL, test with Paystack's test cards, then turn payments on.
 3. Set up a custom SMTP sender in Supabase (for example a Gmail app password) and friendlier email templates. The default sender allows only a handful of emails per hour and will block sign-ups at any real volume.
 4. Create a new Gemini API key (an earlier key was exposed and must be treated as burned), and add it only as an environment variable.
@@ -485,6 +485,7 @@ callyCV/
 | `share.sql` | `cert_events`, `cert_recipients`, `cert_lookups`, `cert_settings`, `cert_grants`, `owner`-checked functions to create, open, release, update and edit an event, the public `cert_claim()`, `cert_register()`, `cert_event_info()`, `cert_verify()`, and `cert_limit()`. See `FEATURES.md` 15.10 to 15.13. |
 | `admin-more.sql` | `admin_overview()`: the money, certificates, unlocks and AI numbers on the admin dashboard. |
 | `owner-devices.sql` | `owner_devices`, `mark_owner_device()` and a trigger that drops events from the owner's devices. |
+| `affiliates.sql` and the files after it | The affiliate program: tables `affiliates` and `affiliate_payouts`, reward columns on `payments`, application, dashboard, admin approve/pause/payout, refunds, limits, flagged payments, profile changes. **Run `affiliate-update-all.sql` last.** Full list and order in [AFFILIATES.md](AFFILIATES.md). |
 
 ---
 

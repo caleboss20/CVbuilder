@@ -230,6 +230,8 @@ All routes are `POST`, JSON in and out, authenticated with `Authorization: Beare
 | `POST /api/pay/verify` | `{ reference }` | `{ paid: boolean }` | Asks Paystack; idempotent |
 | `POST /api/pay/webhook` | Paystack's event | `ok` | No bearer token: authenticated by the `x-paystack-signature` HMAC-SHA512 of the raw body; 401 on a bad signature; only `charge.success` is acted on, and re-verified with Paystack |
 
+> **Affiliate program:** its database functions (`affiliate_apply`, `affiliate_me`, `affiliate_activity`, `affiliate_update_profile`, `admin_affiliate_*`, `admin_payment_refund`, `admin_flagged_payments`, and the changed `payment_start`) are documented in [AFFILIATES.md](AFFILIATES.md), section 5.
+
 ### 4.3 Database functions (called through Supabase REST `rpc`)
 
 `is_admin()`; `admin_stats(days)` (admin only); `ai_use_credit()` returns `{ allowed, reason?, remaining }` (`reason` is `user_limit` or `site_limit`); `ai_refund_credit()`; `payment_start(p_cv_id)` returns `{ reference, amount }`; `payment_confirm(p_reference, p_amount, p_secret)` returns boolean (raises if the secret is wrong); `cv_access(p_cv_id)` returns `{ paid, expires_at?, owner? }`.
