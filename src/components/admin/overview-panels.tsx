@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import type { AdminAffiliate, AdminOverview } from "@/lib/admin-stats";
 
@@ -117,9 +117,25 @@ export function OverviewPanels({ overview, missing }: { overview: AdminOverview 
   );
 }
 
+/** A payment that went over an affiliate limit and so earned no reward. */
+type Flagged = { reference: string; flag: string; paid_at: string; amount: number; buyer: string };
+
 /** Affiliates: who has applied, who is approved, and what each is owed. `affiliates` is null until it loads. */
 export function AffiliatePanel({ affiliates, missing, onChanged }: { affiliates: AdminAffiliate[] | null; missing: boolean; onChanged: () => void }) {
   const [message, setMessage] = useState("");
+  const [flagged, setFlagged] = useState<Flagged[]>([]);
+
+  // Payments that went over a limit (supabase/admin-flagged.sql); the list stays empty if that has not been run
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const { data } = (await getSupabase()?.rpc("admin_flagged_payments")) ?? {};
+      if (!cancelled && Array.isArray(data)) setFlagged(data as Flagged[]);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [affiliates]);
 
   /** Runs one of the owner's database actions, then reloads the list. */
   async function act(fn: string, args: Record<string, unknown>) {
@@ -203,6 +219,21 @@ export function AffiliatePanel({ affiliates, missing, onChanged }: { affiliates:
           </li>
         ))}
       </ul>
+      {flagged.length > 0 && (
+        <div className="mt-4 border-t border-afg/10 pt-4">
+          <h3 className="text-sm font-medium">Flagged payments</h3>
+          <p className="mt-1 text-xs text-afg/50">These went over an affiliate limit, so no reward was given. Look at them for anything unusual.</p>
+          <ul className="mt-2 divide-y divide-afg/10 text-xs">
+            {flagged.map((x) => (
+              <li key={x.reference} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-2">
+                <span className="tabular-nums text-afg/70">{day(x.paid_at)} · {cedis(x.amount)} · {x.buyer}</span>
+                <span className="rounded-full bg-amber-500/15 px-2 py-0.5 font-medium text-amber-500">{x.flag}</span>
+                <span className="w-full break-all font-mono text-afg/40">{x.reference}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <button
         type="button"
         className="mt-3 rounded-md border border-afg/20 px-2.5 py-1 text-xs hover:bg-afg/5"
