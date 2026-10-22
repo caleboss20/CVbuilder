@@ -111,6 +111,8 @@ export async function fetchAdminOverview(days: number, accessToken: string | und
 
 /** One affiliate as the admin sees them. Money is in pesewas. */
 export type AdminAffiliate = {
+  /** Needed by the approve, pause and payout buttons (supabase/admin-affiliate-actions.sql). */
+  id?: string;
   name: string;
   phone: string;
   email: string;

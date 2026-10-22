@@ -124,7 +124,7 @@ export function AdminDashboard() {
       <>
         <Panels stats={stats} series={series} onSeries={setSeries} />
         <OverviewPanels overview={overview} missing={overviewMissing} />
-        <AffiliatePanel affiliates={affiliates} missing={affiliatesMissing} />
+        <AffiliatePanel affiliates={affiliates} missing={affiliatesMissing} onChanged={() => void load(days)} />
       </>
     );
 

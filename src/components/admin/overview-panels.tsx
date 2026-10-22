@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { getSupabase } from "@/lib/supabase";
 import type { AdminAffiliate, AdminOverview } from "@/lib/admin-stats";
 
 const cardClass = "rounded-lg border border-afg/10 bg-acard";
@@ -116,7 +118,20 @@ export function OverviewPanels({ overview, missing }: { overview: AdminOverview 
 }
 
 /** Affiliates: who has applied, who is approved, and what each is owed. `affiliates` is null until it loads. */
-export function AffiliatePanel({ affiliates, missing }: { affiliates: AdminAffiliate[] | null; missing: boolean }) {
+export function AffiliatePanel({ affiliates, missing, onChanged }: { affiliates: AdminAffiliate[] | null; missing: boolean; onChanged: () => void }) {
+  const [message, setMessage] = useState("");
+
+  /** Runs one of the owner's database actions, then reloads the list. */
+  async function act(fn: string, args: Record<string, unknown>) {
+    setMessage("");
+    const { error } = (await getSupabase()?.rpc(fn, args)) ?? {};
+    if (error) setMessage(error.code === "PGRST202" ? "Run supabase/admin-affiliate-actions.sql in Supabase first." : `Could not do that: ${error.message}`);
+    else onChanged();
+  }
+
+  /** A suggested code from the name, for example "Ama Mensah" becomes AMAM1. */
+  const suggest = (name: string, phone: string) => (name.replace(/[^a-zA-Z]/g, "").slice(0, 4).toUpperCase() || "AFF") + (phone.replace(/D/g, "").slice(-2) || "1");
+
   if (missing) {
     return (
       <section className={`${cardClass} p-5 text-sm text-afg/60`}>
@@ -145,6 +160,40 @@ export function AffiliatePanel({ affiliates, missing }: { affiliates: AdminAffil
             <p className="mt-0.5 text-xs text-afg/50">
               {p.phone} · {p.email}
             </p>
+            {p.id && (
+              <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                {p.status !== "approved" && (
+                  <button
+                    type="button"
+                    className="rounded-md border border-afg/20 px-2.5 py-1 hover:bg-afg/5"
+                    onClick={() => {
+                      const code = window.prompt(`Code for ${p.name} (capital letters and digits, 3 to 12):`, p.code ?? suggest(p.name, p.phone));
+                      if (code) void act("admin_affiliate_set", { p_id: p.id, p_status: "approved", p_code: code });
+                    }}
+                  >
+                    {p.status === "paused" ? "Resume" : "Approve"}
+                  </button>
+                )}
+                {p.status === "approved" && (
+                  <button type="button" className="rounded-md border border-afg/20 px-2.5 py-1 hover:bg-afg/5" onClick={() => void act("admin_affiliate_set", { p_id: p.id, p_status: "paused" })}>
+                    Pause
+                  </button>
+                )}
+                {p.code && (
+                  <button
+                    type="button"
+                    className="rounded-md border border-afg/20 px-2.5 py-1 hover:bg-afg/5"
+                    onClick={() => {
+                      const text = window.prompt(`Amount sent to ${p.name} by mobile money (GH₵):`, (p.owed / 100).toFixed(2));
+                      const pesewas = Math.round(Number(text) * 100);
+                      if (text && pesewas > 0) void act("admin_affiliate_payout", { p_id: p.id, p_amount_pesewas: pesewas, p_note: null });
+                    }}
+                  >
+                    Record payout
+                  </button>
+                )}
+              </div>
+            )}
             {p.status === "pending" && p.note && <p className="mt-1 text-xs text-afg/60">&ldquo;{p.note}&rdquo;</p>}
             {p.code && (
               <p className="mt-1 text-xs tabular-nums text-afg/70">
@@ -154,8 +203,9 @@ export function AffiliatePanel({ affiliates, missing }: { affiliates: AdminAffil
           </li>
         ))}
       </ul>
+      {message && <p className="mt-3 text-xs text-amber-500" role="alert">{message}</p>}
       <p className="mt-3 text-xs text-afg/40">
-        To approve: in Supabase open the table affiliates, set code (capital letters and digits) and status to approved. After paying someone by MoMo, add a row to affiliate_payouts.
+        Approve gives the person a code. Record payout after you have sent their money by mobile money; it then shows in their dashboard with a receipt.
       </p>
     </section>
   );
