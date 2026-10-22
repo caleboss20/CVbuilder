@@ -365,6 +365,8 @@ callyCV/
 | `/cv-checker` | `(marketing)/cv-checker/page.tsx` | CV checker |
 | `/letters`, `/letters/[slug]` | `(marketing)/letters/...` | Letter guides, one per letter type |
 | `/certificates` | `(marketing)/certificates/page.tsx` | Bulk certificate maker |
+| `/claim` | `(marketing)/claim/page.tsx` | The page a shared certificate link opens: a person finds and downloads only their own certificate (or adds their own name while names are being collected). Not indexed |
+| `/verify` | `(marketing)/verify/page.tsx` | The page a certificate's QR code opens: says whether it is genuine. Not indexed |
 | `/sign-letter` | `(marketing)/sign-letter/page.tsx` | Text to PDF and letter signing |
 | `/interview-prep`, `/interview-prep/[field]` | `(marketing)/interview-prep/...` | Interview questions by field |
 | `/tracker`, `/national-service` | `(marketing)/...` | Application tracker, national service checklist |
@@ -449,6 +451,9 @@ callyCV/
 | `payments.ts` | Browser helpers for paying: access check, start checkout, confirm, and "take me back to my download" memory. |
 | `ai-client.ts` | Browser helper that calls the AI routes with the student's token. |
 | `events.ts`, `track.ts`, `owner.ts`, `admin-stats.ts` | Anonymous event counting, the list of tracked events, excluding the owner's devices, reading the dashboard numbers. |
+| `certificate-traced.ts`, `certificate-designs-canva.ts` | The twelve newest certificate designs: artwork traced from the reference images (generated data, do not edit) and the code that draws it, recolours it and adds text, ribbons and the optional rosette. |
+| `cert-share.ts`, `certificate-verify.ts` | The browser's side of certificate sharing (create, list, manage, claim, verify, record for QR) and stamping the verify QR onto a PDF. |
+| `certificate-own.ts` | Writes names (and signatures) onto an uploaded certificate, and packs it for a shared link. |
 | `site.ts` | **Central settings**: site name and URL, WhatsApp number, download price and days, free certificate batch, version limit, menu links, share messages. |
 | `faqs.ts`, `guides.ts`, `interview-prep.ts`, `testimonials.ts`, `ai-demo.ts`, `applications.ts` | Content and data for the FAQ, blog guides, interview questions, testimonials, the homepage AI demo, and the application tracker. |
 | `theme.ts`, `pointer.ts` | Theme applied before first paint; one shared pointer listener for cursor effects. |
@@ -460,6 +465,8 @@ callyCV/
 | `cv/` | The CV renderers. `cv-templates.tsx` routes a template id to a renderer; `cv-templates-ats.tsx` (two config-driven engines, the largest file), `cv-templates-single.tsx`, `cv-templates-more.tsx`, `ats-cv.tsx` hold the designs; `cv-parts.tsx` shared pieces; `cv-page-frame.tsx` scales a page to fit; `hide-empty-sections.tsx` tidies half-filled CVs; `cv-icon.tsx` contact icons. |
 | `builder/` | `builder.tsx` (the editor), `sections.tsx` (the form steps), `fields.tsx` (inputs), `start-screen.tsx`, `type-guide.tsx`, `import-card.tsx`, `job-match-panel.tsx`, `bullet-coach.tsx`, `voice-input.tsx`, `signature-pad.tsx`, `cover-letter.tsx`, `backup-card.tsx`, `cloud-sync-panel.tsx`, `completion-card.tsx`, `confirm-dialog.tsx`, `build-timer.tsx`, background effects (`portal-glow.tsx`, `sky-background.tsx`). **Newer:** `print-copy.tsx` (the one-page print copy shared by the builder and versions), `versions-maker.tsx` (the versions page), `use-download-gate.tsx` and `pay-return.tsx` (payments), `ai-assist.tsx`, `ai-consent.tsx`, `heard-check.tsx`, `use-ai-access.ts` (AI buttons). |
 | `tools/` | `certificates-tool.tsx` (the two tabs on the certificate page), `certificate-maker.tsx` (pick a design), `own-certificate-maker.tsx` (upload your own certificate), `sign-letter.tsx`, `own-letter-editor.tsx`. |
+| `tools/` (sharing) | `share-panel.tsx` (make a link, QR, list), `event-manager.tsx` (the Manage panel), `claim-certificate.tsx` (the `/claim` page), `verify-certificate.tsx` (the `/verify` page), `verify-option.tsx` ("Add a verify QR" on normal downloads), `qr-code.tsx`, `use-cert-limit.ts` (how many names this person may use). |
+| `admin/` | `dashboard.tsx` (the main numbers), `overview-panels.tsx` (money, certificates, unlocks, AI use), `area-chart.tsx`, `ai-lab.tsx`. |
 | `checker/` | `cv-checker.tsx`, `score-card.tsx`. |
 | `tracker/` | `application-tracker.tsx`, `national-service-checklist.tsx`. |
 | `marketing/` | Homepage sections and site chrome: `navbar`, `footer`, `hero`, `how-it-works`, `job-hunt-tools`, `templates-section`, `template-gallery`, `certificates-section`, `testimonials`, `faq`, `final-cta`, `whatsapp-button`, `analytics`, `nav-progress`, `page-shell` and visual helpers. |
