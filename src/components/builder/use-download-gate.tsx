@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useUser } from "@/components/auth/use-user";
 import { DOWNLOAD_DAYS, DOWNLOAD_PRICE, fetchCvAccess, paymentsEnabled, rememberResume, savedPartner, startCheckout } from "@/lib/payments";
 
@@ -23,16 +23,11 @@ export function useDownloadGate({ cvId, onPdf, onWord }: { cvId: string | undefi
   const [state, setState] = useState<DialogState>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  // A partner code the student typed, or one kept from a link they opened
-  const [partner, setPartner] = useState("");
+  // A partner code the student typed, or one kept from a link they opened. The dialog only exists after a
+  // click, so reading the saved code when this first runs cannot disagree with the server render.
+  const [partner, setPartner] = useState(() => savedPartner());
   // The code box stays folded away until someone asks for it (or arrived with a code from a link)
-  const [codeOpen, setCodeOpen] = useState(false);
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a code kept from a link
-    const saved = savedPartner();
-    setPartner(saved);
-    if (saved) setCodeOpen(true);
-  }, []);
+  const [codeOpen, setCodeOpen] = useState(() => savedPartner() !== "");
 
   const run = useCallback((kind: Kind) => (kind === "pdf" ? onPdf() : onWord()), [onPdf, onWord]);
 
