@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useUser } from "@/components/auth/use-user";
 import { authConfigured, loadSupabase } from "@/lib/auth-config";
@@ -22,7 +23,8 @@ const button = "inline-flex h-11 items-center justify-center rounded-full bg-zin
  * The affiliate's page: log in, apply, see the application's status, and (once approved) the code, the link to
  * share and the earnings. Used for both /affiliates/join and /affiliates/dashboard.
  */
-export function AffiliatePanel() {
+export function AffiliatePanel({ guestTo }: { guestTo?: string } = {}) {
+  const router = useRouter();
   const { user, loading } = useUser({ eager: true });
   const [me, setMe] = useState<Me | null>(null);
   const [name, setName] = useState("");
@@ -58,6 +60,15 @@ export function AffiliatePanel() {
     }
     await load();
   }
+
+  // Someone who is not logged in and pressed "Become an affiliate" goes straight to the sign-up screen, and comes
+  // back here afterwards to fill in the application
+  useEffect(() => {
+    if (guestTo && authConfigured && !loading && !user) {
+      rememberResume("/affiliates/join");
+      router.replace(guestTo);
+    }
+  }, [guestTo, loading, user, router]);
 
   const link = me && me.status === "approved" && typeof window !== "undefined" ? `${window.location.origin}/?p=${me.code}` : "";
   async function copy() {

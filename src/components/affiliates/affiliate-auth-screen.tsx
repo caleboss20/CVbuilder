@@ -14,8 +14,8 @@ export function AffiliateAuthScreen({ title, intro, children }: { title: string;
       <header className="px-5 py-6 sm:px-10 sm:py-8">
         <Link href="/affiliates" aria-label="CV11 Affiliates home" className="inline-flex items-center gap-2">
           <LogoMark size={32} />
-          <Wordmark className="text-white" size={24} />
-          <span className="text-base font-medium tracking-tight text-white/70">Affiliates</span>
+          <Wordmark className="translate-y-[2px] text-white" size={24} />
+          <span className="translate-y-[2px] text-base font-medium tracking-tight text-white/70">Affiliates</span>
         </Link>
       </header>
 

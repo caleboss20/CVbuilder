@@ -12,7 +12,7 @@ export default function JoinPage() {
       <h1 className="text-center text-3xl font-medium tracking-tight text-zinc-950 sm:text-4xl">Become an affiliate</h1>
       <p className="mt-3 text-center text-zinc-600">Free to join. Earn a reward for every CV the people you help pay for.</p>
       <div className="mt-8">
-        <AffiliatePanel />
+        <AffiliatePanel guestTo="/affiliates/signup" />
       </div>
     </div>
   );

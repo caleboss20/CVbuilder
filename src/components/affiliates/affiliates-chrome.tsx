@@ -15,8 +15,8 @@ export function AffiliatesLogo() {
   return (
     <Link href="/affiliates" aria-label="CV11 Affiliates home" className="flex min-w-0 items-center gap-2">
       <LogoMark size={30} />
-      <Wordmark className="text-white" size={22} />
-      <span className="hidden whitespace-nowrap text-[15px] font-medium tracking-tight text-white/70 min-[420px]:inline">Affiliates</span>
+      <Wordmark className="translate-y-[2px] text-white" size={22} />
+      <span className="hidden translate-y-[2px] whitespace-nowrap text-[15px] font-medium tracking-tight text-white/70 min-[420px]:inline">Affiliates</span>
     </Link>
   );
 }
