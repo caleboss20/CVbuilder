@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 
-/** The photo on the left. Swap this one line when the chosen photo arrives (two people at a laptop works best). */
-const PHOTO = { src: "/images/partners/hero-woman.jpg", alt: "A smiling young woman holding a folder of documents", position: "50% 38%" };
+/** The photo on the left: Pexels photo 5940713 (free to use, no credit needed), a tutor helping two students at a laptop. */
+const PHOTO = { src: "/images/partners/founding-students.jpg", alt: "A tutor helping two young students at a laptop", position: "50% 50%" };
 
 /** The words that scroll along the ribbon on top. */
 const RIBBON = ["Founding partners", `Only ${siteConfig.partners.spots} spots`, "Free to join", "Apply now"];
@@ -22,7 +22,7 @@ function Mark({ children }: { children: string }) {
  * numbers that matter picked out, three easy steps, real scarcity (we are starting with a few founding
  * partners), and the worry removed right under the button (free, no targets).
  */
-export function FoundingPartners() {
+export function FoundingPartners({ photo = PHOTO }: { photo?: { src: string; alt: string; position: string } }) {
   const ribbon = [...RIBBON, ...RIBBON, ...RIBBON, ...RIBBON];
   return (
     <section id="join" className="scroll-mt-24 bg-white text-zinc-950">
@@ -49,7 +49,7 @@ export function FoundingPartners() {
         {/* Photo */}
         <div className="relative mx-auto w-full max-w-[520px] lg:mx-0">
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[28px] bg-[#e9ecff]">
-            <Image src={PHOTO.src} alt={PHOTO.alt} fill sizes="(min-width: 1024px) 520px, 90vw" className="object-cover" style={{ objectPosition: PHOTO.position }} />
+            <Image src={photo.src} alt={photo.alt} fill sizes="(min-width: 1024px) 520px, 90vw" className="object-cover" style={{ objectPosition: photo.position }} />
           </div>
           {/* Stickers, as on the hero */}
           <span className="absolute -left-3 top-8 -rotate-6 rounded-full bg-[#5b5fe0] px-4 py-2 text-sm font-semibold text-white shadow-lg sm:-left-6">Free to join</span>
