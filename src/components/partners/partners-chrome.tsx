@@ -1,49 +1,68 @@
 import Link from "next/link";
 
 /**
- * The CV11 Partners site has its own look, separate from the main CV11 site: warm paper background, deep
- * green type and a gold accent. Colours are written out here on purpose so this site does not follow the
- * CV11 light and dark theme.
+ * The CV11 Partners navbar and footer. Laid out like a retail partner site: the mark and name on the left,
+ * and on the right a language menu, "Login" and a black "Join Now" button. The text is Geist, the same
+ * font as the rest of CV11, and the colours are CV11's: black, violet and white.
  */
 
-/** The partners mark: a rounded green square holding a "C" arc and a gold dot, with the wordmark. */
-export function PartnersLogo({ dark = false }: { dark?: boolean }) {
+/** The CV11 mark with the word "Partners". */
+export function PartnersLogo({ light = false }: { light?: boolean }) {
   return (
     <Link href="/partners" aria-label="CV11 Partners home" className="flex items-center gap-2.5">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <rect width="32" height="32" rx="9" fill={dark ? "#f4b400" : "#0f6b4a"} />
-        <path d="M20.5 10.5A7 7 0 1 0 20.5 21.5" stroke={dark ? "#0b3d2e" : "#faf7f0"} strokeWidth="3.2" strokeLinecap="round" />
-        <circle cx="23.5" cy="8.5" r="2.6" fill={dark ? "#ffffff" : "#f4b400"} />
+      <svg width="30" height="30" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect width="28" height="28" rx="8" fill={light ? "#ffffff" : "#09090b"} />
+        <path d="M18.5 9.2A6 6 0 1 0 18.5 18.8" stroke={light ? "#09090b" : "#ffffff"} strokeWidth="3" strokeLinecap="round" />
+        <circle cx="21" cy="7" r="2.2" fill="#7c80ff" />
       </svg>
-      <span className={`whitespace-nowrap text-base font-semibold tracking-tight sm:text-lg ${dark ? "text-white" : "text-[#0d2b21]"}`}>
-        CV11 <span className="font-normal opacity-70">Partners</span>
+      <span className={`whitespace-nowrap text-lg font-extrabold tracking-tight sm:text-xl ${light ? "text-white" : "text-zinc-950"}`}>
+        CV11 <span className="font-extrabold">Partners</span>
       </span>
     </Link>
   );
 }
 
-/** The partner site's header: its own name and menu, with a way back to CV11. */
+/** The language menu. English is the only language for now, so it is a small list with one choice. */
+function LanguageMenu() {
+  return (
+    <details className="group relative">
+      <summary className="flex h-[37px] cursor-pointer list-none items-center gap-2 rounded-lg px-3 text-sm font-medium text-zinc-950 marker:hidden hover:bg-black/5 [&::-webkit-details-marker]:hidden">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z" />
+        </svg>
+        English
+        <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="transition-transform group-open:rotate-180">
+          <path d="M5 8l5 5 5-5" />
+        </svg>
+      </summary>
+      <ul className="absolute right-0 top-full z-50 mt-1 w-40 rounded-lg bg-white py-1 text-sm shadow-lg ring-1 ring-black/10">
+        <li className="flex items-center justify-between px-3 py-2 font-medium text-zinc-950">
+          English
+          <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="#7c80ff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4.5 10.5l3.5 3.5 7.5-8" />
+          </svg>
+        </li>
+      </ul>
+    </details>
+  );
+}
+
+/** The navbar. It sits on top of the page's gradient, with no bar or border of its own. */
 export function PartnersHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0b3d2e]">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
-        <PartnersLogo dark />
-        <nav aria-label="Partners" className="ml-8 hidden items-center gap-7 text-sm font-medium text-white/75 md:flex">
-          <a href="/partners#how" className="hover:text-white">How it works</a>
-          <a href="/partners#earn" className="hover:text-white">Earnings</a>
-          <a href="/partners#faq" className="hover:text-white">FAQ</a>
-          <Link href="/" className="hover:text-white">CV11 home</Link>
-        </nav>
-        <div className="ml-auto flex items-center gap-2 sm:gap-4">
-          <Link href="/partners/dashboard" className="hidden text-sm font-medium text-white hover:underline sm:block">
-            Log in
+    <header className="relative z-30 h-[70px] w-full">
+      <div className="flex h-full items-center justify-between px-5 sm:px-9 lg:pr-[50px]">
+        <PartnersLogo />
+        <div className="flex items-center gap-1 sm:gap-5">
+          <div className="hidden sm:block">
+            <LanguageMenu />
+          </div>
+          <Link href="/partners/dashboard" className="px-2 text-sm font-medium text-zinc-950 hover:underline">
+            Login
           </Link>
-          <Link
-            href="/partners/join"
-            className="inline-flex h-10 items-center whitespace-nowrap rounded-full bg-[#f4b400] px-5 text-sm font-semibold text-[#0b3d2e] transition-colors hover:bg-[#ffc61a]"
-          >
-            <span className="sm:hidden">Join</span>
-            <span className="hidden sm:inline">Become a partner</span>
+          <Link href="/partners/join" className="inline-flex h-[38px] items-center whitespace-nowrap rounded-lg bg-zinc-950 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 sm:px-5">
+            Join Now
           </Link>
         </div>
       </div>
@@ -53,10 +72,10 @@ export function PartnersHeader() {
 
 export function PartnersFooter() {
   return (
-    <footer className="bg-[#0b3d2e] text-white/70">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
+    <footer className="bg-zinc-950 text-zinc-400">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-10 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-9">
         <div>
-          <PartnersLogo dark />
+          <PartnersLogo light />
           <p className="mt-3 max-w-sm">CV11 Partners is part of CV11, the CV builder and job-hunt toolkit for students in Ghana.</p>
         </div>
         <nav aria-label="Partners footer" className="flex flex-wrap gap-x-6 gap-y-2">

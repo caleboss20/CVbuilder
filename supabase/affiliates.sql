@@ -12,10 +12,10 @@
 --     and disputes can sort themselves out first.
 --   * You pay partners by MoMo, then record it in the table "affiliate_payouts" (affiliate_id, amount in
 --     pesewas, a note). The admin dashboard shows who is owed what.
--- Settings live in pay_settings: partner_commission_pesewas (200 = GH₵ 2), partner_hold_days, partners_open.
+-- Settings live in pay_settings: partner_commission_percent (6 = 6% of each payment), partner_hold_days, partners_open.
 
 -- ---------------------------------------------------------------- settings
-alter table public.pay_settings add column if not exists partner_commission_pesewas integer not null default 200 check (partner_commission_pesewas >= 0);
+alter table public.pay_settings add column if not exists partner_commission_percent numeric(5, 2) not null default 6 check (partner_commission_percent between 0 and 100);
 alter table public.pay_settings add column if not exists partner_hold_days integer not null default 14 check (partner_hold_days >= 0);
 alter table public.pay_settings add column if not exists partners_open boolean not null default true;
 
@@ -109,7 +109,7 @@ begin
     if not found then raise exception 'unknown partner code' using errcode = '22023'; end if;
     if aff.user_id = me then raise exception 'own code' using errcode = '22023'; end if;
     partner := aff.code;
-    reward := least(cfg.partner_commission_pesewas, cfg.price_pesewas);
+    reward := round(cfg.price_pesewas * cfg.partner_commission_percent / 100)::integer;
   end if;
 
   insert into public.payments (reference, user_id, cv_id, amount_pesewas, partner_code, commission_pesewas)

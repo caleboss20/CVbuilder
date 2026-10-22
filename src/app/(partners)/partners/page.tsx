@@ -6,7 +6,7 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "CV11 Partners: Earn by Helping People Get Their CV Done",
-  description: `Help people build a CV on CV11 and earn ${siteConfig.partners.commission} for every CV they pay for with your code. Free to join, paid by mobile money.`,
+  description: `Help people build a CV on CV11 and earn ${siteConfig.partners.commission} of every CV payment made with your code. Free to join, paid by mobile money.`,
   alternates: { canonical: "/partners" },
 };
 
@@ -14,11 +14,11 @@ const steps = [
   { n: "1", title: "Join for free", body: "Create a CV11 account and apply with your name and MoMo number. No fee, ever." },
   { n: "2", title: "Get your code", body: "We approve your application and give you a personal code, and a link ending in ?p=KOFI that remembers it for you." },
   { n: "3", title: "Help people with their CV", body: "Build a CV with a student, or share your link. They type your code when they pay." },
-  { n: "4", title: "Get paid", body: `You earn ${siteConfig.partners.commission} for every CV paid with your code, sent to your MoMo on ${siteConfig.partners.payoutDay}.` },
+  { n: "4", title: "Get paid", body: `You earn ${siteConfig.partners.commission} of every CV payment made with your code, sent to your MoMo on ${siteConfig.partners.payoutDay}.` },
 ];
 
 const benefits = [
-  { title: `${siteConfig.partners.commission} on every CV`, body: "A flat reward for each confirmed payment, however many you bring." },
+  { title: `${siteConfig.partners.commission} commission`, body: "A share of every confirmed payment, however many people you bring." },
   { title: "Charge your own fee too", body: "Typing a CV for someone? Keep whatever you charge them. We never take a cut of that." },
   { title: "Paid by mobile money", body: "MTN, Telecel or AirtelTigo. One clear payout, once a month." },
   { title: "No cost, no stock, no risk", body: "You are paid only when a real payment is confirmed." },
@@ -50,7 +50,7 @@ export default function PartnersPage() {
         <ol className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s) => (
             <li key={s.n} className="rounded-2xl border border-fg/10 bg-fg/[0.03] p-6">
-              <span className="grid size-9 place-items-center rounded-full bg-emerald-400/15 text-sm font-semibold text-emerald-300">{s.n}</span>
+              <span className="grid size-9 place-items-center rounded-full bg-brand-400/15 text-sm font-semibold text-brand-300">{s.n}</span>
               <h3 className="mt-4 text-base font-medium text-fg">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-fg/60">{s.body}</p>
             </li>
@@ -80,7 +80,7 @@ export default function PartnersPage() {
           <ul className="mt-3 grid gap-2 text-sm text-fg/65 sm:grid-cols-2">
             {who.map((w) => (
               <li key={w} className="flex items-start gap-2">
-                <span aria-hidden="true" className="mt-1.5 size-1.5 shrink-0 rounded-full bg-emerald-400" />
+                <span aria-hidden="true" className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand-400" />
                 {w}
               </li>
             ))}
@@ -104,7 +104,7 @@ export default function PartnersPage() {
 
       {/* Closing call to action */}
       <section className="px-4 pb-24 sm:px-6">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-8 text-center">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-brand-400/30 bg-brand-500/10 p-8 text-center">
           <h2 className="text-2xl font-medium text-fg">Ready to start earning?</h2>
           <p className="mt-2 text-fg/65">It takes two minutes to apply.</p>
           <ButtonLink href="/partners/join" size="lg" className="mt-6">Become a partner</ButtonLink>
