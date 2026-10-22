@@ -3,6 +3,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { EarningsCalculator } from "@/components/affiliates/earnings-calculator";
 import { AffiliatesHero } from "@/components/affiliates/affiliates-hero";
 import { FoundingAffiliates } from "@/components/affiliates/founding-affiliates";
+import { WhoCanJoin } from "@/components/affiliates/who-can-join";
 import { WhyJoin } from "@/components/affiliates/why-join";
 import { siteConfig } from "@/lib/site";
 
@@ -10,8 +11,6 @@ export const metadata: Metadata = {
   title: "CV11 Affiliates: Earn by Helping People Get Their CV Done",
   description: `Help people build a CV on CV11 and earn ${siteConfig.affiliates.commission} of every CV payment made with your code. Free to join, paid by mobile money.`,
 };
-
-const who = ["Cyber cafés and print shops", "Campus helpers and course reps", "Teachers and youth leaders", "NSS coordinators and career clubs", "Bootcamp and event organisers", "Any student who helps friends"];
 
 const faqs = [
   { q: "Do I have to pay to join?", a: "No. Joining is free and there is nothing to buy." },
@@ -28,6 +27,7 @@ export default function AffiliatesPage() {
       <AffiliatesHero />
       <WhyJoin />
       <FoundingAffiliates />
+      <WhoCanJoin />
 
       {/* The sections below are still in the first draft look; they are redesigned one at a time */}
       <div className="bg-ink-950 text-fg">
@@ -36,15 +36,6 @@ export default function AffiliatesPage() {
         <div>
           <h2 className="text-3xl font-medium tracking-tight text-fg">See what you could earn</h2>
           <p className="mt-4 text-fg/65">A CV on CV11 costs the student {siteConfig.download.price} and covers all their edits for a while. You earn {siteConfig.affiliates.commission} of it every time.</p>
-          <h3 className="mt-8 text-base font-medium text-fg">Who affiliates are</h3>
-          <ul className="mt-3 grid gap-2 text-sm text-fg/65 sm:grid-cols-2">
-            {who.map((w) => (
-              <li key={w} className="flex items-start gap-2">
-                <span aria-hidden="true" className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand-400" />
-                {w}
-              </li>
-            ))}
-          </ul>
         </div>
         <EarningsCalculator />
       </section>
