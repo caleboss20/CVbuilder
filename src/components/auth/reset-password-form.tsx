@@ -10,7 +10,7 @@ import { useUser } from "./use-user";
  * The page a student lands on from the "reset your password" email. Supabase signs them in
  * with the link, so they only need to type a new password.
  */
-export function ResetPasswordForm() {
+export function ResetPasswordForm({ affiliate = false }: { affiliate?: boolean } = {}) {
   const { user, loading } = useUser({ eager: true });
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -33,7 +33,7 @@ export function ResetPasswordForm() {
   if (done) {
     return (
       <p className="text-sm text-emerald-300" role="status">
-        Password changed. <Link href="/account" className="underline">Go to your account</Link>.
+        Password changed. <Link href={affiliate ? "/affiliates/dashboard" : "/account"} className="underline">{affiliate ? "Go to your dashboard" : "Go to your account"}</Link>.
       </p>
     );
   }
@@ -41,7 +41,7 @@ export function ResetPasswordForm() {
   if (!loading && !user) {
     return (
       <p className="text-sm text-fg/70">
-        This link has expired or was already used. <Link href="/login" className="text-fg underline underline-offset-4">Ask for a new one from the log-in page</Link>.
+        This link has expired or was already used. <Link href={affiliate ? "/affiliates/login" : "/login"} className="text-fg underline underline-offset-4">Ask for a new one from the log-in page</Link>.
       </p>
     );
   }
@@ -50,13 +50,13 @@ export function ResetPasswordForm() {
     <form onSubmit={submit} className="space-y-3">
       <label className="block">
         <span className="sr-only">New password</span>
-        <PasswordInput value={password} onChange={setPassword} autoComplete="new-password" placeholder="New password (8+ characters)" />
+        <PasswordInput value={password} onChange={setPassword} autoComplete="new-password" placeholder="New password (8+ characters)" affiliate={affiliate} />
       </label>
       {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
       <button
         type="submit"
         disabled={busy}
-        className="flex h-12 w-full items-center justify-center rounded-md bg-brand-600 text-[15px] font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_22px_rgb(124_128_255/0.5)] hover:bg-brand-500 disabled:opacity-50"
+        className={affiliate ? "flex h-12 w-full items-center justify-center rounded-full bg-[#5b5fe0] text-[15px] font-medium text-white hover:bg-[#6d71ec] disabled:opacity-50" : "flex h-12 w-full items-center justify-center rounded-md bg-brand-600 text-[15px] font-medium text-white ring-1 ring-brand-300/60 shadow-[0_0_22px_rgb(124_128_255/0.5)] hover:bg-brand-500 disabled:opacity-50"}
       >
         {busy ? "Please wait…" : "Save new password"}
       </button>

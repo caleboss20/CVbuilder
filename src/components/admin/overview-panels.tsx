@@ -125,7 +125,7 @@ export function AffiliatePanel({ affiliates, missing, onChanged }: { affiliates:
   async function act(fn: string, args: Record<string, unknown>) {
     setMessage("");
     const { error } = (await getSupabase()?.rpc(fn, args)) ?? {};
-    if (error) setMessage(error.code === "PGRST202" ? "Run supabase/admin-affiliate-actions.sql in Supabase first." : `Could not do that: ${error.message}`);
+    if (error) setMessage(error.code === "PGRST202" ? "Run supabase/admin-affiliate-actions.sql and supabase/refunds-and-limits.sql in Supabase first." : `Could not do that: ${error.message}`);
     else onChanged();
   }
 
@@ -203,6 +203,16 @@ export function AffiliatePanel({ affiliates, missing, onChanged }: { affiliates:
           </li>
         ))}
       </ul>
+      <button
+        type="button"
+        className="mt-3 rounded-md border border-afg/20 px-2.5 py-1 text-xs hover:bg-afg/5"
+        onClick={() => {
+          const reference = window.prompt("Reference of the payment you refunded on Paystack (starts with cv11_):");
+          if (reference && window.confirm("Mark this payment refunded? Its reward is cancelled and the student's download access from it ends.")) void act("admin_payment_refund", { p_reference: reference });
+        }}
+      >
+        Refund a payment
+      </button>
       {message && <p className="mt-3 text-xs text-amber-500" role="alert">{message}</p>}
       <p className="mt-3 text-xs text-afg/40">
         Approve gives the person a code. Record payout after you have sent their money by mobile money; it then shows in their dashboard with a receipt.

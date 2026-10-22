@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function AffiliateLoginPage() {
   return (
     <AffiliateAuthScreen title="Log in to your affiliate account" intro="See your code, your link and what you have earned.">
-      <AuthForm mode="login" affiliate after="/affiliates/dashboard" confirmTo="/affiliates/dashboard" loginHref="/affiliates/login" signupHref="/affiliates/signup" />
+      <AuthForm mode="login" affiliate after="/affiliates/dashboard" confirmTo="/affiliates/dashboard" resetTo="/affiliates/reset-password" loginHref="/affiliates/login" signupHref="/affiliates/signup" />
     </AffiliateAuthScreen>
   );
 }

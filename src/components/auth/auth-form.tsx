@@ -69,6 +69,7 @@ export function AuthForm({
   loginHref = "/login",
   signupHref = "/signup",
   confirmTo = "/account",
+  resetTo = "/reset-password",
 }: {
   mode: "login" | "signup";
   /** Plain black and white colours instead of the site's, used on the admin page. */
@@ -78,6 +79,8 @@ export function AuthForm({
   /** Where the "Log in" and "Sign Up" links point (the affiliate site has its own pages). */
   loginHref?: string;
   signupHref?: string;
+  /** Where the emailed "reset your password" link lands. */
+  resetTo?: string;
   /** Where the emailed confirmation link lands. */
   confirmTo?: string;
   /** Where to go once signed in. */
@@ -148,7 +151,7 @@ export function AuthForm({
     setNotice("");
     if (!email.trim()) return setError("Type your email above first, then tap this again.");
     const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${window.location.origin}${resetTo}`,
     });
     if (err) setError(friendly(err.message));
     else setNotice("If that email has an account, we sent a link to reset the password.");
