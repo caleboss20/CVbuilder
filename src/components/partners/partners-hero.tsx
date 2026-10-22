@@ -2,9 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 
-/** The picture in the arch on the right. Swap this one line when a new photo arrives. */
-// Photo: Pexels photo 7658276 (free to use, no credit needed), 1400 px wide.
-const PHOTO = { src: "/images/partners/hero-woman.jpg", alt: "A smiling young woman in an orange shirt holding a folder of documents", position: "50% 16%" };
+/**
+ * The picture in the arch on the right. Swap this one line when a new photo arrives.
+ * Photo: a smiling young woman holding up her resume, supplied by the owner (a small file, 418 x 626 px: a larger
+ * original would be sharper on big and high-resolution screens, and its licence should be confirmed).
+ */
+const PHOTO = { src: "/images/partners/hero-resume.png", alt: "A smiling young woman in glasses holding up her resume", position: "50% 22%" };
 
 /**
  * A small label on a splash of paint: an irregular blob with a few flying drops, in a bright violet, behind
