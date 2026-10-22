@@ -31,19 +31,28 @@ export async function fetchCvAccess(cvId: string): Promise<CvAccess | null> {
 
 const PARTNER_KEY = "cv11-partner";
 
-/** Keeps an affiliate code seen in a link (?p=KOFI) so it is still there when the student reaches the pay screen. */
+/**
+ * Keeps an affiliate code seen in a link (?p=KOFI) so it is still there when the student reaches the pay screen.
+ * It is saved with the time it was seen, and forgotten after `siteConfig.affiliates.linkDays` days. The most recent
+ * link wins, as on every affiliate program. Editing this value in the browser can only pick another real code:
+ * the server checks the code, and works out the reward itself.
+ */
 export function rememberPartner(code: string) {
   const clean = code.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
   if (clean.length < 3) return;
   try {
-    localStorage.setItem(PARTNER_KEY, clean);
+    localStorage.setItem(PARTNER_KEY, `${clean}|${Date.now()}`);
   } catch {}
 }
 
-/** The affiliate code kept from a link, or "". */
+/** The affiliate code kept from a link, or "" when there is none or it is older than the allowed days. */
 export function savedPartner(): string {
   try {
-    return localStorage.getItem(PARTNER_KEY) ?? "";
+    const [code = "", seen = ""] = (localStorage.getItem(PARTNER_KEY) ?? "").split("|");
+    const age = Date.now() - Number(seen);
+    // A value without a time (saved before this rule existed) counts as expired
+    if (!code || !Number.isFinite(age) || age > siteConfig.affiliates.linkDays * 86_400_000) return "";
+    return code;
   } catch {
     return "";
   }

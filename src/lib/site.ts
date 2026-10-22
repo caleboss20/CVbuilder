@@ -58,6 +58,8 @@ export const siteConfig = {
     commission: "25%",
     commissionPercent: 25,
     holdDays: 14,
+    /** How many days a visitor who opened an affiliate's link is still credited to that affiliate. */
+    linkDays: 30,
     minPayout: "GH₵ 10",
     /** How many founding affiliates the program starts with (shown on the affiliate page). */
     spots: 10,
