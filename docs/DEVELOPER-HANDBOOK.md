@@ -116,7 +116,7 @@ Model: set `GEMINI_MODEL` (the default is in `src/server/ai/config.ts`). **Check
 
 ### 2.12 Change prices
 
-The charged amount is `pay_settings.price_pesewas` (500 = GH₵ 5) and the window is `valid_days`. Update `siteConfig.download.price` and `days` so the words match. Existing paid rows keep what they paid.
+The charged amount is `pay_settings.price_pesewas` (700 = GH₵ 7) and the window is `valid_days`. Update `siteConfig.download.price` and `days` so the words match. Existing paid rows keep what they paid.
 
 ---
 
@@ -124,7 +124,7 @@ The charged amount is `pay_settings.price_pesewas` (500 = GH₵ 5) and the windo
 
 - **Free batch:** `siteConfig.certificates.freeBatch` (browser, 15) and the table `cert_settings.free_names` (database, 15) must match.
 - **Unlock a bigger batch:** in Supabase, table `cert_grants`, add a row with the person's `user_id` (Authentication > Users), `max_names` (50, 200 or 500) and an `expires_at`. The price list shown to organisers is `siteConfig.certificates.bigger`.
-- **CV price:** the amount charged is `pay_settings.price_pesewas` in the database (500 = GH₵ 5); the text shown is `siteConfig.download.price`. Change both.
+- **CV price:** the amount charged is `pay_settings.price_pesewas` in the database (700 = GH₵ 7); the text shown is `siteConfig.download.price`. Change both.
 - **Rosette words:** the default is `DEFAULT_BADGE_TEXT` in `certificates.ts`.
 
 ## 3. Data shape reference

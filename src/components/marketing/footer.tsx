@@ -41,6 +41,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
     links: [
       { label: "About", href: "/about" },
       { label: "Pricing", href: "/pricing" },
+      { label: "Earn with CV11", href: "/partners" },
       // Only when a WhatsApp number is configured
       ...(whatsappLink() ? [{ label: "WhatsApp support", href: whatsappLink() as string }] : []),
       { label: "FAQ", href: "/#faq" },

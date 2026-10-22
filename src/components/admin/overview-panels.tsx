@@ -1,6 +1,6 @@
 "use client";
 
-import type { AdminOverview } from "@/lib/admin-stats";
+import type { AdminAffiliate, AdminOverview } from "@/lib/admin-stats";
 
 const cardClass = "rounded-lg border border-afg/10 bg-acard";
 const n = (v: number) => v.toLocaleString("en-GB");
@@ -112,5 +112,51 @@ export function OverviewPanels({ overview, missing }: { overview: AdminOverview 
         ]}
       />
     </>
+  );
+}
+
+/** Partners: who has applied, who is approved, and what each is owed. `partners` is null until it loads. */
+export function AffiliatePanel({ partners, missing }: { partners: AdminAffiliate[] | null; missing: boolean }) {
+  if (missing) {
+    return (
+      <section className={`${cardClass} p-5 text-sm text-afg/60`}>
+        To see partners here, run <span className="font-mono">supabase/affiliates.sql</span> in the Supabase SQL Editor, then refresh.
+      </section>
+    );
+  }
+  if (!partners) return null;
+  const owedTotal = partners.reduce((sum, p) => sum + p.owed, 0);
+  return (
+    <section className={`${cardClass} p-5`} aria-label="Partners">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="text-sm font-medium">Partners</h2>
+        <p className="text-xs text-afg/50">Owed now, across everyone: {cedis(owedTotal)}</p>
+      </div>
+      <ul className="mt-4 divide-y divide-afg/10 text-sm">
+        {partners.length === 0 && <li className="py-2 text-afg/40">No applications yet. People apply at /partners.</li>}
+        {partners.map((p, i) => (
+          <li key={i} className="py-3">
+            <div className="flex flex-wrap items-center justify-between gap-x-3">
+              <span className="min-w-0 truncate font-medium">
+                {p.name} {p.code ? <span className="font-mono text-afg/60">({p.code})</span> : null}
+              </span>
+              <span className="shrink-0 text-xs uppercase tracking-wide text-afg/50">{p.status}</span>
+            </div>
+            <p className="mt-0.5 text-xs text-afg/50">
+              {p.phone} · {p.email}
+            </p>
+            {p.status === "pending" && p.note && <p className="mt-1 text-xs text-afg/60">&ldquo;{p.note}&rdquo;</p>}
+            {p.code && (
+              <p className="mt-1 text-xs tabular-nums text-afg/70">
+                {n(p.customers)} customers · earned {cedis(p.earned)} · <b>owed {cedis(p.owed)}</b> · waiting {cedis(p.waiting)} · paid {cedis(p.paid_out)}
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+      <p className="mt-3 text-xs text-afg/40">
+        To approve: in Supabase open the table affiliates, set code (capital letters and digits) and status to approved. After paying someone by MoMo, add a row to affiliate_payouts.
+      </p>
+    </section>
   );
 }

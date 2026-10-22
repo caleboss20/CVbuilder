@@ -26,7 +26,7 @@
 
 **For organisers (live):** paste a list of names, choose from 35 original designs (wide and tall) or **upload their own certificate** (a Canva PDF or a photo), optionally add a logo anywhere on the page, and download a certificate for every person as a ZIP or one PDF to print. Free for up to 15 per batch.
 
-**Live in test mode:** one-time payment (GH₵ 5 per CV) through Paystack with mobile money and cards (live keys need Paystack's business verification). **Built but switched off:** AI writing help (rewrite a bullet, tidy a project, write a summary, correct speech-recognition mistakes), restricted to the owner while quality is checked.
+**Live in test mode:** one-time payment (GH₵ 7 per CV) through Paystack with mobile money and cards (live keys need Paystack's business verification). **Built but switched off:** AI writing help (rewrite a bullet, tidy a project, write a summary, correct speech-recognition mistakes), restricted to the owner while quality is checked.
 
 **Also live for organisers:** one shared link or QR so each person downloads only their own certificate (names pasted by the organiser, or added by attendees and then released), a verify QR on each certificate that opens a "this certificate is genuine" page, link management, and a bigger-batch unlock (50, 200 or 500) sold for about GH₵ 20, 50 or 100 and unlocked by an administrator today.
 
@@ -51,7 +51,7 @@
 - **Mobile money is the normal way to pay small amounts.** Paystack supports MTN, Telecel and AirtelTigo mobile money and cards in Ghana.
 - **A recurring, calendar-driven need.** Every graduating class needs a first CV and a national service application; every event needs certificates.
 - **Local content is a real barrier to entry for foreign tools:** course-specific examples, the formal Ghanaian letter layout, national service material, support for Ghanaian letters (Ɛ, Ɔ) in PDFs.
-- **Low willingness to pay requires a very low price and no subscription.** A one-time GH₵ 5 and a free tier that is genuinely useful is designed for that.
+- **Low willingness to pay requires a very low price and no subscription.** A one-time GH₵ 7 and a free tier that is genuinely useful is designed for that.
 
 ---
 
@@ -61,7 +61,7 @@
 
 | # | Stream | State | Price (designed) | Notes |
 |---|---|---|---|---|
-| 1 | **CV download** | Live, test mode | GH₵ 5 once per CV, 30 days of PDF, Word and all versions | Free to build and preview; pay only to download. Priced just under a local competitor's GH₵ 9 |
+| 1 | **CV download** | Live, test mode | GH₵ 7 once per CV, 30 days of PDF, Word and all versions | Free to build and preview; pay only to download. Priced just under a local competitor's GH₵ 9 |
 | 2 | **Bulk certificates, paid batches** | Built; unlocked by hand today | Proposed: about GH₵ 20 up to 50, GH₵ 50 up to 200, GH₵ 100 up to 500 (to be tested) | Free up to 15 per batch applies to both built-in designs and uploaded certificates. Charging applies at the point of download beyond the free amount |
 | 3 | **Certificate extras** | Built: share link, self-register, verify QR | To be set | QR verification, attendee sign-up link, WhatsApp delivery, "Made with CV11" footer removal |
 | 4 | **Club or organisation plans** | Idea | To be set | For groups that issue certificates every month |
@@ -73,23 +73,23 @@
 
 | Item | Amount | Basis |
 |---|---|---|
-| Price | GH₵ 5.00 | `pay_settings` default |
-| Paystack fee | about GH₵ 0.10 | About 1.95% in Ghana (Paystack's published rate; confirm for your account) |
-| **Net per CV** | **about GH₵ 4.90** | |
+| Price | GH₵ 7.00 | `pay_settings` default |
+| Paystack fee | about GH₵ 0.14 | About 1.95% in Ghana (Paystack's published rate; confirm for your account) |
+| **Net per CV** | **about GH₵ 6.86** | |
 | Cost to produce the PDF or Word file | about zero | Made on the student's device |
 | Hosting and database | free tiers at early volume | Vercel and Supabase |
 | AI cost per paying user | well under a cent, and zero on the free tier | Flash-Lite model; per-person and per-site daily limits in the database |
 
 **What the numbers mean.** Gross margin is essentially the payment fee, so the business is constrained by **acquisition and conversion**, not by cost of service.
 
-**Illustrative monthly net revenue from CV downloads alone** (`paid CVs × GH₵ 4.90`):
+**Illustrative monthly net revenue from CV downloads alone** (`paid CVs × GH₵ 6.86`):
 
 | Paid CVs per month | Net revenue |
 |---|---|
-| 100 | about GH₵ 490 |
-| 500 | about GH₵ 2,450 |
-| 1,000 | about GH₵ 4,900 |
-| 5,000 | about GH₵ 24,500 |
+| 100 | about GH₵ 686 |
+| 500 | about GH₵ 3,430 |
+| 1,000 | about GH₵ 6,860 |
+| 5,000 | about GH₵ 34,300 |
 
 These are **arithmetic, not predictions**. The decisive unknown is the conversion rate from "finished a CV" to "paid", which will be measured after launch. The price is a single value in the database and can be changed without a deploy.
 
@@ -117,7 +117,7 @@ These are **arithmetic, not predictions**. The decisive unknown is the conversio
 
 | | CV11 | HerbbyCV (a local competitor, observed from its public site) | Global CV builders |
 |---|---|---|---|
-| CV download price | GH₵ 5 once per CV, 30 days of re-downloads, versions included (when payments are on) | GH₵ 9 per CV download | Often subscriptions, priced in dollars |
+| CV download price | GH₵ 7 once per CV, 30 days of re-downloads, versions included (when payments are on) | GH₵ 9 per CV download | Often subscriptions, priced in dollars |
 | Free to build and preview | Yes | Yes | Often limited |
 | Account needed to build | No | Account for the dashboard | Usually yes |
 | Where the CV is stored | The student's device | Its privacy policy says CV content is collected | On their servers |
@@ -163,8 +163,8 @@ These are **arithmetic, not predictions**. The decisive unknown is the conversio
 
 | Risk | Why it matters | Mitigation |
 |---|---|---|
-| **Students will not pay** | The whole CV revenue stream depends on it | Everything else stays free (traffic and trust); the price is one database value; measure the funnel at launch; test GH₵ 5 to 10; certificates provide a second, higher-value stream |
-| **Paywall can be bypassed** | The download is generated in the browser, so a determined user could get around the gate | Accepted at GH₵ 5 and a mostly non-technical audience; the planned verification and attendee features are server-recorded and cannot be bypassed in the browser |
+| **Students will not pay** | The whole CV revenue stream depends on it | Everything else stays free (traffic and trust); the price is one database value; measure the funnel at launch; test GH₵ 7 to 10; certificates provide a second, higher-value stream |
+| **Paywall can be bypassed** | The download is generated in the browser, so a determined user could get around the gate | Accepted at GH₵ 7 and a mostly non-technical audience; the planned verification and attendee features are server-recorded and cannot be bypassed in the browser |
 | **Free certificate limit is browser-side** | Someone can make several free batches | Same: enforce with accounts and server records when verification ships |
 | **Payment fraud or forged payments** | Money | The server asks Paystack directly; the database function needs a secret only the server holds; signed webhooks; the price is set in the database; no privileged database key exists anywhere |
 | **AI cost or abuse** | Open-ended spend | Daily limits per person and per site stored in the database; refunds on failure; the free Flash-Lite tier (about 500 requests a day) at launch; fail closed if limits are missing |

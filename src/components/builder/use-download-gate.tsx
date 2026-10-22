@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useUser } from "@/components/auth/use-user";
-import { DOWNLOAD_DAYS, DOWNLOAD_PRICE, fetchCvAccess, paymentsEnabled, rememberResume, startCheckout } from "@/lib/payments";
+import { DOWNLOAD_DAYS, DOWNLOAD_PRICE, fetchCvAccess, paymentsEnabled, rememberResume, savedPartner, startCheckout } from "@/lib/payments";
 
 type Kind = "pdf" | "word";
 type DialogState = "checking" | "signup" | "pay" | "ready" | null;
@@ -23,6 +23,12 @@ export function useDownloadGate({ cvId, onPdf, onWord }: { cvId: string | undefi
   const [state, setState] = useState<DialogState>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // A partner code the student typed, or one kept from a link they opened
+  const [partner, setPartner] = useState("");
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a code kept from a link
+    setPartner(savedPartner());
+  }, []);
 
   const run = useCallback((kind: Kind) => (kind === "pdf" ? onPdf() : onWord()), [onPdf, onWord]);
 
@@ -53,7 +59,7 @@ export function useDownloadGate({ cvId, onPdf, onWord }: { cvId: string | undefi
     if (!cvId || !session) return;
     setBusy(true);
     setError("");
-    const result = await startCheckout(cvId, session.access_token);
+    const result = await startCheckout(cvId, session.access_token, partner);
     if ("error" in result) {
       setError(result.error);
       setBusy(false);
@@ -98,6 +104,16 @@ export function useDownloadGate({ cvId, onPdf, onWord }: { cvId: string | undefi
               <li>PDF and Word, as many times as you like for {DOWNLOAD_DAYS} days.</li>
               <li>Pay with MTN, Telecel or AirtelTigo mobile money, or a card.</li>
             </ul>
+            <label className="mt-4 block text-sm text-fg/70">
+              Partner code (optional)
+              <input
+                value={partner}
+                onChange={(e) => setPartner(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12))}
+                placeholder="Only if someone helped you"
+                autoComplete="off"
+                className="mt-1.5 block h-10 w-full rounded-md bg-fg/5 px-3 text-[15px] text-fg ring-1 ring-fg/15 placeholder:text-fg/35 focus:outline-none focus:ring-2 focus:ring-brand-400"
+              />
+            </label>
             {error && <p className="mt-3 text-sm text-amber-300">{error}</p>}
             <div className="mt-5 space-y-2">
               <button type="button" onClick={pay} disabled={busy} className={primary}>

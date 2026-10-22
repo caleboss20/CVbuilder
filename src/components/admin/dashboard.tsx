@@ -5,11 +5,11 @@ import { AuthForm } from "@/components/auth/auth-form";
 import { useUser } from "@/components/auth/use-user";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { fetchAdminOverview, fetchAdminStats, type AdminError, type AdminOverview, type AdminStats, type DailyPoint } from "@/lib/admin-stats";
+import { fetchAdminAffiliates, fetchAdminOverview, fetchAdminStats, type AdminAffiliate, type AdminError, type AdminOverview, type AdminStats, type DailyPoint } from "@/lib/admin-stats";
 import { authConfigured } from "@/lib/auth-config";
 import { getSupabase } from "@/lib/supabase";
 import { AreaChart, shortDate } from "./area-chart";
-import { OverviewPanels } from "./overview-panels";
+import { AffiliatePanel, OverviewPanels } from "./overview-panels";
 
 const RANGES = [
   { days: 7, label: "7 days" },
@@ -52,6 +52,8 @@ export function AdminDashboard() {
   // Money, certificates and the rest; missing when supabase/admin-more.sql has not been run
   const [overview, setOverview] = useState<AdminOverview | null>(null);
   const [overviewMissing, setOverviewMissing] = useState(false);
+  const [partners, setPartners] = useState<AdminAffiliate[] | null>(null);
+  const [partnersMissing, setPartnersMissing] = useState(false);
   const [error, setError] = useState<AdminError | null>(null);
   // The technical reason, shown so a failure can be fixed instead of guessed at
   const [detail, setDetail] = useState("");
@@ -60,7 +62,9 @@ export function AdminDashboard() {
   const load = useCallback(
     async (period: number) => {
       setBusy(true);
-      const [result, more] = await Promise.all([fetchAdminStats(period, token), fetchAdminOverview(period, token)]);
+      const [result, more, aff] = await Promise.all([fetchAdminStats(period, token), fetchAdminOverview(period, token), fetchAdminAffiliates(token)]);
+      if ("partners" in aff) setPartners(aff.partners);
+      setPartnersMissing("missing" in aff && aff.missing);
       if ("overview" in more) setOverview(more.overview);
       setOverviewMissing("missing" in more && more.missing);
       if ("stats" in result) {
@@ -120,6 +124,7 @@ export function AdminDashboard() {
       <>
         <Panels stats={stats} series={series} onSeries={setSeries} />
         <OverviewPanels overview={overview} missing={overviewMissing} />
+        <AffiliatePanel partners={partners} missing={partnersMissing} />
       </>
     );
 

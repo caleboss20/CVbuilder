@@ -29,13 +29,33 @@ export async function fetchCvAccess(cvId: string): Promise<CvAccess | null> {
   return { paid: row.paid === true, expiresAt: row.expires_at };
 }
 
+const PARTNER_KEY = "cv11-partner";
+
+/** Keeps a partner code seen in a link (?p=KOFI) so it is still there when the student reaches the pay screen. */
+export function rememberPartner(code: string) {
+  const clean = code.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+  if (clean.length < 3) return;
+  try {
+    localStorage.setItem(PARTNER_KEY, clean);
+  } catch {}
+}
+
+/** The partner code kept from a link, or "". */
+export function savedPartner(): string {
+  try {
+    return localStorage.getItem(PARTNER_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
 /** Asks our server for a Paystack checkout page. Returns its URL, or a message to show the student. */
-export async function startCheckout(cvId: string, token: string): Promise<{ url: string } | { error: string }> {
+export async function startCheckout(cvId: string, token: string, partner = ""): Promise<{ url: string } | { error: string }> {
   try {
     const res = await fetch("/api/pay/start", {
       method: "POST",
       headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
-      body: JSON.stringify({ cvId }),
+      body: JSON.stringify({ cvId, partner }),
     });
     const data = (await res.json()) as { url?: string; error?: string };
     return data.url ? { url: data.url } : { error: data.error ?? "Could not start the payment." };

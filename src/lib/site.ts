@@ -29,7 +29,7 @@ export const siteConfig = {
    */
   download: {
     enabled: process.env.NEXT_PUBLIC_PAYMENTS_ENABLED === "true",
-    price: "GH₵ 5",
+    price: "GH₵ 7",
     days: 30,
   },
   /**
@@ -46,6 +46,18 @@ export const siteConfig = {
       { upTo: 200, price: "GH₵ 50" },
       { upTo: 500, price: "GH₵ 100" },
     ],
+  },
+  /**
+   * The partner (affiliate) programme at /partners. `commission` is what a partner earns for each confirmed
+   * payment made with their code (the amount actually recorded is pay_settings.partner_commission_pesewas in
+   * the database, keep the two equal). `holdDays` matches pay_settings.partner_hold_days.
+   */
+  partners: {
+    commission: "GH₵ 2",
+    commissionCedis: 2,
+    holdDays: 14,
+    minPayout: "GH₵ 20",
+    payoutDay: "the 1st of every month",
   },
   /** CV versions (the same CV in several looks, one for each company). `max` is the most one CV may have. */
   cvVersions: {

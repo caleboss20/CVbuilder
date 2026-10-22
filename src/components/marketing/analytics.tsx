@@ -6,6 +6,7 @@ import { useUser } from "@/components/auth/use-user";
 import { currentDeviceId, recordFirstVisit } from "@/lib/events";
 import { OWNER_KEY, isBot, isTestSite, shouldSkipCounting } from "@/lib/owner";
 import { loadSupabase } from "@/lib/auth-config";
+import { rememberPartner } from "@/lib/payments";
 
 /** Remembers which account we already asked "are you the admin?", so that is only asked once per device. */
 const CHECKED_KEY = "cv11-admin-checked-2";
@@ -23,6 +24,9 @@ export function SiteAnalytics() {
 
   useEffect(() => {
     recordFirstVisit();
+    // A partner's link ends in ?p=CODE: keep the code until the student reaches the pay screen
+    const code = new URLSearchParams(window.location.search).get("p");
+    if (code) rememberPartner(code);
   }, []);
 
   useEffect(() => {

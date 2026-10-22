@@ -108,3 +108,37 @@ export async function fetchAdminOverview(days: number, accessToken: string | und
     return { missing: false };
   }
 }
+
+/** One partner as the admin sees them. Money is in pesewas. */
+export type AdminAffiliate = {
+  name: string;
+  phone: string;
+  email: string;
+  code: string | null;
+  status: "pending" | "approved" | "paused";
+  note: string | null;
+  customers: number;
+  earned: number;
+  owed: number;
+  waiting: number;
+  paid_out: number;
+};
+
+/** Loads the partner list. `missing` is true when supabase/affiliates.sql has not been run yet. */
+export async function fetchAdminAffiliates(accessToken: string | undefined): Promise<{ partners: AdminAffiliate[] } | { missing: boolean }> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key || !accessToken) return { missing: false };
+  try {
+    const response = await fetch(`${url}/rest/v1/rpc/admin_affiliates`, {
+      method: "POST",
+      headers: { apikey: key, Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+      body: "{}",
+    });
+    if (response.ok) return { partners: (await response.json()) as AdminAffiliate[] };
+    const body = (await response.json().catch(() => ({}))) as { code?: string };
+    return { missing: body.code === "PGRST202" || body.code === "42883" };
+  } catch {
+    return { missing: false };
+  }
+}
