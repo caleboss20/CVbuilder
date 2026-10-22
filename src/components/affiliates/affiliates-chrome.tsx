@@ -54,8 +54,8 @@ export function AffiliatesFooter() {
             {chat && (
               <div className="mt-8 flex items-center gap-4">
                 <span className="text-lg font-semibold">Get in touch</span>
-                <a href={chat} target="_blank" rel="noopener noreferrer" aria-label="Chat with us on WhatsApp" className="flex size-10 items-center justify-center rounded-full bg-white text-[#16145f] transition-colors hover:bg-[#e6e7ff]">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.7 7.1L3 21l1.9-6.1A8 8 0 1 1 21 12Z" /></svg>
+                <a href={chat} target="_blank" rel="noopener noreferrer" aria-label="Chat with us on WhatsApp" className="flex size-11 items-center justify-center rounded-full bg-white text-[#16145f] transition-colors hover:bg-[#e6e7ff]">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" fillRule="evenodd" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.5 14.2c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.100-1.500-1.100-2.900s.7-2 1-2.300c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.100 1.200 1 2.100 1.300 2.400 1.500.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.900.9c.3.1.5.2.5.3.1.1.1.7-.1 1.300z" /></svg>
                 </a>
               </div>
             )}
