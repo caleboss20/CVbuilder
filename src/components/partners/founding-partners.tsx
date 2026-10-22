@@ -2,8 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 
-/** The photo on the left: Pexels photo 5940713 (free to use, no credit needed), a tutor helping two students at a laptop. */
-const PHOTO = { src: "/images/partners/founding-students.jpg", alt: "A tutor helping two young students at a laptop", position: "50% 50%" };
+/**
+ * The photo on the left: a smiling young woman holding up her resume, supplied by the owner (a small file,
+ * 418 x 626 px: a larger original would be sharper, and its licence should be confirmed).
+ */
+const PHOTO = { src: "/images/partners/hero-resume.png", alt: "A smiling young woman in glasses holding up her resume", position: "50% 24%" };
 
 /** The words that scroll along the ribbon on top. */
 const RIBBON = ["Founding partners", `Only ${siteConfig.partners.spots} spots`, "Free to join", "Apply now"];
