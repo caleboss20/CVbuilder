@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark, Wordmark } from "@/components/ui/logo";
 import { PromoBar } from "./promo-bar";
 
 /**
@@ -7,18 +8,13 @@ import { PromoBar } from "./promo-bar";
  * "Login" and a call to action on the right). The text is Geist, the same font as the rest of CV11.
  */
 
-/** The CV11 mark with the word "Partners". */
+/** The CV11 mark and wordmark, with the word "Partners" (dropped on very narrow phones to leave room). */
 export function PartnersLogo() {
   return (
-    <Link href="/partners" aria-label="CV11 Partners home" className="flex items-center gap-2.5">
-      <svg width="32" height="32" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-        <rect width="28" height="28" rx="8" fill="#ffffff" />
-        <path d="M18.5 9.2A6 6 0 1 0 18.5 18.8" stroke="#16145f" strokeWidth="3" strokeLinecap="round" />
-        <circle cx="21" cy="7" r="2.2" fill="#7c80ff" />
-      </svg>
-      <span className="whitespace-nowrap text-lg font-semibold tracking-tight text-white">
-        CV11 <span className="font-normal text-white/75">Partners</span>
-      </span>
+    <Link href="/partners" aria-label="CV11 Partners home" className="flex min-w-0 items-center gap-2">
+      <LogoMark size={30} />
+      <Wordmark className="text-white" size={22} />
+      <span className="hidden whitespace-nowrap text-[15px] font-medium tracking-tight text-white/70 min-[420px]:inline">Partners</span>
     </Link>
   );
 }
@@ -64,7 +60,7 @@ export function PartnersHeader() {
 
       {/* Navbar */}
       <header className="relative z-30 bg-[#16145f]">
-        <div className="mx-auto flex h-[84px] max-w-[1200px] items-center gap-8 px-5 sm:px-8">
+        <div className="mx-auto flex h-[72px] max-w-[1200px] items-center gap-3 px-4 sm:h-[84px] sm:gap-8 sm:px-8">
           <PartnersLogo />
           <nav aria-label="Partners" className="hidden items-center gap-7 text-sm text-white/85 lg:flex">
             {links.map((l) => (
@@ -73,14 +69,14 @@ export function PartnersHeader() {
               </a>
             ))}
           </nav>
-          <div className="ml-auto flex items-center gap-1 sm:gap-3">
+          <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-3">
             <div className="hidden sm:block">
               <LanguageMenu />
             </div>
             <Link href="/partners/dashboard" className="hidden px-2 text-sm text-white/90 hover:text-white sm:block">
               Login
             </Link>
-            <Link href="/partners/join" className="inline-flex h-10 items-center whitespace-nowrap rounded-lg bg-white px-4 text-sm font-medium text-[#16145f] transition-colors hover:bg-[#e6e7ff] sm:px-5">
+            <Link href="/partners/join" className="inline-flex h-9 items-center whitespace-nowrap rounded-lg bg-white px-3.5 text-[13px] font-medium text-[#16145f] transition-colors hover:bg-[#e6e7ff] sm:h-10 sm:px-5 sm:text-sm">
               Join now
             </Link>
           </div>
