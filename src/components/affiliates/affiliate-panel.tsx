@@ -16,7 +16,7 @@ type Me =
 const cedis = (pesewas: number) => `GH₵ ${(pesewas / 100).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const card = "rounded-2xl border border-zinc-200 bg-zinc-50 p-6 sm:p-8";
 const field = "mt-1.5 block h-11 w-full rounded-md bg-zinc-100 px-3.5 text-[15px] text-zinc-950 ring-1 ring-zinc-300 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500";
-const button = "inline-flex h-11 items-center justify-center rounded-md bg-zinc-950 px-5 text-[15px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50";
+const button = "inline-flex h-11 items-center justify-center rounded-full bg-zinc-950 px-5 text-[15px] font-medium text-white hover:bg-zinc-800 disabled:opacity-50";
 
 /**
  * The affiliate's page: log in, apply, see the application's status, and (once approved) the code, the link to
@@ -80,8 +80,8 @@ export function AffiliatePanel() {
         <h2 className="text-xl font-medium text-zinc-950">Log in to join</h2>
         <p className="mt-2 text-sm text-zinc-600">Affiliates use a free CV11 account, so we know who to pay.</p>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link href="/signup" onClick={() => rememberResume("/affiliates/dashboard")} className={button}>Create a free account</Link>
-          <Link href="/login" onClick={() => rememberResume("/affiliates/dashboard")} className="inline-flex h-11 items-center justify-center rounded-md px-5 text-[15px] text-zinc-950 ring-1 ring-zinc-300 hover:bg-zinc-100">I already have one</Link>
+          <Link href="/affiliates/signup" onClick={() => rememberResume("/affiliates/dashboard")} className={button}>Create a free account</Link>
+          <Link href="/affiliates/login" onClick={() => rememberResume("/affiliates/dashboard")} className="inline-flex h-11 items-center justify-center rounded-full px-5 text-[15px] text-zinc-950 ring-1 ring-zinc-300 hover:bg-zinc-100">I already have one</Link>
         </div>
       </div>
     );
@@ -145,12 +145,12 @@ export function AffiliatePanel() {
         <p className="mt-4 text-sm text-zinc-600">Tell people to type it in the <b className="text-zinc-950">Affiliate code</b> box when they pay, or share your link:</p>
         <p className="mt-2 break-all rounded-lg bg-zinc-100 p-3 text-sm text-zinc-950">{link}</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          <button type="button" onClick={copy} className="inline-flex h-10 items-center rounded-md px-4 text-sm text-zinc-950 ring-1 ring-zinc-300 hover:bg-zinc-100">{copied ? "Copied" : "Copy link"}</button>
+          <button type="button" onClick={copy} className="inline-flex h-10 items-center rounded-full px-5 text-sm text-zinc-950 ring-1 ring-zinc-300 hover:bg-zinc-100">{copied ? "Copied" : "Copy link"}</button>
           <a
             href={`https://wa.me/?text=${encodeURIComponent(`Make a professional CV on CV11: ${link}`)}`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-10 items-center rounded-md px-4 text-sm text-zinc-950 ring-1 ring-zinc-300 hover:bg-zinc-100"
+            className="inline-flex h-10 items-center rounded-full px-5 text-sm text-zinc-950 ring-1 ring-zinc-300 hover:bg-zinc-100"
           >
             Share on WhatsApp
           </a>

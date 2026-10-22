@@ -23,6 +23,16 @@ const TONES = {
     link: "text-fg underline-offset-4 hover:underline",
     notice: "text-emerald-300",
   },
+  // White background with the affiliate violet, for the affiliate site
+  light: {
+    radius: "rounded-full",
+    input: "border-zinc-300 bg-white text-zinc-950 placeholder:text-zinc-400 focus:border-[#5b5fe0]",
+    label: "text-zinc-700",
+    submit: "bg-[#5b5fe0] text-white hover:bg-[#4a4ed0]",
+    muted: "text-zinc-600",
+    link: "font-medium text-[#4a4ed0] underline-offset-4 hover:underline",
+    notice: "text-emerald-700",
+  },
   neutral: {
     input: "border-afg/15 bg-afg/[0.03] text-afg placeholder:text-afg/35 focus:border-afg/60",
     label: "text-afg/80",
@@ -55,10 +65,21 @@ export function AuthForm({
   after = "/account",
   allowSignup = true,
   neutral = false,
+  light = false,
+  loginHref = "/login",
+  signupHref = "/signup",
+  confirmTo = "/account",
 }: {
   mode: "login" | "signup";
   /** Plain black and white colours instead of the site's, used on the admin page. */
   neutral?: boolean;
+  /** Dark text on a white page, in the affiliate violet, used on the affiliate site. */
+  light?: boolean;
+  /** Where the "Log in" and "Sign Up" links point (the affiliate site has its own pages). */
+  loginHref?: string;
+  signupHref?: string;
+  /** Where the emailed confirmation link lands. */
+  confirmTo?: string;
   /** Where to go once signed in. */
   after?: string;
   /** False on private pages, such as the admin log-in, so they do not invite anyone to create an account. */
@@ -73,7 +94,7 @@ export function AuthForm({
   const [notice, setNotice] = useState("");
 
   const signup = mode === "signup";
-  const tone = neutral ? TONES.neutral : TONES.site;
+  const tone = neutral ? TONES.neutral : light ? TONES.light : TONES.site;
   const inputClass = `h-12 w-full rounded-md border px-3.5 text-[15px] focus:outline-none ${tone.input}`;
 
   useEffect(() => {
@@ -104,7 +125,7 @@ export function AuthForm({
         const { data, error: err } = await supabase.auth.signUp({
           email: email.trim(),
           password,
-          options: { emailRedirectTo: `${window.location.origin}/account` },
+          options: { emailRedirectTo: `${window.location.origin}${confirmTo}` },
         });
         if (err) throw err;
         // With email confirmation on, there is no session until they tap the link we emailed
@@ -158,16 +179,17 @@ export function AuthForm({
           autoComplete={signup ? "new-password" : "current-password"}
           placeholder={signup ? "Password (8+ characters)" : "Password"}
           neutral={neutral}
+          light={light}
         />
       </label>
 
-      {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
+      {error && <p className={`text-sm ${light ? "text-red-600" : "text-red-400"}`} role="alert">{error}</p>}
       {notice && <p className={`text-sm ${tone.notice}`} role="status">{notice}</p>}
 
       <button
         type="submit"
         disabled={busy || loading || !email.trim()}
-        className={`flex h-12 w-full items-center justify-center rounded-md text-[15px] font-medium disabled:opacity-50 ${tone.submit}`}
+        className={`flex h-12 w-full items-center justify-center ${"radius" in tone ? tone.radius : "rounded-md"} text-[15px] font-medium disabled:opacity-50 ${tone.submit}`}
       >
         {busy ? "Please wait…" : signup ? "Create account" : "Log in"}
       </button>
@@ -176,7 +198,7 @@ export function AuthForm({
         {signup ? (
           <p>
             Already have an account?{" "}
-            <Link href="/login" className={tone.link}>
+            <Link href={loginHref} className={tone.link}>
               Log in
             </Link>
           </p>
@@ -185,7 +207,7 @@ export function AuthForm({
             {allowSignup && (
               <p>
                 Don’t have an account?{" "}
-                <Link href="/signup" className={tone.link}>
+                <Link href={signupHref} className={tone.link}>
                   Sign Up
                 </Link>
               </p>

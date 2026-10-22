@@ -5,6 +5,7 @@ import { useState } from "react";
 const BASE = "h-12 w-full rounded-md border pl-3.5 pr-12 text-[15px] focus:outline-none";
 const SITE = "border-fg/15 bg-fg/[0.03] text-fg placeholder:text-fg/40 focus:border-fg/50";
 // Plain black and white, for the admin page
+const LIGHT = "border-zinc-300 bg-white text-zinc-950 placeholder:text-zinc-400 focus:border-[#5b5fe0]";
 const NEUTRAL = "border-afg/15 bg-afg/[0.03] text-afg placeholder:text-afg/35 focus:border-afg/60";
 
 /**
@@ -17,12 +18,14 @@ export function PasswordInput({
   autoComplete,
   placeholder = "At least 8 characters",
   neutral = false,
+  light = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   autoComplete: "current-password" | "new-password";
   placeholder?: string;
   neutral?: boolean;
+  light?: boolean;
 }) {
   const [shown, setShown] = useState(false);
 
@@ -36,7 +39,7 @@ export function PasswordInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={`${BASE} ${neutral ? NEUTRAL : SITE}`}
+        className={`${BASE} ${neutral ? NEUTRAL : light ? LIGHT : SITE}`}
       />
       <button
         type="button"
@@ -44,7 +47,7 @@ export function PasswordInput({
         aria-label={shown ? "Hide password" : "Show password"}
         aria-pressed={shown}
         // Sits inside the box, at its right edge
-        className={`absolute inset-y-0 right-0 grid w-12 place-items-center ${neutral ? "text-afg/55 hover:text-afg" : "text-fg/55 hover:text-fg"}`}
+        className={`absolute inset-y-0 right-0 grid w-12 place-items-center ${neutral ? "text-afg/55 hover:text-afg" : light ? "text-zinc-500 hover:text-zinc-950" : "text-fg/55 hover:text-fg"}`}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           {shown ? (

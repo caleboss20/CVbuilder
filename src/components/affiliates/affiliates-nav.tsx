@@ -98,12 +98,12 @@ export function AffiliatesNav() {
           <div className="hidden sm:block">
             <LanguageMenu light={stuck} />
           </div>
-          <Link href="/affiliates/dashboard" className={`hidden px-2 text-sm font-medium sm:block ${stuck ? "text-zinc-800 hover:text-zinc-950" : "text-white/90 hover:text-white"}`}>
+          <Link href="/affiliates/login" className={`hidden px-2 text-sm font-medium sm:block ${stuck ? "text-zinc-800 hover:text-zinc-950" : "text-white/90 hover:text-white"}`}>
             Login
           </Link>
           <Link
             href="/affiliates/join"
-            className={`inline-flex h-10 items-center whitespace-nowrap rounded-lg px-3.5 text-[13px] font-medium transition-colors sm:h-11 sm:px-5 sm:text-sm ${
+            className={`inline-flex h-10 items-center whitespace-nowrap rounded-full px-4 text-[13px] font-medium transition-colors sm:h-11 sm:px-5 sm:text-sm ${
               stuck ? "bg-[#5b5fe0] text-white hover:bg-[#4a4ed0]" : "bg-white text-[#16145f] hover:bg-[#e6e7ff]"
             }`}
           >
