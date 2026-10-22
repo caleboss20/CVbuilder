@@ -6,7 +6,6 @@ import { LogoMark, Wordmark } from "@/components/ui/logo";
 
 const links = [
   { label: "How it works", href: "/affiliates#how" },
-  { label: "Earnings", href: "/affiliates#earn" },
   { label: "FAQ", href: "/affiliates#faq" },
   { label: "CV11", href: "/" },
 ];

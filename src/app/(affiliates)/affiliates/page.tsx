@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { ButtonLink } from "@/components/ui/button";
 import { CelebrateCta } from "@/components/affiliates/celebrate-cta";
-import { EarningsCalculator } from "@/components/affiliates/earnings-calculator";
 import { AffiliatesHero } from "@/components/affiliates/affiliates-hero";
 import { FoundingAffiliates } from "@/components/affiliates/founding-affiliates";
 import { WhoCanJoin } from "@/components/affiliates/who-can-join";
@@ -31,18 +30,6 @@ export default function AffiliatesPage() {
       <WhoCanJoin />
 
       {/* The sections below are still in the first draft look; they are redesigned one at a time */}
-      <div className="bg-ink-950 text-fg">
-      {/* Earnings */}
-      <section id="earn" className="mx-auto grid max-w-6xl scroll-mt-24 items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2">
-        <div>
-          <h2 className="text-3xl font-medium tracking-tight text-fg">See what you could earn</h2>
-          <p className="mt-4 text-fg/65">A CV on CV11 costs the student {siteConfig.download.price} and covers all their edits for a while. You earn {siteConfig.affiliates.commission} of it every time.</p>
-        </div>
-        <EarningsCalculator />
-      </section>
-
-      </div>
-
       {/* A celebration band before the questions */}
       <CelebrateCta />
 
