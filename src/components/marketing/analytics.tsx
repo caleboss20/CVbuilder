@@ -3,12 +3,12 @@
 import { Analytics } from "@vercel/analytics/next";
 import { useEffect } from "react";
 import { useUser } from "@/components/auth/use-user";
-import { recordFirstVisit } from "@/lib/events";
-import { OWNER_KEY, shouldSkipCounting } from "@/lib/owner";
+import { currentDeviceId, recordFirstVisit } from "@/lib/events";
+import { OWNER_KEY, isBot, isTestSite, shouldSkipCounting } from "@/lib/owner";
 import { loadSupabase } from "@/lib/auth-config";
 
 /** Remembers which account we already asked "are you the admin?", so that is only asked once per device. */
-const CHECKED_KEY = "cv11-admin-checked";
+const CHECKED_KEY = "cv11-admin-checked-2";
 
 /**
  * Vercel Analytics plus our own counter, both skipping the owner. Returning null from beforeSend
@@ -26,7 +26,7 @@ export function SiteAnalytics() {
   }, []);
 
   useEffect(() => {
-    if (!user || shouldSkipCounting()) return;
+    if (!user || isTestSite() || isBot()) return;
     try {
       if (localStorage.getItem(CHECKED_KEY) === user.id) return;
       localStorage.setItem(CHECKED_KEY, user.id);
@@ -40,6 +40,9 @@ export function SiteAnalytics() {
           try {
             localStorage.setItem(OWNER_KEY, "1");
           } catch {}
+          // Also tell the database, which then deletes this device's earlier visits and ignores its future ones
+          const device = currentDeviceId();
+          if (device) void supabase.rpc("mark_owner_device", { p_device: device });
         }
       }),
     );

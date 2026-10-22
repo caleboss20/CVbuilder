@@ -17,6 +17,7 @@ const prompts: Record<RefineKind, string> = {
  * CV lines, they review and add them. Speech works in Chrome, Edge and Android;
  * elsewhere the mic is hidden and typing still works.
  */
+
 export function VoiceInput({
   kind,
   onAdd,
@@ -176,6 +177,7 @@ export function VoiceInput({
     </div>
   );
 }
+
 
 function MicIcon() {
   return (

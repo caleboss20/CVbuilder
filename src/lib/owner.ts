@@ -26,7 +26,17 @@ export function isTestSite(): boolean {
   return env === "preview" || env === "development";
 }
 
+/**
+ * True for search-engine crawlers, link previews (WhatsApp, Facebook), uptime checkers, headless
+ * browsers and other automated visitors, which would otherwise be counted as people.
+ */
+export function isBot(): boolean {
+  if (typeof navigator === "undefined") return false;
+  if (navigator.webdriver) return true;
+  return /bot|crawl|spider|slurp|headless|lighthouse|pagespeed|pingdom|uptime|preview|facebookexternalhit|whatsapp|telegram|vercel|monitor|curl|wget|python|node-fetch/i.test(navigator.userAgent);
+}
+
 /** True when a visit or action should not be counted. */
 export function shouldSkipCounting(): boolean {
-  return isTestSite() || isOwnerDevice();
+  return isTestSite() || isOwnerDevice() || isBot();
 }

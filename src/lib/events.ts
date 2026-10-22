@@ -39,8 +39,41 @@ export function recordEvent(name: string, props?: Record<string, string | number
   }).catch(() => undefined);
 }
 
-/** Counts a brand-new device once, the first time it opens the site. This is our "people" number. */
+/** The anonymous id of this browser, or "" when storage is blocked. Used to tell the database which device is the owner's. */
+export function currentDeviceId(): string {
+  return deviceId().id;
+}
+
+const COUNTED_KEY = "cv11-first-counted";
+/** How long a new visitor must stay before they count as a person, so quick bounces and crawlers do not. */
+const STAY_MS = 10_000;
+
+/**
+ * Counts a brand-new device once, after it has stayed on the site for a few seconds. This is our
+ * "people" number. The owner and robots are never counted, and a device that is already known is not
+ * counted again.
+ */
 export function recordFirstVisit() {
   if (!authConfigured || shouldSkipCounting()) return;
-  if (deviceId().isNew) recordEvent("first_visit");
+  try {
+    if (localStorage.getItem(COUNTED_KEY)) return;
+    // A device that existed before this rule is not a new person: remember it and stop
+    if (!deviceId().isNew) {
+      localStorage.setItem(COUNTED_KEY, "1");
+      return;
+    }
+  } catch {
+    return;
+  }
+  window.setTimeout(() => {
+    // The owner flag may have been set while we waited (the admin was recognised), so check again
+    if (shouldSkipCounting() || document.visibilityState === "hidden") return;
+    try {
+      if (localStorage.getItem(COUNTED_KEY)) return;
+      localStorage.setItem(COUNTED_KEY, "1");
+    } catch {
+      return;
+    }
+    recordEvent("first_visit");
+  }, STAY_MS);
 }
