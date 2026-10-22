@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PromoBar } from "./promo-bar";
 
 /**
  * The CV11 Partners top of page: a thin announcement bar, then the navbar on a deep blue-violet background
@@ -58,13 +59,8 @@ function LanguageMenu() {
 export function PartnersHeader() {
   return (
     <>
-      {/* Announcement bar */}
-      <div className="bg-[#0c0b33] px-4 py-3 text-center text-sm text-white/90">
-        Now inviting our first partners.{" "}
-        <Link href="/partners/join" className="font-medium text-white underline underline-offset-4 hover:text-[#c7c9ff]">
-          Apply today
-        </Link>
-      </div>
+      {/* Announcement bar, with a close button */}
+      <PromoBar />
 
       {/* Navbar */}
       <header className="relative z-30 bg-[#16145f]">
@@ -81,7 +77,7 @@ export function PartnersHeader() {
             <div className="hidden sm:block">
               <LanguageMenu />
             </div>
-            <Link href="/partners/dashboard" className="px-2 text-sm text-white/90 hover:text-white">
+            <Link href="/partners/dashboard" className="hidden px-2 text-sm text-white/90 hover:text-white sm:block">
               Login
             </Link>
             <Link href="/partners/join" className="inline-flex h-10 items-center whitespace-nowrap rounded-lg bg-white px-4 text-sm font-medium text-[#16145f] transition-colors hover:bg-[#e6e7ff] sm:px-5">
