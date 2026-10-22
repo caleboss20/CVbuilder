@@ -214,7 +214,7 @@ Known weaknesses
 ## 9. What to do next (owner checklist)
 
 1. **Run the SQL.** In Supabase run `affiliate-update-all.sql` (after the base files). If anything errors, read the message: a missing function or column means an earlier file is missing.
-2. **Supabase > Authentication > URL Configuration:** add `https://cv11-one.vercel.app/affiliates/reset-password` to the allowed redirect URLs (otherwise the affiliate password reset email lands on the wrong page).
+2. **Supabase > Authentication > URL Configuration:** make sure the Site URL is `https://cv11-one.vercel.app` and that these are all in the Redirect URLs list: `https://cv11-one.vercel.app/account`, `https://cv11-one.vercel.app/reset-password`, `https://cv11-one.vercel.app/affiliates/reset-password` (affiliate password reset) and `https://cv11-one.vercel.app/affiliates/dashboard` (where the affiliate sign-up confirmation email returns). A missing address means the email link lands on the Site URL instead.
 3. **Vercel environment:** `NEXT_PUBLIC_PAYMENTS_ENABLED=true`, Paystack secret key, `PAYMENT_CONFIRM_SECRET` (same value as `pay_settings.confirm_secret`), webhook URL in Paystack set to `https://…/api/pay/webhook`. Set `NEXT_PUBLIC_FREE_CERTIFICATES` to 15 or remove it.
 4. **Live test with three accounts** (yours as admin, an affiliate, a customer; Paystack **test** mode):
    - Affiliate signs up at `/affiliates/signup` and applies.
@@ -256,7 +256,7 @@ Known weaknesses
 | Admin buttons say "Run supabase/… first" | The SQL for that feature is not run | Run `affiliate-update-all.sql`. |
 | "Saving details is not switched on yet" on Profile | `affiliate-profile.sql` not run | Run it. |
 | Dashboard shows no chart/referrals | `affiliate-activity.sql` not run (the panels hide themselves) | Run it. |
-| Affiliate reset email lands on the student reset page | The redirect URL is not allowed in Supabase | Add `/affiliates/reset-password` to the allowed redirect URLs (section 9). |
+| Affiliate reset or sign-up confirmation email lands on the wrong page | The redirect URL is not in Supabase's allowed list | Add `/affiliates/reset-password` and `/affiliates/dashboard` to the Redirect URLs (section 9). |
 | Reward is 6% but the site says 25% (or the reverse) | The two places disagree | Make `site.ts` and `pay_settings.partner_commission_percent` equal. |
 | Long shell commands with heredocs fail to parse in the terminal tool | Quoting | Write scripts to a file and run them. |
 | Next.js behaves differently from older versions | This project uses Next 16 with breaking changes | Read `node_modules/next/dist/docs/` before changing Next-specific code (see `AGENTS.md`). |
