@@ -285,7 +285,7 @@ function drawCertificate(doc: PDFDocument, fonts: Fonts, settings: CertSettings,
   const shown = L.nameCaps ? name.toUpperCase() : name;
   const wanted = L.nameFont === "title" ? fonts.title : L.nameFont === "display" ? fonts.display : L.nameFont === "bold" ? fonts.bold : fonts.script;
   const nameFont = pick(fonts, wanted, shown);
-  let size = nameFont === fonts.script ? 68 : nameFont === fonts.title || nameFont === fonts.display ? 48 : 36;
+  let size = L.nameSize ?? (nameFont === fonts.script ? 68 : nameFont === fonts.title || nameFont === fonts.display ? 48 : 36);
   while (size > 24 && nameFont.widthOfTextAtSize(shown, size) > L.w * 0.92) size -= 2;
   drawCentred(page, shown, nameFont, size, L.cx, L.name, L.nameColor);
   if (!L.noNameLine) line(page, [L.cx - L.w * 0.4, L.nameLine], [L.cx + L.w * 0.4, L.nameLine], 1, L.lineColor);

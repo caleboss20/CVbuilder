@@ -35,7 +35,7 @@ export type CertDesign =
   | "navyRibbon"
   | "redWaves"
   | "redFrame"
-  | "blueStripes"
+  | "blueBands"
   | "blueArrows"
   | "blueDash"
   | "navyGold"
@@ -76,6 +76,8 @@ export type Layout = {
   nameFont?: "script" | "title" | "bold" | "display";
   /** Write names in capitals (for designs whose name font is not handwriting). */
   nameCaps?: boolean;
+  /** The name's font size in points. Defaults to a size that suits the font. */
+  nameSize?: number;
   /** Skip the line under the name when the design draws its own divider. */
   noNameLine?: boolean;
   /**
