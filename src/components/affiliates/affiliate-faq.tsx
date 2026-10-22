@@ -25,20 +25,20 @@ const FAQS = [
   { q: "How do I close my affiliate account?", a: "Contact us and we will switch off your code and close your account. Rewards you are already owed will still be paid." },
 ];
 
-/** The questions, as a light two-column section: the title on the left, a divided accordion on the right. */
+/** The questions, as a wide white section: a centred title, then one full-width divided accordion. */
 export function AffiliateFaq() {
   return (
-    <section id="faq" className="scroll-mt-24 bg-white py-16 text-zinc-950 sm:py-24">
-      <div className="mx-auto grid max-w-[1110px] gap-10 px-5 sm:px-8 lg:grid-cols-[minmax(0,340px)_1fr] lg:gap-20">
-        <h2 className="text-[2rem] font-semibold leading-[1.02] tracking-[-0.04em] sm:text-[46px] sm:leading-[46px]">Frequently asked questions</h2>
-        <div className="divide-y divide-zinc-200 border-y border-zinc-200">
+    <section id="faq" className="scroll-mt-24 bg-white py-16 text-zinc-950 sm:py-28">
+      <div className="mx-auto max-w-[1110px] px-5 sm:px-8">
+        <h2 className="text-center text-[2rem] font-semibold leading-[1.02] tracking-[-0.04em] sm:text-[46px] sm:leading-[46px]">Frequently asked questions</h2>
+        <div className="mt-12 divide-y divide-zinc-200 border-y border-zinc-200">
           {FAQS.map((f) => (
-            <details key={f.q} className="group py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-medium tracking-tight marker:hidden [&::-webkit-details-marker]:hidden">
+            <details key={f.q} className="group py-6">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-medium tracking-tight sm:text-xl marker:hidden [&::-webkit-details-marker]:hidden">
                 {f.q}
                 <span aria-hidden="true" className="shrink-0 text-2xl font-light text-[#5b5fe0] transition-transform group-open:rotate-45">+</span>
               </summary>
-              <p className="mt-3 max-w-[640px] text-base leading-7 text-zinc-600">{f.a}</p>
+              <p className="mt-3 max-w-[900px] text-base leading-7 text-zinc-600">{f.a}</p>
             </details>
           ))}
         </div>
