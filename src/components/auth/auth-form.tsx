@@ -23,15 +23,15 @@ const TONES = {
     link: "text-fg underline-offset-4 hover:underline",
     notice: "text-emerald-300",
   },
-  // White background with the affiliate violet, for the affiliate site
-  light: {
+  // Dark violet page with the affiliate blue, for the affiliate sign-in screens
+  affiliate: {
     radius: "rounded-full",
-    input: "border-zinc-300 bg-white text-zinc-950 placeholder:text-zinc-400 focus:border-[#5b5fe0]",
-    label: "text-zinc-700",
-    submit: "bg-[#5b5fe0] text-white hover:bg-[#4a4ed0]",
-    muted: "text-zinc-600",
-    link: "font-medium text-[#4a4ed0] underline-offset-4 hover:underline",
-    notice: "text-emerald-700",
+    input: "border-white/30 bg-transparent text-white placeholder:text-white/45 focus:border-white",
+    label: "text-white/80",
+    submit: "bg-[#5b5fe0] text-white hover:bg-[#6d71ec]",
+    muted: "text-white/60",
+    link: "font-medium text-[#9a9dff] underline-offset-4 hover:underline",
+    notice: "text-emerald-300",
   },
   neutral: {
     input: "border-afg/15 bg-afg/[0.03] text-afg placeholder:text-afg/35 focus:border-afg/60",
@@ -65,7 +65,7 @@ export function AuthForm({
   after = "/account",
   allowSignup = true,
   neutral = false,
-  light = false,
+  affiliate = false,
   loginHref = "/login",
   signupHref = "/signup",
   confirmTo = "/account",
@@ -73,8 +73,8 @@ export function AuthForm({
   mode: "login" | "signup";
   /** Plain black and white colours instead of the site's, used on the admin page. */
   neutral?: boolean;
-  /** Dark text on a white page, in the affiliate violet, used on the affiliate site. */
-  light?: boolean;
+  /** Light text on the dark violet affiliate sign-in screens. */
+  affiliate?: boolean;
   /** Where the "Log in" and "Sign Up" links point (the affiliate site has its own pages). */
   loginHref?: string;
   signupHref?: string;
@@ -94,8 +94,8 @@ export function AuthForm({
   const [notice, setNotice] = useState("");
 
   const signup = mode === "signup";
-  const tone = neutral ? TONES.neutral : light ? TONES.light : TONES.site;
-  const inputClass = `h-12 w-full rounded-md border px-3.5 text-[15px] focus:outline-none ${tone.input}`;
+  const tone = neutral ? TONES.neutral : affiliate ? TONES.affiliate : TONES.site;
+  const inputClass = `h-12 w-full ${affiliate ? "rounded-full px-5" : "rounded-md px-3.5"} border text-[15px] focus:outline-none ${tone.input}`;
 
   useEffect(() => {
     // Someone who was stopped at a Download button goes back to it; everyone else to `after`
@@ -179,11 +179,11 @@ export function AuthForm({
           autoComplete={signup ? "new-password" : "current-password"}
           placeholder={signup ? "Password (8+ characters)" : "Password"}
           neutral={neutral}
-          light={light}
+          affiliate={affiliate}
         />
       </label>
 
-      {error && <p className={`text-sm ${light ? "text-red-600" : "text-red-400"}`} role="alert">{error}</p>}
+      {error && <p className={`text-sm text-red-400`} role="alert">{error}</p>}
       {notice && <p className={`text-sm ${tone.notice}`} role="status">{notice}</p>}
 
       <button

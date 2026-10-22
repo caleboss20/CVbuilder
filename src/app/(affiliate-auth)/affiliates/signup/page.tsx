@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function AffiliateSignupPage() {
   return (
     <AffiliateAuthScreen title="Create your free account" intro="One CV11 account is all you need. After this, you apply to become an affiliate.">
-      <AuthForm mode="signup" light after="/affiliates/dashboard" confirmTo="/affiliates/dashboard" loginHref="/affiliates/login" signupHref="/affiliates/signup" />
+      <AuthForm mode="signup" affiliate after="/affiliates/dashboard" confirmTo="/affiliates/dashboard" loginHref="/affiliates/login" signupHref="/affiliates/signup" />
     </AffiliateAuthScreen>
   );
 }
