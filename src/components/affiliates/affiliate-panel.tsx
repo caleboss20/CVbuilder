@@ -70,6 +70,11 @@ export function AffiliatePanel({ guestTo }: { guestTo?: string } = {}) {
     }
   }, [guestTo, loading, user, router]);
 
+  // On the join page, someone who has already applied (or is approved) belongs on the dashboard
+  useEffect(() => {
+    if (guestTo && me && me.status !== "none") router.replace("/affiliates/dashboard");
+  }, [guestTo, me, router]);
+
   const link = me && me.status === "approved" && typeof window !== "undefined" ? `${window.location.origin}/?p=${me.code}` : "";
   async function copy() {
     try {
