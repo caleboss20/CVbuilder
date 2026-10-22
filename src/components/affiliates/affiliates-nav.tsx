@@ -109,7 +109,7 @@ export function AffiliatesNav() {
             }`}
           >
             <span className="sm:hidden">Join now</span>
-            <span className="hidden sm:inline">{stuck ? "Join the program" : "Join now"}</span>
+            <span className="hidden sm:inline">{stuck ? "Become an affiliate" : "Join now"}</span>
           </Link>
         </div>
       </div>

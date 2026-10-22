@@ -80,7 +80,7 @@ export function FoundingAffiliates({ photo = PHOTO }: { photo?: { src: string; a
               href="/affiliates/join"
               className="inline-flex h-14 items-center gap-2 rounded-lg bg-[#5b5fe0] px-8 text-base font-semibold text-white transition-colors hover:bg-[#4a4ed0]"
             >
-              Claim my founding spot
+              Become an affiliate
               <span aria-hidden="true">→</span>
             </Link>
             <p className="mt-4 text-sm text-zinc-500">

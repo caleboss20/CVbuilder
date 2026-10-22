@@ -59,7 +59,7 @@ export function AffiliatesHero({ photo = PHOTO }: { photo?: { src: string; alt: 
               href="/affiliates/join"
               className="inline-flex h-12 items-center gap-2 whitespace-nowrap rounded-lg bg-white px-5 text-lg font-medium text-[#16145f] sm:px-6 transition-colors hover:bg-[#e6e7ff]"
             >
-              Join the program
+              Become an affiliate
               <span aria-hidden="true">→</span>
             </Link>
             <p className="text-sm text-white/70">Free to join. No targets.</p>
