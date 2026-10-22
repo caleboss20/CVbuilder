@@ -7,7 +7,6 @@ import { siteConfig } from "@/lib/site";
 export const metadata: Metadata = {
   title: "CV11 Partners: Earn by Helping People Get Their CV Done",
   description: `Help people build a CV on CV11 and earn ${siteConfig.partners.commission} of every CV payment made with your code. Free to join, paid by mobile money.`,
-  alternates: { canonical: "/partners" },
 };
 
 const steps = [

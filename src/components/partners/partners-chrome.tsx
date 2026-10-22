@@ -1,32 +1,39 @@
 import Link from "next/link";
 
 /**
- * The CV11 Partners navbar and footer. Laid out like a retail partner site: the mark and name on the left,
- * and on the right a language menu, "Login" and a black "Join Now" button. The text is Geist, the same
- * font as the rest of CV11, and the colours are CV11's: black, violet and white.
+ * The CV11 Partners top of page: a thin announcement bar, then the navbar on a deep blue-violet background
+ * that carries straight into the hero. Laid out like a software affiliate page (logo left, links beside it,
+ * "Login" and a call to action on the right). The text is Geist, the same font as the rest of CV11.
  */
 
 /** The CV11 mark with the word "Partners". */
-export function PartnersLogo({ light = false }: { light?: boolean }) {
+export function PartnersLogo() {
   return (
     <Link href="/partners" aria-label="CV11 Partners home" className="flex items-center gap-2.5">
-      <svg width="30" height="30" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-        <rect width="28" height="28" rx="8" fill={light ? "#ffffff" : "#09090b"} />
-        <path d="M18.5 9.2A6 6 0 1 0 18.5 18.8" stroke={light ? "#09090b" : "#ffffff"} strokeWidth="3" strokeLinecap="round" />
+      <svg width="32" height="32" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect width="28" height="28" rx="8" fill="#ffffff" />
+        <path d="M18.5 9.2A6 6 0 1 0 18.5 18.8" stroke="#16145f" strokeWidth="3" strokeLinecap="round" />
         <circle cx="21" cy="7" r="2.2" fill="#7c80ff" />
       </svg>
-      <span className={`whitespace-nowrap text-lg font-extrabold tracking-tight sm:text-xl ${light ? "text-white" : "text-zinc-950"}`}>
-        CV11 <span className="font-extrabold">Partners</span>
+      <span className="whitespace-nowrap text-lg font-semibold tracking-tight text-white">
+        CV11 <span className="font-normal text-white/75">Partners</span>
       </span>
     </Link>
   );
 }
 
+const links = [
+  { label: "How it works", href: "/partners#how" },
+  { label: "Earnings", href: "/partners#earn" },
+  { label: "FAQ", href: "/partners#faq" },
+  { label: "CV11", href: "/" },
+];
+
 /** The language menu. English is the only language for now, so it is a small list with one choice. */
 function LanguageMenu() {
   return (
     <details className="group relative">
-      <summary className="flex h-[37px] cursor-pointer list-none items-center gap-2 rounded-lg px-3 text-sm font-medium text-zinc-950 marker:hidden hover:bg-black/5 [&::-webkit-details-marker]:hidden">
+      <summary className="flex h-9 cursor-pointer list-none items-center gap-1.5 rounded-lg px-2.5 text-sm text-white/85 marker:hidden hover:bg-white/10 [&::-webkit-details-marker]:hidden">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="9" />
           <path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z" />
@@ -36,10 +43,10 @@ function LanguageMenu() {
           <path d="M5 8l5 5 5-5" />
         </svg>
       </summary>
-      <ul className="absolute right-0 top-full z-50 mt-1 w-40 rounded-lg bg-white py-1 text-sm shadow-lg ring-1 ring-black/10">
+      <ul className="absolute right-0 top-full z-50 mt-1 w-40 rounded-lg bg-white py-1 text-sm shadow-lg">
         <li className="flex items-center justify-between px-3 py-2 font-medium text-zinc-950">
           English
-          <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="#7c80ff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="#5b5fe0" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M4.5 10.5l3.5 3.5 7.5-8" />
           </svg>
         </li>
@@ -48,34 +55,51 @@ function LanguageMenu() {
   );
 }
 
-/** The navbar. It sits on top of the page's gradient, with no bar or border of its own. */
 export function PartnersHeader() {
   return (
-    <header className="relative z-30 h-[70px] w-full">
-      <div className="flex h-full items-center justify-between px-5 sm:px-9 lg:pr-[50px]">
-        <PartnersLogo />
-        <div className="flex items-center gap-1 sm:gap-5">
-          <div className="hidden sm:block">
-            <LanguageMenu />
-          </div>
-          <Link href="/partners/dashboard" className="px-2 text-sm font-medium text-zinc-950 hover:underline">
-            Login
-          </Link>
-          <Link href="/partners/join" className="inline-flex h-[38px] items-center whitespace-nowrap rounded-lg bg-zinc-950 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 sm:px-5">
-            Join Now
-          </Link>
-        </div>
+    <>
+      {/* Announcement bar */}
+      <div className="bg-[#0c0b33] px-4 py-3 text-center text-sm text-white/90">
+        Now inviting our first partners.{" "}
+        <Link href="/partners/join" className="font-medium text-white underline underline-offset-4 hover:text-[#c7c9ff]">
+          Apply today
+        </Link>
       </div>
-    </header>
+
+      {/* Navbar */}
+      <header className="relative z-30 bg-[#16145f]">
+        <div className="mx-auto flex h-[84px] max-w-[1200px] items-center gap-8 px-5 sm:px-8">
+          <PartnersLogo />
+          <nav aria-label="Partners" className="hidden items-center gap-7 text-sm text-white/85 lg:flex">
+            {links.map((l) => (
+              <a key={l.label} href={l.href} className="hover:text-white">
+                {l.label}
+              </a>
+            ))}
+          </nav>
+          <div className="ml-auto flex items-center gap-1 sm:gap-3">
+            <div className="hidden sm:block">
+              <LanguageMenu />
+            </div>
+            <Link href="/partners/dashboard" className="px-2 text-sm text-white/90 hover:text-white">
+              Login
+            </Link>
+            <Link href="/partners/join" className="inline-flex h-10 items-center whitespace-nowrap rounded-lg bg-white px-4 text-sm font-medium text-[#16145f] transition-colors hover:bg-[#e6e7ff] sm:px-5">
+              Join now
+            </Link>
+          </div>
+        </div>
+      </header>
+    </>
   );
 }
 
 export function PartnersFooter() {
   return (
-    <footer className="bg-zinc-950 text-zinc-400">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-10 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-9">
+    <footer className="bg-[#0c0b33] text-white/65">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-5 py-10 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-8">
         <div>
-          <PartnersLogo light />
+          <PartnersLogo />
           <p className="mt-3 max-w-sm">CV11 Partners is part of CV11, the CV builder and job-hunt toolkit for students in Ghana.</p>
         </div>
         <nav aria-label="Partners footer" className="flex flex-wrap gap-x-6 gap-y-2">

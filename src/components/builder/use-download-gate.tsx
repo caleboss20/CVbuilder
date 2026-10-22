@@ -25,9 +25,13 @@ export function useDownloadGate({ cvId, onPdf, onWord }: { cvId: string | undefi
   const [error, setError] = useState("");
   // A partner code the student typed, or one kept from a link they opened
   const [partner, setPartner] = useState("");
+  // The code box stays folded away until someone asks for it (or arrived with a code from a link)
+  const [codeOpen, setCodeOpen] = useState(false);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of a code kept from a link
-    setPartner(savedPartner());
+    const saved = savedPartner();
+    setPartner(saved);
+    if (saved) setCodeOpen(true);
   }, []);
 
   const run = useCallback((kind: Kind) => (kind === "pdf" ? onPdf() : onWord()), [onPdf, onWord]);
@@ -104,6 +108,12 @@ export function useDownloadGate({ cvId, onPdf, onWord }: { cvId: string | undefi
               <li>PDF and Word, as many times as you like for {DOWNLOAD_DAYS} days.</li>
               <li>Pay with MTN, Telecel or AirtelTigo mobile money, or a card.</li>
             </ul>
+            {!codeOpen && (
+              <button type="button" onClick={() => setCodeOpen(true)} className="mt-4 text-sm text-fg/55 underline underline-offset-2 hover:text-fg">
+                Have a partner code?
+              </button>
+            )}
+            {codeOpen && (
             <label className="mt-4 block text-sm text-fg/70">
               Partner code (optional)
               <input
@@ -114,6 +124,7 @@ export function useDownloadGate({ cvId, onPdf, onWord }: { cvId: string | undefi
                 className="mt-1.5 block h-10 w-full rounded-md bg-fg/5 px-3 text-[15px] text-fg ring-1 ring-fg/15 placeholder:text-fg/35 focus:outline-none focus:ring-2 focus:ring-brand-400"
               />
             </label>
+            )}
             {error && <p className="mt-3 text-sm text-amber-300">{error}</p>}
             <div className="mt-5 space-y-2">
               <button type="button" onClick={pay} disabled={busy} className={primary}>

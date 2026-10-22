@@ -3,7 +3,6 @@ import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Partner Programme Terms",
-  alternates: { canonical: "/partners/terms" },
 };
 
 const p = siteConfig.partners;
