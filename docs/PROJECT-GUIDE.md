@@ -121,17 +121,19 @@ Four small features behind **Improve with AI** and **Check what we heard** butto
 
 **Two ways to work.** *Pick a design* (below), or *Use my own certificate*: the organiser uploads a certificate they already have (a Canva PDF, or a photo or scan) with the name left blank, drags the name to the right place, chooses its font, colour and size, and every name is written onto it. A PDF stays sharp vector art. The same free limit applies to both ways. See `FEATURES.md` section 15.8, and 15.9 for how charging beyond the free amount is designed.
 
-Paste a list of names (WhatsApp, Excel, typed). The tool cleans it (removes numbering, fixes ALL CAPS and lowercase names including Ghanaian letters, drops repeats). Pick one of **35 original designs** (19 wide, 4 tall) in a gallery, pick a colour, fill in the event, date, signers and an optional drawn signature, and optionally add the organiser's **logo**, which can be dragged anywhere on the certificate and resized. Download **a ZIP of separate PDFs** (one per person, named after them), or **one PDF to print**. One name gives a single PDF.
+Paste a list of names (WhatsApp, Excel, typed). The tool cleans it (removes numbering, fixes ALL CAPS and lowercase names including Ghanaian letters, drops repeats). Pick one of **35 original designs** (31 wide, 4 tall) in a gallery, pick a colour, fill in the event, date, signers and an optional drawn signature, and optionally add the organiser's **logo**, which can be dragged anywhere on the certificate and resized. Download **a ZIP of separate PDFs** (one per person, named after them), or **one PDF to print**. One name gives a single PDF.
 
-Free batches are limited to the first **10** names (a setting in `src/lib/site.ts`), with a clear message and a WhatsApp link to ask for a bigger batch. Everything is drawn in the browser as vector art with real gradients, laurel-wreath medals and ribbons, so certificates print sharply and the list of names never leaves the device.
+Free batches are limited to the first **15** names (a setting in `src/lib/site.ts`), with a clear message and a WhatsApp link to ask for a bigger batch. Everything is drawn in the browser as vector art with real gradients, laurel-wreath medals and ribbons, so certificates print sharply and the list of names never leaves the device.
 
-### 3.9 Payments (Built, off)
+**Sharing, self-registration and verification (Live; needs `supabase/share.sql`).** Under the download buttons a signed-in organiser can make **one link** (and a QR code for it). Each person opens it, types their own name (and the event code, if one was set) and downloads only their own certificate, drawn on their own device; nobody can list the names. The organiser chooses how names get on the list: pasted by them, or **people add their own names** at the sign-up link and the organiser taps **Release**. A saved link has a **Manage** panel (change the code, keep the link working longer, add, correct or remove names). Certificates opened through a link carry a small **verify QR** that opens `/verify` and says who the certificate was issued to, for which event and when; ordinary downloads can get the same QR if the organiser ticks "Add a verify QR" (the names are then kept so the QR can be checked). Some designs have an optional **award rosette** with editable words. The free batch is **15**; the server enforces it for shared events and an administrator unlocks a bigger batch (50, 200 or 500) by adding a row to `cert_grants` after a MoMo payment. Details: `FEATURES.md` sections 15.10 to 15.13.
 
-Sign up, then pay GH₵ 5 through Paystack (mobile money or card), then download. One payment unlocks one CV (and all its versions) for 30 days. The price and rules live in the database. Our server asks Paystack directly whether the money arrived before unlocking anything. Nothing is charged and no wording on the site changes until a single switch is turned on (see 13).
+### 3.9 Payments (Live in test mode)
+
+Sign up, then pay GH₵ 5 through Paystack (mobile money or card), then download. One payment unlocks one CV (and all its versions) for 30 days. The price and rules live in the database. Our server asks Paystack directly whether the money arrived before unlocking anything. The switch `NEXT_PUBLIC_PAYMENTS_ENABLED` is on and Paystack is connected with test keys: a real student is asked for GH₵ 5, a signed-in owner is never charged, and going live needs Paystack's business verification and the live secret key (see 13).
 
 ### 3.10 Owner tools (Live)
 
-An analytics dashboard at `/admin` (people, CVs started and finished, trends, template popularity), an **AI lab** at `/admin/ai-lab` to try the AI on messy text, privacy-respecting counting that excludes the owner's own devices, and `/stop-tracking` to switch counting off on a device.
+An analytics dashboard at `/admin` (people, CVs started and finished, trends, template popularity), an **AI lab** at `/admin/ai-lab` to try the AI on messy text, privacy-respecting counting that excludes the owner's own devices (when the admin is logged in on a browser, the database deletes that browser's earlier counts and ignores its future ones, `supabase/owner-devices.sql`), and `/stop-tracking` to switch counting off on a device. Under the main numbers the dashboard shows **money** (earned, paid downloads, latest payments), **certificates** (made, shared links, people on them, verify QR scans), active **bigger-batch unlocks**, new accounts and AI use (`supabase/admin-more.sql`).
 
 ---
 
@@ -179,17 +181,18 @@ These are the designed models and the cost facts behind them. **No revenue figur
 | CV checker, letters, signing, Text to PDF, interview prep, tracker, NSS checklist | Live | |
 | Accounts, password reset, cloud save, backup | Live | Email sending uses Supabase's default sender: needs the owner's own SMTP before real volume (see 6.3) |
 | Admin analytics and AI lab | Live (owner only) | |
-| Bulk certificates (35 designs, logo, upload-your-own, ZIP, free 10 per batch) | Live | Charging beyond the free amount is designed but not built (`FEATURES.md` 15.9) |
+| Bulk certificates (35 designs, logo, upload-your-own, ZIP, free 15 per batch) | Live | Bigger batches are unlocked by hand with a `cert_grants` row; automatic payment for them is not built |
+| Certificate share link, self-register, verify QR, manage a link | Live | Needs `supabase/share.sql` |
 | AI writing help and voice clean-up | Built, owner-only | Needs `supabase/ai.sql` run, a Gemini key, and `AI_ACCESS=everyone` to open |
-| Payments (Paystack, GH₵ 5 per CV) | Built, off | Needs Paystack keys, `supabase/payments.sql`, and `NEXT_PUBLIC_PAYMENTS_ENABLED=true`. Not tested with real money |
-| Certificate QR verification page | Planned | Needs a database table and a public page |
-| Paid certificate batches | Planned | Reuses the payment system; needs Paystack first |
+| Payments (Paystack, GH₵ 5 per CV) | Live in test mode | Test keys in Vercel, `payments.sql` run, switch on. Going live needs Paystack's business verification and the live secret key. Not yet tested with real money |
+| Certificate QR verification page | Live | `/verify`, counts scans |
+| Paid certificate batches | Manual | An admin adds a `cert_grants` row; Paystack could add it automatically later |
 | Logo upload on CVs, Pro AI plan, Google sign-in | Not started | |
 
 ### 6.2 Known limits and risks (read these)
 
 - **Paywall strength.** PDFs are generated in the browser, so the download gate is enforced in the browser. A technically skilled person could bypass it (for example by printing the preview). For a GH₵ 5 product aimed at mostly non-technical students, this was judged acceptable at launch. Real enforcement would need server-side generation, which conflicts with the privacy promise (decision D2).
-- **The free certificate limit is also browser-side.** Someone can paste the next 15 names and download again. Real limits need accounts and server records, which the planned verification feature provides.
+- **The free certificate limit is also browser-side.** Someone can paste the next 15 names and download again. Shared links enforce the limit on the server (`cert_limit()`); plain downloads stay limited only in the browser, because they happen entirely on the user's device.
 - **No traction data in this document.** Read the admin dashboard for real numbers. Testimonials on the homepage are real students' words, but the wording and short headlines were written by the developer, and the students' consent to be quoted should be confirmed.
 - **Print-dialog downloads.** Saving a CV means passing through the browser's print dialog. Printing several in a row ("Download all" on the versions page) can be unreliable on phones; the page tells students to download one at a time there.
 - **Free AI tier terms.** Google may use free-tier inputs to improve its products. Students are told before first use. Moving to a paid Gemini tier removes this.
@@ -198,13 +201,15 @@ These are the designed models and the cost facts behind them. **No revenue figur
 
 ### 6.2b Known gaps in consistency (worth fixing soon)
 
+> Update: the marketing lines about AI now say "coming soon" and one testimonial that credits the AI is hidden until re-confirmed (see `FEATURES.md`); certificates and versions now appear on the dashboard (`admin-more.sql`). The bullets below were written before those changes.
+
 - **AI wording vs reality.** Several marketing lines promise AI ("let AI help", "the AI suggests stronger lines as you type", "AI writes it stronger", an FAQ entry, the site description). Today students get the **rule-based** helpers; the real AI is owner-only and the homepage AI demo is **scripted** (`src/lib/ai-demo.ts`). Either open the AI to students or reword those lines, so the site matches the principle of honesty in section 7. Files: `src/lib/site.ts`, `faqs.ts`, `components/marketing/hero.tsx`, `how-it-works.tsx`, `problems.tsx`, `final-cta.tsx`.
 - **Certificates and versions are counted but not on the dashboard.** `certificates_made` and `cv_versions_downloaded` are recorded anonymously; read them with queries 5 and 5b in `supabase/stats.sql` until the dashboard shows them.
 - **No pay-screen analytics yet.** "Reached the pay screen" and "paid" are not recorded; add them before payments go live so the funnel can be measured.
 
 ### 6.3 Owner checklist (things only the owner can do)
 
-1. Run the SQL files in Supabase in this order: `schema.sql`, `stats.sql`, `ai.sql`, `payments.sql` (see 14.3). Add the owner's email to the `admins` table.
+1. Run the SQL files in Supabase in this order: `schema.sql`, `stats.sql`, `ai.sql`, `payments.sql`, `share.sql`, `admin-more.sql`, `owner-devices.sql` (see 14.3). Add the owner's email to the `admins` table.
 2. Create a Paystack account. Test keys are instant and free; going live needs Paystack's account verification. Add the keys as environment variables, set the webhook URL, test with Paystack's test cards, then turn payments on.
 3. Set up a custom SMTP sender in Supabase (for example a Gmail app password) and friendlier email templates. The default sender allows only a handful of emails per hour and will block sign-ups at any real volume.
 4. Create a new Gemini API key (an earlier key was exposed and must be treated as burned), and add it only as an environment variable.
@@ -215,8 +220,8 @@ These are the designed models and the cost facts behind them. **No revenue figur
 ### 6.4 Roadmap, in a sensible order
 
 1. Switch payments on (keys, SQL, test, flip the flag). Add tracking for "reached the pay screen" and "paid" to the admin dashboard.
-2. Certificate **QR verification** page and a **sign-up link** for attendees; "add to my CV" for recipients.
-3. Paid certificate batches using the payment system.
+2. Certificate sharing, sign-up links and the verify QR are built. Next: "add to my CV" for recipients, bulk email to every recipient, and attendance-gated certificates for online bootcamps.
+3. Automatic paid certificate batches through Paystack (today an admin adds a row in `cert_grants` after a MoMo payment).
 4. Open the AI to students once quality is judged and limits are watched.
 5. Typing-time suggestions in the builder (rule-based coach first, AI only for weak lines).
 6. Automated tests for the pure logic (names cleaner, CV checker, CV import, payment helpers), and a continuous-integration job running lint, types and build.
@@ -469,7 +474,10 @@ callyCV/
 | `schema.sql` | Tables `cv_sync`, `events`, `admins`; functions `is_admin()` and `admin_stats()`; row-level security. |
 | `stats.sql` | Ready-made queries for reading the anonymous numbers. |
 | `ai.sql` | `ai_settings`, `ai_usage`, `ai_use_credit()`, `ai_refund_credit()`. |
-| `payments.sql` | `pay_settings`, `payments`, `payment_start()`, `payment_confirm()`, `cv_access()`. |
+| `payments.sql` | `pay_settings`, `payments`, `payment_start()`, `payment_confirm()`, `cv_access()`. The CV price is `pay_settings.price_pesewas` (500 = GH₵ 5). |
+| `share.sql` | `cert_events`, `cert_recipients`, `cert_lookups`, `cert_settings`, `cert_grants`, `owner`-checked functions to create, open, release, update and edit an event, the public `cert_claim()`, `cert_register()`, `cert_event_info()`, `cert_verify()`, and `cert_limit()`. See `FEATURES.md` 15.10 to 15.13. |
+| `admin-more.sql` | `admin_overview()`: the money, certificates, unlocks and AI numbers on the admin dashboard. |
+| `owner-devices.sql` | `owner_devices`, `mark_owner_device()` and a trigger that drops events from the owner's devices. |
 
 ---
 
@@ -533,6 +541,10 @@ Browser button leads to `ai-client.ts` leads to `POST /api/ai/<feature>` leads t
 
 Names are cleaned by `parseNames`; the first `FREE_BATCH` are used. `previewCertificate` builds a one-page PDF and renders it with pdf.js for the live preview (the dragged logo is drawn in the page on top of it, using the same fractions the PDF will use). **Download** calls `buildSeparatePdfs` (one document per person, then `fflate` zips them) or `buildCombinedPdf` (one document, one page per name). One name gives a single PDF. All of this runs in the browser.
 
+### 12.4b Sharing a certificate link
+
+The organiser's browser calls `cert_event_create()` (pasted names) or `cert_event_open()` (people add their own) with the design settings; an uploaded certificate travels inside the settings as base64 (limit 3.5 MB). A person opens `/claim?e=<slug>`; the page asks `cert_event_info()`, then `cert_claim()` with a name (matched exactly, or by word prefixes when exactly one person matches) and the event code; the database returns only that person's name, the design and a reference (`<slug>.<id>`). The browser draws the PDF, stamps a QR for `/verify?c=<reference>` (`certificate-verify.ts`) and offers the download. `cert_verify()` answers the QR, and counts the scan. Lookups are limited to 40 a minute per event. Files: `src/lib/cert-share.ts`, `certificate-verify.ts`, `src/components/tools/{share-panel,event-manager,claim-certificate,verify-certificate,verify-option,qr-code,use-cert-limit}`.
+
 ### 12.5 CV versions
 
 `/builder/versions` loads the saved CV, loads or creates 3 mixed versions, and shows a live card for each. Printing a version renders `PrintCopy` for `deriveCv(base, version)`, waits a few frames, sets `document.title` to the version's file name, and calls `window.print()`. "Download all" repeats this in order. Downloads go through the same payment gate.
@@ -542,6 +554,10 @@ Names are cleaned by `parseNames`; the first `FREE_BATCH` are used. `previewCert
 `trackEvent` sends to Vercel Analytics and to our own `events` table, except on the owner's devices and test copies (`owner.ts`). Only fixed event names and a random device id are sent, never personal data. `/admin` reads aggregate numbers through the admin-only `admin_stats()` function, called with the signed-in admin's own token.
 
 ---
+
+### 12.6b Counting people correctly
+
+`recordFirstVisit()` counts a new device only after it has stayed about 10 seconds, once, and never for robots (`isBot()` in `owner.ts`) or test copies. When the admin is logged in on a browser, `mark_owner_device()` deletes that device's earlier events and the `skip_owner_events` trigger drops its future ones, so testing on many browsers no longer inflates "people". To clear old inflated history once, run `delete from public.events;` in the SQL Editor.
 
 ## 13. Configuration: environment variables and switches
 

@@ -120,6 +120,13 @@ The charged amount is `pay_settings.price_pesewas` (500 = GH₵ 5) and the windo
 
 ---
 
+### 2.13 Change certificate limits, unlock a bigger batch, change the CV price
+
+- **Free batch:** `siteConfig.certificates.freeBatch` (browser, 15) and the table `cert_settings.free_names` (database, 15) must match.
+- **Unlock a bigger batch:** in Supabase, table `cert_grants`, add a row with the person's `user_id` (Authentication > Users), `max_names` (50, 200 or 500) and an `expires_at`. The price list shown to organisers is `siteConfig.certificates.bigger`.
+- **CV price:** the amount charged is `pay_settings.price_pesewas` in the database (500 = GH₵ 5); the text shown is `siteConfig.download.price`. Change both.
+- **Rosette words:** the default is `DEFAULT_BADGE_TEXT` in `certificates.ts`.
+
 ## 3. Data shape reference
 
 ### 3.1 The CV the student edits (`BuilderCv`, `src/lib/builder.ts`)
@@ -228,6 +235,12 @@ All routes are `POST`, JSON in and out, authenticated with `Authorization: Beare
 `is_admin()`; `admin_stats(days)` (admin only); `ai_use_credit()` returns `{ allowed, reason?, remaining }` (`reason` is `user_limit` or `site_limit`); `ai_refund_credit()`; `payment_start(p_cv_id)` returns `{ reference, amount }`; `payment_confirm(p_reference, p_amount, p_secret)` returns boolean (raises if the secret is wrong); `cv_access(p_cv_id)` returns `{ paid, expires_at?, owner? }`.
 
 ---
+
+### 4.4 Sharing, verification and dashboard functions
+
+`supabase/share.sql`: public `cert_event_info(slug)`, `cert_claim(slug, name, code)`, `cert_register(slug, name, code)`, `cert_verify(ref)`, `cert_limit()`; signed-in `cert_event_create`, `cert_event_open`, `cert_event_release`, `cert_event_update`, `cert_event_record`, `cert_recipient_add`, `cert_recipient_rename`, `cert_recipient_remove`. `supabase/admin-more.sql`: admin-only `admin_overview(days)`. `supabase/owner-devices.sql`: admin-only `mark_owner_device(device)`. All are `security definer` with fixed `search_path`; the app uses only the anon key and the user's own token.
+
+**Gotcha when editing SQL with scripts:** in JavaScript `String.replace`, `$$` in the replacement becomes `$`, which broke three function definitions once. Use a replacement function.
 
 ## 5. Security model
 

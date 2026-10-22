@@ -26,9 +26,11 @@
 
 **For organisers (live):** paste a list of names, choose from 35 original designs (wide and tall) or **upload their own certificate** (a Canva PDF or a photo), optionally add a logo anywhere on the page, and download a certificate for every person as a ZIP or one PDF to print. Free for up to 15 per batch.
 
-**Built but switched off:** one-time payment (GH₵ 5 per CV) through Paystack with mobile money and cards; AI writing help (rewrite a bullet, tidy a project, write a summary, correct speech-recognition mistakes), restricted to the owner while quality is checked.
+**Live in test mode:** one-time payment (GH₵ 5 per CV) through Paystack with mobile money and cards (live keys need Paystack's business verification). **Built but switched off:** AI writing help (rewrite a bullet, tidy a project, write a summary, correct speech-recognition mistakes), restricted to the owner while quality is checked.
 
-**Planned:** paid certificate batches; a QR code on each certificate that opens a "this certificate is real" page; a sign-up link so attendees add their own names; opening the AI to students.
+**Also live for organisers:** one shared link or QR so each person downloads only their own certificate (names pasted by the organiser, or added by attendees and then released), a verify QR on each certificate that opens a "this certificate is genuine" page, link management, and a bigger-batch unlock (50, 200 or 500) sold for about GH₵ 20, 50 or 100 and unlocked by an administrator today.
+
+**Planned:** automatic payment for bigger certificate batches; bulk email to every recipient; attendance-gated certificates for online bootcamps; opening the AI to students.
 
 ### A three-minute demo script
 
@@ -59,9 +61,9 @@
 
 | # | Stream | State | Price (designed) | Notes |
 |---|---|---|---|---|
-| 1 | **CV download** | Built, off | GH₵ 5 once per CV, 30 days of PDF, Word and all versions | Free to build and preview; pay only to download. Priced just under a local competitor's GH₵ 9 |
-| 2 | **Bulk certificates, paid batches** | Planned | Proposed: about GH₵ 20 up to 50, GH₵ 50 up to 200, GH₵ 100 up to 500 (to be tested) | Free up to 15 per batch applies to both built-in designs and uploaded certificates. Charging applies at the point of download beyond the free amount |
-| 3 | **Certificate extras** | Planned | To be set | QR verification, attendee sign-up link, WhatsApp delivery, "Made with CV11" footer removal |
+| 1 | **CV download** | Live, test mode | GH₵ 5 once per CV, 30 days of PDF, Word and all versions | Free to build and preview; pay only to download. Priced just under a local competitor's GH₵ 9 |
+| 2 | **Bulk certificates, paid batches** | Built; unlocked by hand today | Proposed: about GH₵ 20 up to 50, GH₵ 50 up to 200, GH₵ 100 up to 500 (to be tested) | Free up to 15 per batch applies to both built-in designs and uploaded certificates. Charging applies at the point of download beyond the free amount |
+| 3 | **Certificate extras** | Built: share link, self-register, verify QR | To be set | QR verification, attendee sign-up link, WhatsApp delivery, "Made with CV11" footer removal |
 | 4 | **Club or organisation plans** | Idea | To be set | For groups that issue certificates every month |
 | 5 | **AI pro features** | Idea | To be set | Only if students ask for more than the free daily AI allowance |
 
@@ -151,7 +153,7 @@ These are **arithmetic, not predictions**. The decisive unknown is the conversio
 | Now | CV builder, checker, letters, signing, interview prep, tracker, versions, certificates (35 designs, own design, logo) | Live |
 | Next | Switch payments on (Paystack keys, run the payments SQL, test mode, go live) and add pay-screen analytics | Built, needs keys |
 | Next | Own email sender for sign-up emails; Vercel Analytics enabled; testimonial consents | Owner tasks |
-| Soon | Certificate QR verification and attendee sign-up link; paid certificate batches | Planned |
+| Done | Certificate share link, attendee sign-up and verify QR; manual bigger-batch unlocks | Live |
 | Soon | Open the AI writing help to students with daily limits | Built, off |
 | Later | Typing-time suggestions; a certificate-to-CV loop ("add this to my CV"); more fields and templates; automated tests and CI | Planned |
 
